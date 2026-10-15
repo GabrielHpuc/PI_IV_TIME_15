@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar conta | AgroRecursos</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="/js/cadastro.js" defer></script>
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <a class="brand" href="/">AgroRecursos</a>
+    <h1>Crie sua conta</h1>
+    <p class="muted">Comece a encontrar insumos para sua atividade.</p>
+
+    <form id="register-form">
+      <label for="name">Nome completo</label>
+      <input id="name" name="name" required minlength="2" maxlength="100"
+        autocomplete="name" placeholder="Seu nome">
+
+      <label for="email">E-mail</label>
+      <input id="email" name="email" type="email" required maxlength="254"
+        autocomplete="email" placeholder="seu@email.com">
+
+      <label for="password">Senha</label>
+      <input id="password" name="password" type="password" required
+        minlength="8" maxlength="72" autocomplete="new-password"
+        placeholder="Mínimo de 8 caracteres">
+
+      <label for="accountType">Tipo de conta</label>
+      <select id="accountType" name="accountType" required>
+        <option value="">Selecione</option>
+        <option value="produtor">Produtor rural</option>
+        <option value="fornecedor">Fornecedor</option>
+      </select>
+
+      <button class="button full-width" type="submit">Criar conta</button>
+      <p id="message" class="form-message" role="status" aria-live="polite"></p>
+    </form>
+
+    <p class="auth-footer">
+      Já tem conta? <a href="/login.html">Entrar</a>
+    </p>
+  </main>
+</body>
+</html>

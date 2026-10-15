@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha conta | AgroRecursos</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="/js/minha-conta.js" defer></script>
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <a class="brand" href="/">AgroRecursos</a>
+    <h1>Minha conta</h1>
+    <p id="account-status" class="muted">Carregando seus dados...</p>
+
+    <section id="account-data" hidden>
+      <p><strong>Nome:</strong> <span id="account-name"></span></p>
+      <p><strong>E-mail:</strong> <span id="account-email"></span></p>
+      <p><strong>Tipo:</strong> <span id="account-type"></span></p>
+
+      <button id="logout-button" class="button full-width" type="button">
+        Sair da conta
+      </button>
+    </section>
+
+    <a href="/" class="auth-footer">Voltar ao início</a>
+  </main>
+</body>
+</html>
