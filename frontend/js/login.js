@@ -29,7 +29,7 @@ form.addEventListener("submit", async (event) => {
       throw new Error(result.message || "Não foi possível entrar.");
     }
 
-    window.location.href = "/minha-conta.html";
+    window.location.href = "/dashboard.html";
   } catch (error) {
     message.textContent = error.message;
   } finally {

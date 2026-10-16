@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,29 +10,43 @@
 <body class="auth-page">
   <main class="auth-card">
     <a class="brand" href="/">AgroRecursos</a>
-    <h1>Bem-vindo de volta</h1>
+
+    <h1>Bem-vindo de volta!</h1>
     <p class="muted">Entre para acessar sua conta.</p>
 
     <form id="login-form">
       <label for="email">E-mail</label>
-      <input id="email" name="email" type="email" required maxlength="254"
-        autocomplete="email" placeholder="seu@email.com">
+      <input
+        id="email"
+        name="email"
+        type="email"
+        autocomplete="email"
+        placeholder="seu@email.com"
+        required
+      >
 
       <label for="password">Senha</label>
-      <input id="password" name="password" type="password" required
-        maxlength="72" autocomplete="current-password"
-        placeholder="Sua senha">
-
-      <div class="forgot-link">
-        <a href="/esqueci-senha.html">Esqueci minha senha</a>
-      </div>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Sua senha"
+        required
+      >
 
       <button class="button full-width" type="submit">Entrar</button>
-      <p id="message" class="form-message" role="status" aria-live="polite"></p>
+
+      <p id="message" class="form-message" role="status"></p>
     </form>
 
     <p class="auth-footer">
-      Ainda não tem conta? <a href="/cadastro.html">Criar conta</a>
+      Ainda não tem conta?
+      <a href="/cadastro.html">Criar conta</a>
+    </p>
+
+    <p class="auth-footer">
+      <a href="/">Voltar ao início</a>
     </p>
   </main>
 </body>

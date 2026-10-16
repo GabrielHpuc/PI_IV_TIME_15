@@ -1,30 +1,48 @@
-
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minha conta | AgroRecursos</title>
-  <link rel="stylesheet" href="/css/global.css">
-  <script src="/js/minha-conta.js" defer></script>
-</head>
-<body class="auth-page">
-  <main class="auth-card">
-    <a class="brand" href="/">AgroRecursos</a>
-    <h1>Minha conta</h1>
-    <p id="account-status" class="muted">Carregando seus dados...</p>
-
-    <section id="account-data" hidden>
-      <p><strong>Nome:</strong> <span id="account-name"></span></p>
-      <p><strong>E-mail:</strong> <span id="account-email"></span></p>
-      <p><strong>Tipo:</strong> <span id="account-type"></span></p>
-
-      <button id="logout-button" class="button full-width" type="button">
-        Sair da conta
-      </button>
-    </section>
-
-    <a href="/" class="auth-footer">Voltar ao início</a>
-  </main>
-</body>
-</html>
+<html lang="pt-BR"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minha conta | AgroRecursos</title>
+<link rel="stylesheet" href="/css/global.css"><script src="/js/minha-conta.js" defer></script>
+</head><body class="account-page">
+<aside class="account-sidebar">
+<a class="account-brand" href="/dashboard.html">AgroRecursos</a>
+<div class="sidebar-user"><div class="user-avatar" id="user-avatar">A</div><div><strong id="sidebar-name">Carregando...</strong><span id="sidebar-type">Minha conta</span></div></div>
+<nav class="account-nav" aria-label="Menu da conta">
+<button type="button" class="account-nav-item active" data-section="overview">⌂ Minha conta</button>
+<button type="button" class="account-nav-item" data-section="cart">🛒 Carrinho</button>
+<button type="button" class="account-nav-item" data-section="favorites">♡ Favoritos</button>
+<button type="button" class="account-nav-item" data-section="purchases">▤ Minhas compras</button>
+<a class="account-nav-item" href="/dashboard.html">⌂ Início</a>
+</nav><button id="logout-button" class="logout-button" type="button">↪ Sair da conta</button>
+</aside>
+<main class="account-main">
+<header class="account-header"><div><p class="account-eyebrow">ÁREA DO USUÁRIO</p><h1 id="page-title">Minha conta</h1><p class="muted">Gerencie seus dados e acompanhe suas atividades.</p></div><a href="/dashboard.html" class="back-home">Voltar ao painel ↗</a></header>
+<p id="account-status" class="account-message" role="status">Carregando seus dados...</p>
+<section id="overview-section" class="account-section" hidden>
+<div class="welcome-card"><div><p>SEJA BEM-VINDO(A)!</p><h2 id="welcome-name">Olá!</h2><span>Este é o seu espaço no AgroRecursos.</span></div><div class="welcome-icon">🌱</div></div>
+<div class="account-card"><div class="card-heading"><div><h2>Meu perfil</h2><p>Confira seus dados.</p></div><button type="button" class="text-button" data-section="edit-profile">Editar perfil →</button></div>
+<div class="profile-details">
+<div><span>Nome completo</span><strong id="profile-name">—</strong></div><div><span>E-mail</span><strong id="profile-email">—</strong></div><div><span>Tipo de conta</span><strong id="profile-type">—</strong></div><div><span>Telefone</span><strong id="profile-phone">Não informado</strong></div><div><span>CPF/CNPJ</span><strong id="profile-document">Não informado</strong></div><div><span>Endereço</span><strong id="profile-address">Não informado</strong></div>
+</div></div>
+<div class="account-shortcuts"><button type="button" class="shortcut-card" data-section="purchases"><strong>Minhas compras</strong><span>Consulte seus pedidos</span></button><button type="button" class="shortcut-card" data-section="favorites"><strong>Meus favoritos</strong><span>Reúna produtos de interesse</span></button></div>
+</section>
+<section id="edit-profile-section" class="account-section" hidden><div class="account-card"><h2>Editar perfil</h2><p>Preencha os dados que faltam ou altere-os depois.</p>
+<form id="profile-form" class="profile-form">
+<h3>Dados pessoais</h3><label for="edit-name">Nome completo *</label><input id="edit-name" name="name" autocomplete="name" minlength="2" maxlength="100" required>
+<label for="edit-email">E-mail *</label><input id="edit-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+<label for="edit-phone">Telefone</label><input id="edit-phone" name="phone" type="tel" autocomplete="tel" maxlength="20" placeholder="(19) 99999-9999">
+<label for="edit-document">CPF ou CNPJ</label><input id="edit-document" name="document" inputmode="numeric" maxlength="18" placeholder="CPF ou CNPJ">
+<small>Campos complementares podem ser preenchidos aos poucos.</small>
+<h3>Endereço</h3><label for="edit-cep">CEP</label><input id="edit-cep" name="cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000">
+<label for="edit-street">Rua / Logradouro</label><input id="edit-street" name="street" autocomplete="address-line1" maxlength="120">
+<div class="form-grid-two"><div><label for="edit-number">Número</label><input id="edit-number" name="number" maxlength="20"></div><div><label for="edit-complement">Complemento</label><input id="edit-complement" name="complement" maxlength="80"></div></div>
+<label for="edit-neighborhood">Bairro</label><input id="edit-neighborhood" name="neighborhood" maxlength="80">
+<div class="form-grid-two"><div><label for="edit-city">Cidade</label><input id="edit-city" name="city" maxlength="80"></div><div><label for="edit-state">Estado (UF)</label><select id="edit-state" name="state"><option value="">Selecione</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select></div></div>
+<label for="edit-account-type">Tipo de conta</label><input id="edit-account-type" disabled><small>O tipo de conta controla as permissões e não é alterado nesta tela.</small>
+<p id="profile-message" class="account-message" role="status" aria-live="polite"></p><div class="form-actions"><button type="button" class="button button-outline" data-section="overview">Cancelar</button><button id="save-profile" type="submit" class="button">Salvar alterações</button></div>
+</form></div></section>
+<section id="cart-section" class="account-section" hidden><div class="account-card empty-state"><h2>Seu carrinho</h2><p>Será conectado ao catálogo em uma próxima etapa.</p><a href="/dashboard.html" class="button">Voltar ao painel</a></div></section>
+<section id="favorites-section" class="account-section" hidden><div class="account-card empty-state"><h2>Seus favoritos</h2><p>Esta área será conectada ao catálogo em uma próxima etapa.</p></div></section>
+<section id="purchases-section" class="account-section" hidden><div class="account-card empty-state"><h2>Minhas compras</h2><p>O histórico aparecerá aqui quando os pedidos forem implementados.</p></div></section>
+<footer class="account-footer">AgroRecursos MarketPlace · Projeto Integrador IV · PUC-Campinas</footer>
+</main></body></html>

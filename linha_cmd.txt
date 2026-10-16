@@ -1,0 +1,34 @@
+git --version
+git version 2.49.0.windows.1
+
+node -v
+v22.14.0
+
+npm -v
+11.6.4
+
+raiz// 
+npm install
+
+npm list --depth=0
+
+
+
+//caso não funcionar o npm install
+npm install --save-dev nodemon
+
+
+//dependencias do mongo bd
+npm install express mongodb dotenv bcryptjs express-session connect-mongo helmet express-rate-limit
+
+npm install --save-dev nodemon
+
+npm run dev
+-> isso tem q gerar o:
+[nodemon] 3.1.14
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: js,mjs,cjs,json
+[nodemon] starting `node backend/src/app.js`
+MongoDB conectado com sucesso.
+AgroRecursos disponível em http://localhost:3000

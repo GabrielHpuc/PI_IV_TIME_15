@@ -3,15 +3,6 @@ const form = document.querySelector("#register-form");
 const message = document.querySelector("#message");
 const button = form.querySelector('button[type="submit"]');
 
-const formData = new FormData(form);
-
-const data = {
-  name: formData.get("name").trim(),
-  email: formData.get("email").trim(),
-  password: formData.get("password"),
-  accountType: formData.get("accountType")
-};
-
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -41,7 +32,7 @@ form.addEventListener("submit", async (event) => {
     }
 
     form.reset();
-    window.location.href = "/minha-conta.html";
+    window.location.href = "/dashboard.html";
   } catch (error) {
     message.textContent = error.message;
   } finally {

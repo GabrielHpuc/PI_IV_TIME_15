@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Painel do AgroRecursos MarketPlace">
+  <title>Painel | AgroRecursos</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="/js/dashboard.js" defer></script>
+</head>
+<body class="dashboard-page">
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-brand" href="/dashboard.html">
+      <span class="brand-mark">A</span>
+      <span><strong>AgroRecursos</strong><small>Marketplace agro</small></span>
+    </a>
+    <div class="sidebar-user">
+      <div class="avatar" id="user-avatar">A</div>
+      <div class="sidebar-user-info">
+        <strong id="user-name">Carregando...</strong>
+        <small id="user-type">Sua conta</small>
+      </div>
+    </div>
+
+    <nav class="side-nav" aria-label="Menu do painel">
+      <p class="nav-caption">MENU PRINCIPAL</p>
+      <a class="side-link active" href="/dashboard.html" data-page="inicio"><span>⌂</span> Início</a>
+      <a class="side-link buyer-link" href="/dashboard.html?page=catalogo" data-page="catalogo"><span>▦</span> Catálogo de produtos</a>
+      <a class="side-link buyer-link" href="/dashboard.html?page=favoritos" data-page="favoritos"><span>♡</span> Favoritos</a>
+      <a class="side-link buyer-link" href="/dashboard.html?page=carrinho" data-page="carrinho"><span>🛒</span> Carrinho</a>
+      <a class="side-link buyer-link" href="/dashboard.html?page=pedidos" data-page="pedidos"><span>▤</span> Histórico de compras</a>
+
+      <div class="supplier-nav" id="supplier-nav" hidden>
+        <p class="nav-caption">ÁREA DO FORNECEDOR</p>
+        <a class="side-link" href="/dashboard.html?page=produto" data-page="produto"><span>＋</span> Cadastrar produto</a>
+        <a class="side-link" href="/dashboard.html?page=produtos" data-page="produtos"><span>▣</span> Meus produtos</a>
+        <a class="side-link" href="/dashboard.html?page=vendas" data-page="vendas"><span>↗</span> Pedidos e vendas</a>
+        <a class="side-link" href="/dashboard.html?page=historico-vendas" data-page="historico-vendas"><span>◷</span> Histórico de vendas</a>
+      </div>
+
+      <p class="nav-caption">CONTA</p>
+      <a class="side-link" href="/minha-conta.html"><span>♙</span> Meu perfil</a>
+    </nav>
+
+    <button id="logout-button" class="sidebar-logout" type="button"><span>↪</span> Sair da conta</button>
+  </aside>
+
+  <div class="dashboard-main">
+    <header class="dashboard-topbar">
+      <button class="mobile-menu-button" id="mobile-menu-button" type="button" aria-label="Abrir menu">☰</button>
+      <div class="breadcrumbs">AgroRecursos <span>/</span> <strong id="breadcrumb-current">Início</strong></div>
+      <a class="topbar-profile" href="/minha-conta.html"><span class="topbar-avatar" id="topbar-avatar">A</span><span id="topbar-name">Minha conta</span></a>
+    </header>
+
+    <main class="dashboard-content">
+      <section id="dashboard-home">
+        <div class="dashboard-welcome">
+          <div>
+            <p class="eyebrow">PAINEL AGRORECURSOS</p>
+            <h1 id="welcome-title">Bem-vindo(a)!</h1>
+            <p id="welcome-description">Encontre insumos, compare informações e acompanhe suas atividades em um só lugar.</p>
+          </div>
+          <div class="welcome-illustration" aria-hidden="true">🌱</div>
+        </div>
+
+        <div class="dashboard-section-heading">
+          <div><h2>Acesso rápido</h2><p>Atalhos para as áreas principais da plataforma.</p></div>
+        </div>
+        <div class="quick-grid" id="quick-grid">
+          <a class="quick-card buyer-link" href="/dashboard.html?page=catalogo"><span class="quick-icon">▦</span><strong>Explorar produtos</strong><small>Encontre insumos agropecuários</small><span class="quick-arrow">→</span></a>
+          <a class="quick-card buyer-link" href="/dashboard.html?page=favoritos"><span class="quick-icon">♡</span><strong>Meus favoritos</strong><small>Veja os produtos salvos</small><span class="quick-arrow">→</span></a>
+          <a class="quick-card buyer-link" href="/dashboard.html?page=carrinho"><span class="quick-icon">🛒</span><strong>Meu carrinho</strong><small>Revise os itens selecionados</small><span class="quick-arrow">→</span></a>
+          <a class="quick-card supplier-only" href="/dashboard.html?page=produto" hidden><span class="quick-icon">＋</span><strong>Cadastrar produto</strong><small>Disponibilize um novo insumo</small><span class="quick-arrow">→</span></a>
+          <a class="quick-card supplier-only" href="/dashboard.html?page=vendas" hidden><span class="quick-icon">↗</span><strong>Pedidos e vendas</strong><small>Acompanhe pedidos recebidos</small><span class="quick-arrow">→</span></a>
+          <a class="quick-card" href="/minha-conta.html"><span class="quick-icon">♙</span><strong>Meu perfil</strong><small>Consulte os dados da sua conta</small><span class="quick-arrow">→</span></a>
+        </div>
+
+        <div class="dashboard-section-heading section-spaced">
+          <div><h2>Resumo da atividade</h2><p>Seu painel está pronto para receber os dados reais.</p></div>
+        </div>
+        <div class="summary-grid">
+          <article class="summary-card"><span class="summary-label" id="summary-label-one">Compras</span><strong>—</strong><small>Integração pendente</small></article>
+          <article class="summary-card"><span class="summary-label" id="summary-label-two">Favoritos</span><strong>—</strong><small>Integração pendente</small></article>
+          <article class="summary-card"><span class="summary-label" id="summary-label-three">Cotações</span><strong>—</strong><small>Integração pendente</small></article>
+        </div>
+        <div class="notice-card"><span class="notice-icon">ⓘ</span><div><strong>Área inicial em desenvolvimento</strong><p>O menu e a navegação já estão organizados. Catálogo, carrinho, favoritos, pedidos e vendas serão conectados ao banco de dados nas próximas etapas.</p></div></div>
+      </section>
+
+      <section id="dashboard-placeholder" hidden>
+        <div class="page-heading"><p class="eyebrow">AGRORECURSOS</p><h1 id="placeholder-title">Área</h1><p id="placeholder-description"></p></div>
+        <div class="empty-state"><div class="empty-state-icon" id="placeholder-icon">🌱</div><h2>Estamos preparando esta área</h2><p id="placeholder-message">Esta seção terá suas funcionalidades em uma próxima etapa.</p><a class="button" href="/dashboard.html">Voltar ao início</a></div>
+      </section>
+    </main>
+    <footer class="dashboard-footer">AgroRecursos MarketPlace · Projeto Integrador IV · PUC-Campinas</footer>
+  </div>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+</body>
+</html>

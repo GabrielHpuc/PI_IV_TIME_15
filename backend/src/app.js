@@ -22,6 +22,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const frontendPath = path.resolve(__dirname, "../../frontend");
 
+console.log("Pasta frontend:", frontendPath);
+console.log(
+  "index.html encontrado:",
+  (await import("node:fs")).existsSync(
+    path.join(frontendPath, "index.html")
+  )
+);
+
 if (!process.env.SESSION_SECRET) {
   throw new Error("Configure SESSION_SECRET no arquivo .env.");
 }

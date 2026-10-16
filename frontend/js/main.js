@@ -1,19 +1,16 @@
-
-async function checkServer() {
+async function verificarServidor() {
   try {
     const response = await fetch("/api/health");
-    const data = await response.json();
 
-    if (!response.ok || data.status !== "ok") {
+    if (!response.ok) {
       throw new Error("Servidor indisponível.");
     }
 
-    console.info("API AgroRecursos conectada:", data.application);
+    const data = await response.json();
+    console.log("AgroRecursos conectado:", data);
   } catch (error) {
-    console.error("Não foi possível acessar a API:", error.message);
+    console.error("Erro ao verificar servidor:", error);
   }
 }
 
-checkServer();
-
-
+verificarServidor();

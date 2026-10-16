@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,22 +10,45 @@
 <body class="auth-page">
   <main class="auth-card">
     <a class="brand" href="/">AgroRecursos</a>
+
     <h1>Crie sua conta</h1>
-    <p class="muted">Comece a encontrar insumos para sua atividade.</p>
+    <p class="muted">Cadastre-se no AgroRecursos.</p>
 
     <form id="register-form">
       <label for="name">Nome completo</label>
-      <input id="name" name="name" required minlength="2" maxlength="100"
-        autocomplete="name" placeholder="Seu nome">
+      <input
+        id="name"
+        name="name"
+        type="text"
+        minlength="2"
+        maxlength="100"
+        autocomplete="name"
+        placeholder="Seu nome completo"
+        required
+      >
 
       <label for="email">E-mail</label>
-      <input id="email" name="email" type="email" required maxlength="254"
-        autocomplete="email" placeholder="seu@email.com">
+      <input
+        id="email"
+        name="email"
+        type="email"
+        maxlength="254"
+        autocomplete="email"
+        placeholder="seu@email.com"
+        required
+      >
 
       <label for="password">Senha</label>
-      <input id="password" name="password" type="password" required
-        minlength="8" maxlength="72" autocomplete="new-password"
-        placeholder="Mínimo de 8 caracteres">
+      <input
+        id="password"
+        name="password"
+        type="password"
+        minlength="8"
+        maxlength="72"
+        autocomplete="new-password"
+        placeholder="Mínimo de 8 caracteres"
+        required
+      >
 
       <label for="accountType">Tipo de conta</label>
       <select id="accountType" name="accountType" required>
@@ -35,12 +57,20 @@
         <option value="fornecedor">Fornecedor</option>
       </select>
 
-      <button class="button full-width" type="submit">Criar conta</button>
-      <p id="message" class="form-message" role="status" aria-live="polite"></p>
+      <button class="button full-width" type="submit">
+        Criar conta
+      </button>
+
+      <p id="message" class="form-message" role="status"></p>
     </form>
 
     <p class="auth-footer">
-      Já tem conta? <a href="/login.html">Entrar</a>
+      Já tem conta?
+      <a href="/login.html">Entrar</a>
+    </p>
+
+    <p class="auth-footer">
+      <a href="/">Voltar ao início</a>
     </p>
   </main>
 </body>
