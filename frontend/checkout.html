@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | AgroRecursos</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/marketplace.css">
+  <script src="js/marketplace.js" defer></script>
+  <script src="js/checkout.js" defer></script>
+</head>
+<body class="mk-page" data-pagina="checkout" data-header="checkout">
+  <header id="site-header"></header>
+
+  <main class="mk-content">
+    <div class="checkout-layout">
+      <div>
+        <h1>Checkout</h1>
+
+        <section class="checkout-bloco mk-card">
+          <h2>1. Revisão do Pedido</h2>
+          <div id="itens-pedido"></div>
+          <div class="aviso-entrega" id="aviso-entrega" hidden>
+            <span data-icone="caminhao"></span>
+            <span><strong>Prazo de entrega 'na porteira':</strong> seu pedido será entregue diretamente na sua fazenda em até <span id="prazo-entrega">3</span> dias úteis.</span>
+          </div>
+        </section>
+
+        <section class="checkout-bloco mk-card">
+          <h2>2. Dados de Entrega</h2>
+          <form id="form-entrega" class="form-endereco" novalidate>
+            <div class="c6 cep-linha">
+              <label for="cep">CEP de Fazenda
+                <input id="cep" name="cep" inputmode="numeric" maxlength="9" placeholder="CEP" autocomplete="postal-code" required>
+              </label>
+              <button class="mk-btn mk-btn-verde" type="button" id="calcular-frete">Calcular</button>
+            </div>
+            <label class="c6" for="rua">Endereço Completo
+              <input id="rua" name="rua" placeholder="Rua" autocomplete="address-line1" required>
+            </label>
+            <label class="c2" for="numero">Número
+              <input id="numero" name="numero" placeholder="Número" required>
+            </label>
+            <label class="c4" for="complemento">Complemento
+              <input id="complemento" name="complemento" placeholder="Complemento">
+            </label>
+            <label class="c2" for="bairro">Bairro
+              <input id="bairro" name="bairro" placeholder="Bairro" required>
+            </label>
+            <label class="c3" for="cidade">Cidade
+              <input id="cidade" name="cidade" placeholder="Cidade" required>
+            </label>
+            <label class="c1" for="estado">Estado
+              <input id="estado" name="estado" placeholder="UF" maxlength="2" required>
+            </label>
+            <label class="c6" for="observacoes">Campo opcional
+              <textarea id="observacoes" name="observacoes" rows="2" placeholder="Observações de entrega na fazenda (ex: ponto de referência, acesso)"></textarea>
+            </label>
+          </form>
+        </section>
+      </div>
+
+      <aside class="resumo mk-card" aria-label="Resumo do pedido">
+        <h2>Resumo do Pedido</h2>
+        <div class="resumo-linha"><span id="resumo-subtotal-rotulo">Subtotal (0 itens)</span><span id="resumo-subtotal">R$ 0,00</span></div>
+        <div class="resumo-linha"><span>Frete calculado<small id="resumo-frete-cep">Informe o CEP</small></span><span id="resumo-frete">—</span></div>
+        <div class="resumo-linha resumo-total"><span>Total</span><span id="resumo-total">R$ 0,00</span></div>
+        <button class="mk-btn mk-btn-verde mk-btn-grande" type="button" id="prosseguir">Prosseguir para Pagamento ›</button>
+        <p class="mensagem-checkout" id="mensagem-checkout" role="status"></p>
+
+        <p class="pagamento-titulo">Seleção de método de pagamento seguro</p>
+        <label class="pagamento-opcao"><input type="radio" name="pagamento" value="boleto"> <span>Boleto Bancário</span></label>
+        <label class="pagamento-opcao"><input type="radio" name="pagamento" value="cartao" checked> <span>Cartão de Crédito<small>Até 12x sem juros</small></span></label>
+        <label class="pagamento-parcelas" id="parcelas-rotulo">Parcelas
+          <select id="parcelas" name="parcelas"></select>
+        </label>
+        <label class="pagamento-opcao"><input type="radio" name="pagamento" value="credito_rural"> <span>Crédito Rural<small>Processo simplificado</small></span></label>
+
+        <div class="garantias"><span>Compra 100% segura</span><span>Garantia de laudo MAPA</span></div>
+      </aside>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+</body>
+</html>
