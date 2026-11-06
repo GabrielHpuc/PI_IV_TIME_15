@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "node backend/src/app.js",
-    "dev": "nodemon backend/src/app.js"
+    "dev": "nodemon backend/src/app.js",
+    "seed": "node backend/scripts/seed.js",
+    "test": "node --test",
+    "smoke": "node backend/scripts/smoke.mjs"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

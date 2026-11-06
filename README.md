@@ -178,9 +178,10 @@ A arquitetura inicialmente proposta durante a etapa de ideação considera as se
 
 | Tecnologia | Aplicação prevista |
 |---|---|
-| Java | Desenvolvimento do back-end |
+| Java | Desenvolvimento do servidor (nao desenvolver sera feito depois do preojeto pronto) |
 | MongoDB | Persistência de dados em banco NoSQL |
 | HTML | Estruturação da interface web |
+| JavaScript | Desenvolvimento do back-end |
 
 A definição da stack tecnológica poderá ser revisada conforme a evolução dos requisitos e as necessidades técnicas identificadas durante o desenvolvimento.
 
