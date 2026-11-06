@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redefinir senha | AgroRecursos</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/marketplace.css">
+  <script src="js/redefinir-senha.js" defer></script>
+</head>
+<body class="rec-page">
+  <main class="rec-main">
+    <section class="rec-card">
+      <a class="rec-brand" href="index.html">
+        <span class="rec-brand-logo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="M5 19c3-5 6-8 10-10"/></svg></span>
+        <span class="rec-brand-text"><strong>AgroRecursos</strong><small>MarketPlace</small></span>
+      </a>
+
+      <h1 class="rec-titulo">REDEFINIR SENHA</h1>
+      <div class="rec-linha" aria-hidden="true"></div>
+
+      <form id="reset-form" class="rec-form">
+        <label for="password">Nova senha</label>
+        <div class="rec-campo">
+          <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="Mínimo de 8 caracteres" required>
+        </div>
+        <label for="confirm">Confirmar nova senha</label>
+        <div class="rec-campo">
+          <input id="confirm" name="confirm" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="Repita a senha" required>
+        </div>
+
+        <button class="rec-botao" type="submit">Salvar nova senha →</button>
+        <p id="message" class="form-message rec-mensagem" role="status"></p>
+      </form>
+    </section>
+
+    <footer class="rec-rodape">
+      <nav aria-label="Rodapé">
+        <a href="#">Sobre Nós</a>
+        <a href="#">Termos de Uso</a>
+        <a href="#">Ajuda</a>
+        <a href="#">Contato</a>
+      </nav>
+      <p>© 2026 AgroRecursos MarketPlace</p>
+    </footer>
+  </main>
+</body>
+</html>

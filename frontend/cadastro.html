@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar conta | AgroRecursos</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/marketplace.css">
+  <script src="js/cadastro.js" defer></script>
+</head>
+<body class="rec-page cad-page">
+  <main class="rec-main">
+    <section class="rec-card">
+      <a class="rec-brand" href="index.html">
+        <span class="rec-brand-logo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="M5 19c3-5 6-8 10-10"/></svg></span>
+        <span class="rec-brand-text"><strong>AgroRecursos</strong><small>MarketPlace</small></span>
+      </a>
+
+      <div class="cad-abas" role="tablist">
+        <span class="cad-aba ativa" role="tab" aria-selected="true">REGISTRO</span>
+        <a class="cad-aba" href="login.html" role="tab" aria-selected="false">ENTRAR</a>
+      </div>
+
+      <div class="cad-tipos">
+        <button type="button" class="cad-tipo ativo" data-tipo="produtor" aria-pressed="true">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+          SOU PRODUTOR
+        </button>
+        <button type="button" class="cad-tipo" data-tipo="fornecedor" aria-pressed="false">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5l8-2v18M12 9h8v12M4 21h16M8 8h.01M8 12h.01M8 16h.01M16 13h.01M16 17h.01"/></svg>
+          SOU FORNECEDOR
+        </button>
+      </div>
+
+      <ol class="cad-passos" id="cad-passos" aria-label="Etapas do cadastro"></ol>
+
+      <form id="register-form" class="rec-form" novalidate>
+        <div class="cad-grupo" id="g-produtor-1">
+          <label for="p-nome">Nome Completo</label>
+          <div class="rec-campo"><input id="p-nome" name="nome" maxlength="100" autocomplete="name" placeholder="Nome Completo"></div>
+          <label for="p-doc">CPF / CNPJ</label>
+          <div class="rec-campo"><input id="p-doc" name="documento" inputmode="numeric" maxlength="18" placeholder="CPF / CNPJ"></div>
+          <div class="cad-duas">
+            <div><label for="p-cel">Celular</label><div class="rec-campo"><input id="p-cel" name="celular" inputmode="tel" maxlength="15" autocomplete="tel" placeholder="(00) 00000-0000"></div></div>
+            <div><label for="p-email">E-mail</label><div class="rec-campo"><input id="p-email" name="email" type="email" maxlength="254" autocomplete="email" placeholder="E-mail"></div></div>
+          </div>
+        </div>
+
+        <div class="cad-grupo" id="g-fornecedor-1" hidden>
+          <label for="f-razao">Razão Social</label>
+          <div class="rec-campo"><input id="f-razao" name="razao" maxlength="120" placeholder="Razão Social"></div>
+          <label for="f-cnpj">CNPJ</label>
+          <div class="rec-campo"><input id="f-cnpj" name="cnpj" inputmode="numeric" maxlength="18" placeholder="CNPJ"></div>
+          <div class="cad-duas">
+            <div><label for="f-fantasia">Nome Fantasia</label><div class="rec-campo"><input id="f-fantasia" name="fantasia" maxlength="120" placeholder="Nome Fantasia"></div></div>
+            <div><label for="f-ie">Inscrição Estadual</label><div class="rec-campo"><input id="f-ie" name="ie" maxlength="20" placeholder="Inscrição Estadual"></div></div>
+          </div>
+        </div>
+
+        <div class="cad-grupo" id="g-fornecedor-2" hidden>
+          <label for="f-resp">Nome do Responsável</label>
+          <div class="rec-campo"><input id="f-resp" name="responsavel" maxlength="100" autocomplete="name" placeholder="Nome do Responsável"></div>
+          <div class="cad-duas">
+            <div><label for="f-cel">Celular</label><div class="rec-campo"><input id="f-cel" name="celularf" inputmode="tel" maxlength="15" autocomplete="tel" placeholder="(00) 00000-0000"></div></div>
+            <div><label for="f-email">E-mail</label><div class="rec-campo"><input id="f-email" name="emailf" type="email" maxlength="254" autocomplete="email" placeholder="E-mail"></div></div>
+          </div>
+          <fieldset class="cad-categorias">
+            <legend>Categorias que você vende</legend>
+            <label><input type="checkbox" name="categorias" value="Sementes"> Sementes</label>
+            <label><input type="checkbox" name="categorias" value="Fertilizantes"> Fertilizantes</label>
+            <label><input type="checkbox" name="categorias" value="Defensivos"> Defensivos</label>
+            <label><input type="checkbox" name="categorias" value="Outros"> Outros</label>
+          </fieldset>
+        </div>
+
+        <div class="cad-grupo" id="g-senha" hidden>
+          <label for="senha">Senha</label>
+          <div class="rec-campo"><input id="senha" name="senha" type="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="Mínimo de 8 caracteres"></div>
+          <label for="confirma">Confirmar senha</label>
+          <div class="rec-campo"><input id="confirma" name="confirma" type="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="Repita a senha"></div>
+        </div>
+
+        <div class="cad-botoes">
+          <button class="cad-voltar" type="button" id="cad-voltar" hidden>← Voltar</button>
+          <button class="rec-botao" type="submit" id="cad-avancar">Continuar →</button>
+        </div>
+        <p id="message" class="form-message rec-mensagem" role="status"></p>
+      </form>
+    </section>
+
+    <footer class="rec-rodape">
+      <nav aria-label="Rodapé">
+        <a href="#">Sobre Nós</a>
+        <a href="#">Termos de Uso</a>
+        <a href="#">Ajuda</a>
+        <a href="#">Contato</a>
+      </nav>
+      <p>© 2026 AgroRecursos MarketPlace</p>
+    </footer>
+  </main>
+</body>
+</html>
