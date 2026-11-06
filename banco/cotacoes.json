@@ -1,0 +1,144 @@
+[
+  {
+    "_id": {
+      "$oid": "e50000000000000000000001"
+    },
+    "modelo": true,
+    "ordem": 1,
+    "seed": true,
+    "codigo": null,
+    "userId": null,
+    "item": "Sementes de Soja RR Super 40kg",
+    "quantidade": "200 Sacos",
+    "produtoId": null,
+    "diasValidade": 3,
+    "status": "analise",
+    "propostas": [
+      {
+        "_id": {
+          "$oid": "f60000000000000000000001"
+        },
+        "fornecedorId": {
+          "$oid": "a10000000000000000000001"
+        },
+        "fornecedor": "AgroVant",
+        "preco": 36000,
+        "laudo": true,
+        "prazo": 3,
+        "avaliacao": 4.5
+      },
+      {
+        "_id": {
+          "$oid": "f60000000000000000000002"
+        },
+        "fornecedorId": {
+          "$oid": "a10000000000000000000002"
+        },
+        "fornecedor": "CampoLimpo",
+        "preco": 37400,
+        "laudo": true,
+        "prazo": 4,
+        "avaliacao": 4
+      },
+      {
+        "_id": {
+          "$oid": "f60000000000000000000003"
+        },
+        "fornecedorId": {
+          "$oid": "a10000000000000000000003"
+        },
+        "fornecedor": "Sementes Brasil",
+        "preco": 36800,
+        "laudo": false,
+        "prazo": 5,
+        "avaliacao": 3.5
+      },
+      {
+        "_id": {
+          "$oid": "f60000000000000000000004"
+        },
+        "fornecedorId": {
+          "$oid": "a10000000000000000000004"
+        },
+        "fornecedor": "Safra Forte",
+        "preco": 38200,
+        "laudo": true,
+        "prazo": 2,
+        "avaliacao": 5
+      },
+      {
+        "_id": {
+          "$oid": "f60000000000000000000005"
+        },
+        "fornecedorId": {
+          "$oid": "a10000000000000000000005"
+        },
+        "fornecedor": "Terra Viva",
+        "preco": 37900,
+        "laudo": true,
+        "prazo": 6,
+        "avaliacao": 4
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "e50000000000000000000002"
+    },
+    "modelo": true,
+    "ordem": 2,
+    "seed": true,
+    "codigo": null,
+    "userId": null,
+    "item": "Fertilizante Adubo NPK 10-10-10 (Ton)",
+    "quantidade": "10 Tons",
+    "produtoId": null,
+    "diasValidade": 2,
+    "status": "aguardando",
+    "propostas": [
+      {
+        "_id": {
+          "$oid": "f60000000000000000000006"
+        },
+        "fornecedorId": {
+          "$oid": "a10000000000000000000001"
+        },
+        "fornecedor": "AgroVant",
+        "preco": 25000,
+        "laudo": true,
+        "prazo": 4,
+        "avaliacao": 4.5
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "e50000000000000000000003"
+    },
+    "modelo": true,
+    "ordem": 3,
+    "seed": true,
+    "codigo": null,
+    "userId": null,
+    "item": "Fertilizante Ureia 45% (Ton)",
+    "quantidade": "5 Tons",
+    "produtoId": null,
+    "diasValidade": 1,
+    "status": "aguardando",
+    "propostas": [
+      {
+        "_id": {
+          "$oid": "f60000000000000000000007"
+        },
+        "fornecedorId": {
+          "$oid": "a10000000000000000000002"
+        },
+        "fornecedor": "CampoLimpo",
+        "preco": 15500,
+        "laudo": true,
+        "prazo": 5,
+        "avaliacao": 4
+      }
+    ]
+  }
+]
