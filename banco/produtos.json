@@ -1,0 +1,994 @@
+[
+  {
+    "_id": {
+      "$oid": "b20000000000000000000001"
+    },
+    "nome": "Semente Soja RR Super 40kg",
+    "categoria": "Sementes",
+    "marca": "Monsanto",
+    "regiao": "Centro-Oeste",
+    "preco": 180,
+    "entregaDias": 3,
+    "cultura": "Soja",
+    "tecnologia": "RR Super",
+    "embalagem": "Saco: 40kg",
+    "germinacao": 92,
+    "vigor": 88,
+    "pureza": 99.5,
+    "vencimento": "06/2027",
+    "condicao": "Novo",
+    "vendidos": 120,
+    "estoque": 500,
+    "descricao": "Semente Soja RR Super 40kg. Tecnologia: RR Super. Saco: 40kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000001"
+    },
+    "chave": "semente soja rr super 40kg|monsanto",
+    "laudoId": {
+      "$oid": "c30000000000000000000001"
+    },
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000002"
+    },
+    "nome": "Semente Soja RR Light 40kg",
+    "categoria": "Sementes",
+    "marca": "Bayer",
+    "regiao": "Sul",
+    "preco": 172,
+    "entregaDias": 4,
+    "cultura": "Soja",
+    "tecnologia": "RR Light",
+    "embalagem": "Saco: 40kg",
+    "germinacao": 90,
+    "vigor": 85,
+    "pureza": 99.2,
+    "vencimento": "08/2027",
+    "condicao": "Novo",
+    "vendidos": 64,
+    "estoque": 500,
+    "descricao": "Semente Soja RR Light 40kg. Tecnologia: RR Light. Saco: 40kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000002"
+    },
+    "chave": "semente soja rr light 40kg|bayer",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000003"
+    },
+    "nome": "Semente Soja RR Sun 40kg",
+    "categoria": "Sementes",
+    "marca": "Syngenta",
+    "regiao": "Sudeste",
+    "preco": 195,
+    "entregaDias": 2,
+    "cultura": "Soja",
+    "tecnologia": "RR Sun",
+    "embalagem": "Saco: 40kg",
+    "germinacao": 94,
+    "vigor": 90,
+    "pureza": 99.7,
+    "vencimento": "09/2027",
+    "condicao": "Novo",
+    "vendidos": 88,
+    "estoque": 500,
+    "descricao": "Semente Soja RR Sun 40kg. Tecnologia: RR Sun. Saco: 40kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000003"
+    },
+    "chave": "semente soja rr sun 40kg|syngenta",
+    "laudoId": {
+      "$oid": "c30000000000000000000002"
+    },
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000004"
+    },
+    "nome": "Milho Híbrido KWS",
+    "categoria": "Sementes",
+    "marca": "KWS",
+    "regiao": "Sudeste",
+    "preco": 220,
+    "entregaDias": 3,
+    "cultura": "Milho",
+    "tecnologia": "Híbrido",
+    "embalagem": "Saco: 20kg",
+    "germinacao": 95,
+    "vigor": 91,
+    "pureza": 99.8,
+    "vencimento": "10/2027",
+    "condicao": "Novo",
+    "vendidos": 210,
+    "estoque": 500,
+    "descricao": "Milho Híbrido KWS. Tecnologia: Híbrido. Saco: 20kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000004"
+    },
+    "chave": "milho hibrido kws|kws",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000005"
+    },
+    "nome": "Semente Soja RR 40kg",
+    "categoria": "Sementes",
+    "marca": "Monsanto",
+    "regiao": "Nordeste",
+    "preco": 168,
+    "entregaDias": 6,
+    "cultura": "Soja",
+    "tecnologia": "RR",
+    "embalagem": "Saco: 40kg",
+    "germinacao": 89,
+    "vigor": 84,
+    "pureza": 99,
+    "vencimento": "07/2027",
+    "condicao": "Novo",
+    "vendidos": 41,
+    "estoque": 500,
+    "descricao": "Semente Soja RR 40kg. Tecnologia: RR. Saco: 40kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000005"
+    },
+    "chave": "semente soja rr 40kg|monsanto",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000006"
+    },
+    "nome": "Semente Soja RR Super 40kg Premium",
+    "categoria": "Sementes",
+    "marca": "KWS",
+    "regiao": "Centro-Oeste",
+    "preco": 189,
+    "entregaDias": 3,
+    "cultura": "Soja",
+    "tecnologia": "RR Super",
+    "embalagem": "Saco: 40kg",
+    "germinacao": 93,
+    "vigor": 89,
+    "pureza": 99.6,
+    "vencimento": "11/2027",
+    "condicao": "Novo",
+    "vendidos": 97,
+    "estoque": 500,
+    "descricao": "Semente Soja RR Super 40kg Premium. Tecnologia: RR Super. Saco: 40kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000001"
+    },
+    "chave": "semente soja rr super 40kg premium|kws",
+    "laudoId": {
+      "$oid": "c30000000000000000000003"
+    },
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000007"
+    },
+    "nome": "Adubo NPK 10-10-10 (Ton)",
+    "categoria": "Fertilizantes",
+    "marca": "Bayer",
+    "regiao": "Sudeste",
+    "preco": 2500,
+    "entregaDias": 4,
+    "cultura": "Diversas",
+    "tecnologia": "NPK 10-10-10",
+    "embalagem": "A granel: 1 tonelada",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "12/2027",
+    "condicao": "Novo",
+    "vendidos": 56,
+    "estoque": 500,
+    "descricao": "Adubo NPK 10-10-10 (Ton). Tecnologia: NPK 10-10-10. A granel: 1 tonelada.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000002"
+    },
+    "chave": "adubo npk 10-10-10 (ton)|bayer",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000008"
+    },
+    "nome": "Fertilizante Ureia 45% (Ton)",
+    "categoria": "Fertilizantes",
+    "marca": "Monsanto",
+    "regiao": "Sul",
+    "preco": 3100,
+    "entregaDias": 5,
+    "cultura": "Diversas",
+    "tecnologia": "Ureia 45% N",
+    "embalagem": "A granel: 1 tonelada",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "12/2027",
+    "condicao": "Novo",
+    "vendidos": 33,
+    "estoque": 500,
+    "descricao": "Fertilizante Ureia 45% (Ton). Tecnologia: Ureia 45% N. A granel: 1 tonelada.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000003"
+    },
+    "chave": "fertilizante ureia 45% (ton)|monsanto",
+    "laudoId": {
+      "$oid": "c30000000000000000000004"
+    },
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000009"
+    },
+    "nome": "Fertilizante MAP (Ton)",
+    "categoria": "Fertilizantes",
+    "marca": "Syngenta",
+    "regiao": "Centro-Oeste",
+    "preco": 4200,
+    "entregaDias": 6,
+    "cultura": "Diversas",
+    "tecnologia": "MAP 11-52-00",
+    "embalagem": "A granel: 1 tonelada",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "01/2028",
+    "condicao": "Novo",
+    "vendidos": 28,
+    "estoque": 500,
+    "descricao": "Fertilizante MAP (Ton). Tecnologia: MAP 11-52-00. A granel: 1 tonelada.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000004"
+    },
+    "chave": "fertilizante map (ton)|syngenta",
+    "laudoId": {
+      "$oid": "c30000000000000000000005"
+    },
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000010"
+    },
+    "nome": "Herbicida Glifosato (20L)",
+    "categoria": "Defensivos",
+    "marca": "Bayer",
+    "regiao": "Sudeste",
+    "preco": 350,
+    "entregaDias": 2,
+    "cultura": "Soja, Milho",
+    "tecnologia": "Glifosato",
+    "embalagem": "Galão: 20L",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "03/2027",
+    "condicao": "Novo",
+    "vendidos": 142,
+    "estoque": 500,
+    "descricao": "Herbicida Glifosato (20L). Tecnologia: Glifosato. Galão: 20L.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000005"
+    },
+    "chave": "herbicida glifosato (20l)|bayer",
+    "laudoId": {
+      "$oid": "c30000000000000000000006"
+    },
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000011"
+    },
+    "nome": "Herbicida Seletivo (20L)",
+    "categoria": "Defensivos",
+    "marca": "Syngenta",
+    "regiao": "Sul",
+    "preco": 410,
+    "entregaDias": 3,
+    "cultura": "Milho",
+    "tecnologia": "Seletivo",
+    "embalagem": "Galão: 20L",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "04/2027",
+    "condicao": "Novo",
+    "vendidos": 75,
+    "estoque": 500,
+    "descricao": "Herbicida Seletivo (20L). Tecnologia: Seletivo. Galão: 20L.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000001"
+    },
+    "chave": "herbicida seletivo (20l)|syngenta",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000012"
+    },
+    "nome": "Trator MF 4290 (Usado 2018)",
+    "categoria": "Outros",
+    "marca": "Monsanto",
+    "regiao": "Centro-Oeste",
+    "preco": 210000,
+    "entregaDias": 10,
+    "cultura": "Diversas",
+    "tecnologia": "Tração 4x4",
+    "embalagem": "Unidade",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "—",
+    "condicao": "Usado",
+    "vendidos": 1,
+    "estoque": 500,
+    "descricao": "Trator MF 4290 (Usado 2018). Tecnologia: Tração 4x4. Unidade.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000002"
+    },
+    "chave": "trator mf 4290 (usado 2018)|monsanto",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000013"
+    },
+    "nome": "Milho Híbrido Pioneer 20kg",
+    "categoria": "Sementes",
+    "marca": "Bayer",
+    "regiao": "Sul",
+    "preco": 245,
+    "entregaDias": 4,
+    "cultura": "Milho",
+    "tecnologia": "Híbrido Simples",
+    "embalagem": "Saco: 20kg",
+    "germinacao": 96,
+    "vigor": 92,
+    "pureza": 99.9,
+    "vencimento": "11/2027",
+    "condicao": "Novo",
+    "vendidos": 175,
+    "estoque": 500,
+    "descricao": "Milho Híbrido Pioneer 20kg. Tecnologia: Híbrido Simples. Saco: 20kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000003"
+    },
+    "chave": "milho hibrido pioneer 20kg|bayer",
+    "laudoId": {
+      "$oid": "c30000000000000000000007"
+    },
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000014"
+    },
+    "nome": "Semente Feijão Carioca 25kg",
+    "categoria": "Sementes",
+    "marca": "KWS",
+    "regiao": "Sudeste",
+    "preco": 310,
+    "entregaDias": 3,
+    "cultura": "Feijão",
+    "tecnologia": "Carioca",
+    "embalagem": "Saco: 25kg",
+    "germinacao": 90,
+    "vigor": 86,
+    "pureza": 99.3,
+    "vencimento": "05/2027",
+    "condicao": "Novo",
+    "vendidos": 52,
+    "estoque": 500,
+    "descricao": "Semente Feijão Carioca 25kg. Tecnologia: Carioca. Saco: 25kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000004"
+    },
+    "chave": "semente feijao carioca 25kg|kws",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000015"
+    },
+    "nome": "Adubo NPK 20-05-20 (Ton)",
+    "categoria": "Fertilizantes",
+    "marca": "Monsanto",
+    "regiao": "Centro-Oeste",
+    "preco": 3350,
+    "entregaDias": 5,
+    "cultura": "Diversas",
+    "tecnologia": "NPK 20-05-20",
+    "embalagem": "A granel: 1 tonelada",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "02/2028",
+    "condicao": "Novo",
+    "vendidos": 44,
+    "estoque": 500,
+    "descricao": "Adubo NPK 20-05-20 (Ton). Tecnologia: NPK 20-05-20. A granel: 1 tonelada.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000005"
+    },
+    "chave": "adubo npk 20-05-20 (ton)|monsanto",
+    "laudoId": {
+      "$oid": "c30000000000000000000008"
+    },
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000016"
+    },
+    "nome": "Calcário Dolomítico (Ton)",
+    "categoria": "Fertilizantes",
+    "marca": "Syngenta",
+    "regiao": "Sul",
+    "preco": 190,
+    "entregaDias": 7,
+    "cultura": "Diversas",
+    "tecnologia": "PRNT 90%",
+    "embalagem": "A granel: 1 tonelada",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "—",
+    "condicao": "Novo",
+    "vendidos": 90,
+    "estoque": 500,
+    "descricao": "Calcário Dolomítico (Ton). Tecnologia: PRNT 90%. A granel: 1 tonelada.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000001"
+    },
+    "chave": "calcario dolomitico (ton)|syngenta",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000017"
+    },
+    "nome": "Fungicida Triazol (5L)",
+    "categoria": "Defensivos",
+    "marca": "Bayer",
+    "regiao": "Centro-Oeste",
+    "preco": 520,
+    "entregaDias": 3,
+    "cultura": "Soja",
+    "tecnologia": "Triazol",
+    "embalagem": "Galão: 5L",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "06/2027",
+    "condicao": "Novo",
+    "vendidos": 67,
+    "estoque": 500,
+    "descricao": "Fungicida Triazol (5L). Tecnologia: Triazol. Galão: 5L.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000002"
+    },
+    "chave": "fungicida triazol (5l)|bayer",
+    "laudoId": {
+      "$oid": "c30000000000000000000009"
+    },
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000018"
+    },
+    "nome": "Inseticida Piretroide (5L)",
+    "categoria": "Defensivos",
+    "marca": "Syngenta",
+    "regiao": "Sudeste",
+    "preco": 280,
+    "entregaDias": 2,
+    "cultura": "Soja, Milho",
+    "tecnologia": "Piretroide",
+    "embalagem": "Galão: 5L",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "09/2027",
+    "condicao": "Novo",
+    "vendidos": 81,
+    "estoque": 500,
+    "descricao": "Inseticida Piretroide (5L). Tecnologia: Piretroide. Galão: 5L.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000003"
+    },
+    "chave": "inseticida piretroide (5l)|syngenta",
+    "laudoId": {
+      "$oid": "c30000000000000000000010"
+    },
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000019"
+    },
+    "nome": "Pulverizador Costal 20L",
+    "categoria": "Outros",
+    "marca": "KWS",
+    "regiao": "Nordeste",
+    "preco": 420,
+    "entregaDias": 6,
+    "cultura": "Diversas",
+    "tecnologia": "Manual",
+    "embalagem": "Unidade",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "—",
+    "condicao": "Novo",
+    "vendidos": 38,
+    "estoque": 500,
+    "descricao": "Pulverizador Costal 20L. Tecnologia: Manual. Unidade.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000004"
+    },
+    "chave": "pulverizador costal 20l|kws",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000020"
+    },
+    "nome": "Trator MPK 4x4 (Usado 2016)",
+    "categoria": "Outros",
+    "marca": "Monsanto",
+    "regiao": "Centro-Oeste",
+    "preco": 210000,
+    "entregaDias": 12,
+    "cultura": "Diversas",
+    "tecnologia": "Tração 4x4",
+    "embalagem": "Unidade",
+    "germinacao": 0,
+    "vigor": 0,
+    "pureza": 0,
+    "vencimento": "—",
+    "condicao": "Usado",
+    "vendidos": 1,
+    "estoque": 500,
+    "descricao": "Trator MPK 4x4 (Usado 2016). Tecnologia: Tração 4x4. Unidade.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000005"
+    },
+    "chave": "trator mpk 4x4 (usado 2016)|monsanto",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000021"
+    },
+    "nome": "Semente Milho Híbrido AG 8061 60mil",
+    "categoria": "Sementes",
+    "marca": "Agroceres",
+    "regiao": "Sul",
+    "preco": 890,
+    "entregaDias": 4,
+    "cultura": "Milho",
+    "tecnologia": "Híbrido simples",
+    "embalagem": "Saco: 60 mil sementes",
+    "germinacao": 93,
+    "vigor": 90,
+    "pureza": 99,
+    "vencimento": "08/2027",
+    "condicao": "Novo",
+    "vendidos": 120,
+    "estoque": 260,
+    "descricao": "Semente Milho Híbrido AG 8061 60mil. Tecnologia: Híbrido simples. Saco: 60 mil sementes.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000001"
+    },
+    "chave": "semente milho hibrido ag 8061 60mil|agroceres",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000022"
+    },
+    "nome": "Semente Feijão Carioca IAC 20kg",
+    "categoria": "Sementes",
+    "marca": "IAC",
+    "regiao": "Sudeste",
+    "preco": 142.5,
+    "entregaDias": 2,
+    "cultura": "Feijão",
+    "tecnologia": "Convencional",
+    "embalagem": "Saco: 20kg",
+    "germinacao": 88,
+    "vigor": 84,
+    "pureza": 98,
+    "vencimento": "08/2027",
+    "condicao": "Novo",
+    "vendidos": 45,
+    "estoque": 180,
+    "descricao": "Semente Feijão Carioca IAC 20kg. Tecnologia: Convencional. Saco: 20kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000001"
+    },
+    "chave": "semente feijao carioca iac 20kg|iac",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000023"
+    },
+    "nome": "Semente Trigo BRS 264 40kg",
+    "categoria": "Sementes",
+    "marca": "Embrapa",
+    "regiao": "Sul",
+    "preco": 96,
+    "entregaDias": 5,
+    "cultura": "Trigo",
+    "tecnologia": "Convencional",
+    "embalagem": "Saco: 40kg",
+    "germinacao": 90,
+    "vigor": 85,
+    "pureza": 99,
+    "vencimento": "08/2027",
+    "condicao": "Novo",
+    "vendidos": 80,
+    "estoque": 400,
+    "descricao": "Semente Trigo BRS 264 40kg. Tecnologia: Convencional. Saco: 40kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000002"
+    },
+    "chave": "semente trigo brs 264 40kg|embrapa",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000024"
+    },
+    "nome": "Semente Algodão FM 983 GLT",
+    "categoria": "Sementes",
+    "marca": "FiberMax",
+    "regiao": "Centro-Oeste",
+    "preco": 1250,
+    "entregaDias": 6,
+    "cultura": "Algodão",
+    "tecnologia": "GLT",
+    "embalagem": "Saco: 200 mil sementes",
+    "germinacao": 89,
+    "vigor": 86,
+    "pureza": 98,
+    "vencimento": "08/2027",
+    "condicao": "Novo",
+    "vendidos": 30,
+    "estoque": 90,
+    "descricao": "Semente Algodão FM 983 GLT. Tecnologia: GLT. Saco: 200 mil sementes.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000003"
+    },
+    "chave": "semente algodao fm 983 glt|fibermax",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000025"
+    },
+    "nome": "Fertilizante NPK 20-05-20 50kg",
+    "categoria": "Fertilizantes",
+    "marca": "Mosaic",
+    "regiao": "Centro-Oeste",
+    "preco": 168,
+    "entregaDias": 4,
+    "cultura": "Diversas",
+    "tecnologia": "NPK 20-05-20",
+    "embalagem": "Saco: 50kg",
+    "vencimento": "12/2027",
+    "condicao": "Novo",
+    "vendidos": 310,
+    "estoque": 1200,
+    "descricao": "Fertilizante NPK 20-05-20 50kg. Tecnologia: NPK 20-05-20. Saco: 50kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000004"
+    },
+    "chave": "fertilizante npk 20-05-20 50kg|mosaic",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000026"
+    },
+    "nome": "Ureia Granulada 46% N 50kg",
+    "categoria": "Fertilizantes",
+    "marca": "Yara",
+    "regiao": "Sudeste",
+    "preco": 132,
+    "entregaDias": 3,
+    "cultura": "Diversas",
+    "tecnologia": "Ureia 46%",
+    "embalagem": "Saco: 50kg",
+    "vencimento": "12/2027",
+    "condicao": "Novo",
+    "vendidos": 520,
+    "estoque": 2000,
+    "descricao": "Ureia Granulada 46% N 50kg. Tecnologia: Ureia 46%. Saco: 50kg.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000005"
+    },
+    "chave": "ureia granulada 46% n 50kg|yara",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000027"
+    },
+    "nome": "Calcário Dolomítico PRNT 90% 1t",
+    "categoria": "Fertilizantes",
+    "marca": "Calfértil",
+    "regiao": "Sul",
+    "preco": 210,
+    "entregaDias": 7,
+    "cultura": "Diversas",
+    "tecnologia": "PRNT 90%",
+    "embalagem": "Big bag: 1t",
+    "vencimento": "12/2027",
+    "condicao": "Novo",
+    "vendidos": 75,
+    "estoque": 60,
+    "descricao": "Calcário Dolomítico PRNT 90% 1t. Tecnologia: PRNT 90%. Big bag: 1t.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000002"
+    },
+    "chave": "calcario dolomitico prnt 90% 1t|calfertil",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000028"
+    },
+    "nome": "Herbicida Glifosato 480 SL 20L",
+    "categoria": "Defensivos",
+    "marca": "Nortox",
+    "regiao": "Centro-Oeste",
+    "preco": 340,
+    "entregaDias": 3,
+    "cultura": "Soja",
+    "tecnologia": "Glifosato 480",
+    "embalagem": "Galão: 20L",
+    "vencimento": "12/2027",
+    "condicao": "Novo",
+    "vendidos": 260,
+    "estoque": 300,
+    "descricao": "Herbicida Glifosato 480 SL 20L. Tecnologia: Glifosato 480. Galão: 20L.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000002"
+    },
+    "chave": "herbicida glifosato 480 sl 20l|nortox",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000029"
+    },
+    "nome": "Fungicida Azoxistrobina 5L",
+    "categoria": "Defensivos",
+    "marca": "Syngenta",
+    "regiao": "Sudeste",
+    "preco": 720,
+    "entregaDias": 4,
+    "cultura": "Soja",
+    "tecnologia": "Estrobilurina",
+    "embalagem": "Galão: 5L",
+    "vencimento": "12/2027",
+    "condicao": "Novo",
+    "vendidos": 95,
+    "estoque": 150,
+    "descricao": "Fungicida Azoxistrobina 5L. Tecnologia: Estrobilurina. Galão: 5L.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000003"
+    },
+    "chave": "fungicida azoxistrobina 5l|syngenta",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "b20000000000000000000030"
+    },
+    "nome": "Pulverizador Costal Elétrico 20L",
+    "categoria": "Outros",
+    "marca": "Jacto",
+    "regiao": "Nordeste",
+    "preco": 489.9,
+    "entregaDias": 6,
+    "cultura": "Diversas",
+    "tecnologia": "Bateria 12V",
+    "embalagem": "Unidade",
+    "vencimento": "12/2027",
+    "condicao": "Novo",
+    "vendidos": 60,
+    "estoque": 45,
+    "descricao": "Pulverizador Costal Elétrico 20L. Tecnologia: Bateria 12V. Unidade.",
+    "fornecedorId": {
+      "$oid": "a10000000000000000000001"
+    },
+    "chave": "pulverizador costal eletrico 20l|jacto",
+    "laudoId": null,
+    "imagens": [],
+    "ativo": true,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  }
+]

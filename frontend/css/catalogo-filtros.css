@@ -1,0 +1,6 @@
+.filtro-preco { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.filtro-preco label { display: block; font-size: .85rem; font-weight: 600; }
+.filtro-preco input { display: block; width: 100%; margin-top: 4px; padding: 8px 10px; border: 1px solid var(--borda, #cfd8d1); border-radius: 6px; font: inherit; }
+.filtro-aviso { min-height: 1.2em; margin: 6px 0 0; font-size: .8rem; color: var(--texto-suave, #5d6b63); }
+.filtro-laudo { display: flex; align-items: center; gap: 8px; font-size: .9rem; cursor: pointer; }
+.filtro-laudo input { width: 16px; height: 16px; }

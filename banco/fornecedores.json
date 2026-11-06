@@ -1,0 +1,72 @@
+[
+  {
+    "_id": {
+      "$oid": "a10000000000000000000001"
+    },
+    "userId": null,
+    "nome": "AgroVant Insumos Agrícolas Ltda",
+    "nomeFantasia": "AgroVant",
+    "avaliacao": 4.5,
+    "totalAvaliacoes": 128,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-01-15T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "a10000000000000000000002"
+    },
+    "userId": null,
+    "nome": "CampoLimpo Defensivos Ltda",
+    "nomeFantasia": "CampoLimpo",
+    "avaliacao": 4,
+    "totalAvaliacoes": 94,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-01-15T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "a10000000000000000000003"
+    },
+    "userId": null,
+    "nome": "Sementes Brasil Comércio Ltda",
+    "nomeFantasia": "Sementes Brasil",
+    "avaliacao": 3.5,
+    "totalAvaliacoes": 61,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-01-15T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "a10000000000000000000004"
+    },
+    "userId": null,
+    "nome": "Safra Forte Agro Ltda",
+    "nomeFantasia": "Safra Forte",
+    "avaliacao": 5,
+    "totalAvaliacoes": 47,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-01-15T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "a10000000000000000000005"
+    },
+    "userId": null,
+    "nome": "Terra Viva Fertilizantes Ltda",
+    "nomeFantasia": "Terra Viva",
+    "avaliacao": 4,
+    "totalAvaliacoes": 83,
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-01-15T12:00:00Z"
+    }
+  }
+]

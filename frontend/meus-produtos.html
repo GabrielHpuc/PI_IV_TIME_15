@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meus produtos | AgroRecursos</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/marketplace.css">
+  <link rel="stylesheet" href="css/fornecedor.css">
+  <script src="js/marketplace.js" defer></script>
+  <script src="js/meus-produtos.js" defer></script>
+</head>
+<body class="mk-page" data-pagina="meus-produtos">
+  <header id="site-header"></header>
+
+  <main class="mk-content" id="meus-produtos">
+    <div class="forn-topo">
+      <h1>Meus produtos</h1>
+      <div>
+        <a class="mk-btn" href="fornecedor.html?meu=1">Dados da empresa</a>
+        <button class="mk-btn mk-btn-verde" type="button" id="novo-produto">Novo produto</button>
+      </div>
+    </div>
+    <p class="forn-msg" id="lista-msg" role="status"></p>
+    <div class="mk-card forn-tabela-wrap"><table class="forn-tabela">
+      <thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Laudo</th><th></th></tr></thead>
+      <tbody id="linhas"></tbody>
+    </table></div>
+  </main>
+
+  <dialog class="dialogo" id="dlg-produto">
+    <h2 id="dlg-titulo">Cadastrar produto</h2>
+    <form id="form-produto" novalidate>
+      <label>Nome<input name="nome" maxlength="120" required></label>
+      <label>Categoria<select name="categoria"></select></label>
+      <label>Marca<input name="marca" maxlength="60" required></label>
+      <label>Região<select name="regiao"></select></label>
+      <label>Preço (R$)<input name="preco" inputmode="decimal" placeholder="0,00" required></label>
+      <label>Prazo de entrega (dias)<input name="entregaDias" inputmode="numeric" required></label>
+      <label>Estoque<input name="estoque" inputmode="numeric" placeholder="0"></label>
+      <label>Cultura<input name="cultura" maxlength="60"></label>
+      <label>Tecnologia<input name="tecnologia" maxlength="60"></label>
+      <label>Embalagem<input name="embalagem" maxlength="60" placeholder="Saco: 40kg"></label>
+      <label>Descrição<textarea name="descricao" rows="3" maxlength="1000"></textarea></label>
+      <p class="dialogo-msg" id="msg-produto" role="status"></p>
+      <div class="dialogo-acoes">
+        <button class="mk-btn" type="button" id="cancelar">Cancelar</button>
+        <button class="mk-btn mk-btn-verde" type="submit">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer id="site-footer"></footer>
+</body>
+</html>
