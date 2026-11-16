@@ -23,7 +23,21 @@ router.get("/", async (req, res, next) => {
           id: String(c._id), codigo: c.codigo, item: c.item, status: c.status,
           totalPropostas: (c.propostas || []).length, vencimento: c.vencimento
         })),
-        pedidos: pedidos.map(p => ({ id: String(p._id), numero: p.numero, status: p.status, total: p.total, criadoEm: p.criadoEm })),
+        pedidos: pedidos.map(p => ({
+          id: String(p._id),
+          numero: p.numero,
+          status: p.status,
+          total: p.total,
+          criadoEm: p.criadoEm,
+          entrega: p.entrega,
+          itens: (p.itens || []).map(i => ({
+            produtoId: String(i.produtoId),
+            nome: i.nome,
+            quantidade: i.quantidade,
+            preco: i.preco,
+            subtotal: i.subtotal
+          }))
+        })),
         recomendados: recomendados.map(p => ({
           id: String(p._id), nome: p.nome, categoria: p.categoria, preco: p.preco, laudo: Boolean(p.laudoId),
           imagens: p.imagens || []

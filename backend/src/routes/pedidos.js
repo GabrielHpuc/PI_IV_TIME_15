@@ -78,8 +78,8 @@ router.post("/", exigirTipo("produtor"), async (req, res, next) => {
       userId: req.usuario.id, itens, subtotal,
       frete: { valor: frete.valor, prazo: frete.prazo },
       total, entrega,
-      pagamento: { metodo, parcelas, valorParcelas: dividirParcelas(total, parcelas), status: metodo === "credito_rural" ? "em_analise" : "pendente" },
-      status: metodo === "credito_rural" ? "em_analise" : "aguardando_pagamento",
+      pagamento: { metodo, parcelas, valorParcelas: dividirParcelas(total, parcelas), status: "confirmado" },
+      status: "enviado",
       criadoEm: new Date()
     };
     const { insertedId } = await db.collection("pedidos").insertOne(pedido);
