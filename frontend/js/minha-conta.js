@@ -307,3 +307,20 @@ $("#logout-button").addEventListener("click", async () => {
   } catch (error) { statusElement.hidden = false; statusElement.textContent = error.message; button.disabled = false; }
 });
 loadAccount();
+
+
+// CEP: máscara e preenchimento automático de rua, bairro, cidade e UF
+fields.cep.addEventListener("input", () => {
+  const d = fields.cep.value.replace(/\D/g, "").slice(0, 8);
+  fields.cep.value = d.length > 5 ? d.slice(0, 5) + "-" + d.slice(5) : d;
+});
+window.AgroCep?.aoCompletar(fields.cep, endereco => {
+  if (endereco.rua) fields.street.value = endereco.rua;
+  if (endereco.bairro) fields.neighborhood.value = endereco.bairro;
+  if (endereco.cidade) fields.city.value = endereco.cidade;
+  if (endereco.estado) fields.state.value = endereco.estado;
+  (endereco.rua ? fields.number : fields.street).focus();
+}, (texto, ok) => {
+  profileMessage.textContent = texto;
+  profileMessage.classList.toggle("success-message", ok);
+});

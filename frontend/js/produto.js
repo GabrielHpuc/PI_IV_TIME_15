@@ -133,12 +133,24 @@
     const resultado = document.querySelector("#frete-resultado");
     ui.mascararCep(campoCep);
 
-    document.querySelector("#frete-calcular").addEventListener("click", async function () {
+    async function calcularFrete() {
       try {
-        const frete = await ui.api("/api/frete?cep=" + encodeURIComponent(campoCep.value));
-        resultado.textContent = "Estimativa: " + ui.moeda(frete.valor) + " (Entrega em " + produto.entregaDias + " dias)";
+        const [frete, endereco] = await Promise.all([
+          ui.api("/api/frete?cep=" + encodeURIComponent(campoCep.value)),
+          window.AgroCep.buscar(campoCep.value).catch(function () { return null; })
+        ]);
+        const total = produto.entregaDias + frete.prazo;
+        const local = endereco && endereco.cidade ? "Entrega para " + endereco.cidade + " - " + endereco.estado + ". " : "";
+        resultado.textContent = local + "Frete " + ui.moeda(frete.valor) + ". " + window.AgroCep.previsao(total) + " (" + total + " dias úteis).";
       } catch (erro) {
         resultado.textContent = erro.message;
+      }
+    }
+
+    document.querySelector("#frete-calcular").addEventListener("click", calcularFrete);
+    campoCep.addEventListener("input", function () {
+      if (campoCep.value.replace(/\D/g, "").length === 8) {
+        calcularFrete();
       }
     });
 

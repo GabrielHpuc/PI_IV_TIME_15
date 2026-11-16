@@ -61,6 +61,16 @@
     document.querySelector("#resumo-subtotal").textContent = ui.moeda(subtotal);
     document.querySelector("#resumo-frete").textContent = frete ? ui.moeda(frete.valor) : "—";
     document.querySelector("#resumo-frete-cep").textContent = frete ? "Frete calculado para CEP " + campoCep.value : "Informe o CEP";
+
+    // prazo total = maior prazo de preparo do fornecedor + transporte até o CEP
+    const preparo = itens.reduce(function (m, i) { return Math.max(m, i.produto.entregaDias); }, 0);
+    if (frete && itens.length) {
+      const total = preparo + frete.prazo;
+      prazo.textContent = total;
+      document.querySelector("#resumo-frete-cep").textContent += " · " + window.AgroCep.previsao(total);
+    } else {
+      prazo.textContent = preparo;
+    }
     document.querySelector("#resumo-total").textContent = ui.moeda(subtotal + valorFrete);
   }
 
@@ -126,6 +136,22 @@
   }
 
   document.querySelector("#calcular-frete").addEventListener("click", calcular);
+
+  // Digitou os 8 números do CEP: preenche rua, bairro, cidade e UF e já calcula frete e prazo.
+  window.AgroCep.aoCompletar(campoCep, function (endereco) {
+    ["rua", "bairro", "cidade", "estado"].forEach(function (nome) {
+      if (endereco[nome]) {
+        formulario.elements[nome].value = endereco[nome];
+        formulario.elements[nome].classList.remove("campo-erro");
+      }
+    });
+    calcular().then(function () {
+      formulario.elements[endereco.rua ? "numero" : "rua"].focus();
+    });
+  }, function (texto, ok) {
+    campoCep.classList.toggle("campo-erro", Boolean(texto) && !ok);
+    aviso_(ui.esc(texto), ok && Boolean(texto));
+  });
 
   botaoPagar.addEventListener("click", async function () {
     if (finalizado) {
