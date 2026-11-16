@@ -257,7 +257,8 @@
 .grade-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
 
 .produto-card { display: flex; flex-direction: column; gap: 12px; padding: 12px; }
-.produto-card-corpo { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 10px; }
+.produto-card-corpo { position: relative; display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 10px; padding-right: 26px; }
+.produto-card-info { min-width: 0; }
 .produto-card-img { position: relative; }
 .produto-card-img .mk-thumb { font-size: 2rem; }
 .produto-card-img .mk-selo {
@@ -270,6 +271,30 @@
   letter-spacing: .01em;
   white-space: nowrap;
   box-shadow: 0 1px 3px rgba(0, 0, 0, .18);
+}
+.btn-favorito {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #b5bec6;
+  font-size: 1.35rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  transition: color .15s ease, transform .15s ease;
+}
+.btn-favorito:hover {
+  color: #d4a017;
+  transform: scale(1.12);
+}
+.btn-favorito.ativo {
+  color: #f5b301;
 }
 .produto-card h3 { margin: 0 0 4px; font-size: .98rem; line-height: 1.25; }
 .produto-card .preco { display: block; margin-bottom: 2px; font-size: 1.1rem; font-weight: 800; }
@@ -654,3 +679,91 @@
 .home-numero { font-size: 2rem !important; font-weight: 800; color: var(--green); }
 .home-link { display: inline-block; margin-top: 6px; font-weight: 700; }
 @media (max-width: 600px) { .home-banner { padding: 18px; } .home-banner .ico { display: none; } .cad-duas { grid-template-columns: 1fr; } }
+
+/* ===== MODO ESCURO (MARKETPLACE) ===== */
+html.dark-mode .mk-page {
+  --cinza-fundo: #111915;
+  --borda: #2a3b31;
+  --texto: #e5efe9;
+  --texto-suave: #9cb0a4;
+  --verde-claro: #1f3529;
+  background: #111915;
+  color: #e5efe9;
+}
+html.dark-mode .mk-brand { background: #19241e; color: #7fe3a0; }
+html.dark-mode .mk-brand-text small { color: #56c283; }
+html.dark-mode .mk-search { background: #19241e; border: 1px solid #2a3b31; }
+html.dark-mode .mk-search input { color: #e5efe9; }
+html.dark-mode .mk-card,
+html.dark-mode .rec-card,
+html.dark-mode .dialogo,
+html.dark-mode .comparativo {
+  background: #19241e;
+  border-color: #2a3b31;
+  color: #e5efe9;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .35);
+}
+html.dark-mode .mk-btn:not(.mk-btn-verde):not(.mk-btn-azul-escuro) {
+  background: #213028;
+  border-color: #3d6b52;
+  color: #8ce0a8;
+}
+html.dark-mode .mk-btn:not(.mk-btn-verde):not(.mk-btn-azul-escuro):hover {
+  background: #293d32;
+}
+html.dark-mode .mk-thumb,
+html.dark-mode .galeria-principal,
+html.dark-mode .miniatura {
+  background: linear-gradient(135deg, #223028, #1b2821);
+}
+html.dark-mode .filtro-item { color: #e5efe9; }
+html.dark-mode .filtro-item:hover { background: #223229; }
+html.dark-mode .filtro-item.ativo { background: #264232; color: #8ce0a8; }
+html.dark-mode .ordenar select,
+html.dark-mode .frete-linha input,
+html.dark-mode .form-endereco input,
+html.dark-mode .form-endereco textarea,
+html.dark-mode .dialogo input:not([type="checkbox"]),
+html.dark-mode .dialogo select,
+html.dark-mode .dialogo textarea,
+html.dark-mode .avaliar select,
+html.dark-mode .avaliar textarea,
+html.dark-mode .pagamento-parcelas select,
+html.dark-mode .forn-form input,
+html.dark-mode .campo-status {
+  background: #131c17;
+  border-color: #2e4236;
+  color: #e5efe9;
+}
+html.dark-mode .frete,
+html.dark-mode .aviso-entrega,
+html.dark-mode .ficha th {
+  background: #141e19;
+  border-color: #2a3b31;
+  color: #d3e2d9;
+}
+html.dark-mode .status.analise { background: #4a3b14; color: #ffd97d; }
+html.dark-mode .status.aguardando { background: #28333a; color: #c8d4dc; }
+html.dark-mode .status.aprovada { background: #19422b; color: #8ce0a8; }
+html.dark-mode .status.recusada { background: #4a1c19; color: #ffb4ab; }
+html.dark-mode .comparativo-tabela .melhor { background: #1e3829; }
+html.dark-mode .comparativo-fechar { color: #e5efe9; }
+html.dark-mode .home-secao h2,
+html.dark-mode .forn-topo h1,
+html.dark-mode .dialogo h2,
+html.dark-mode .home-numero { color: #7fe3a0; }
+html.dark-mode .rec-page { background: #111915; color: #e5efe9; }
+html.dark-mode .rec-titulo { background: #141e19; border-color: #2a3b31; color: #e5efe9; }
+html.dark-mode .rec-campo { background: #131c17; border-color: #2e4236; }
+html.dark-mode .rec-campo input { color: #e5efe9; }
+html.dark-mode .rec-ajuda,
+html.dark-mode .rec-rodape a { color: #b7c8be; }
+html.dark-mode .cad-abas { background: #131c17; }
+html.dark-mode .cad-aba { color: #9cb0a4; }
+html.dark-mode .cad-aba.ativa { background: #223229; color: #8ce0a8; }
+html.dark-mode .cad-tipo,
+html.dark-mode .cad-voltar { background: #131c17; border-color: #2e4236; color: #c7d6cd; }
+html.dark-mode .cad-tipo.ativo { border-color: #38b262; color: #8ce0a8; }
+html.dark-mode .btn-favorito { color: #63736a; }
+html.dark-mode .btn-favorito:hover { color: #d4a017; }
+html.dark-mode .btn-favorito.ativo { color: #f5b301; }

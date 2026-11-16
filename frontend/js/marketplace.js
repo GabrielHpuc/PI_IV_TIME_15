@@ -1,6 +1,28 @@
 // Gabriel
 (function () {
   const CHAVE_CARRINHO = "agro_carrinho";
+  const CHAVE_FAVORITOS = "agro_favoritos";
+  const CHAVE_TEMA = "agro_tema";
+
+  const tema = {
+    estaEscuro() {
+      try {
+        return localStorage.getItem(CHAVE_TEMA) === "dark";
+      } catch (e) {
+        return false;
+      }
+    },
+    aplicar(escuro) {
+      document.documentElement.classList.toggle("dark-mode", Boolean(escuro));
+      try {
+        localStorage.setItem(CHAVE_TEMA, escuro ? "dark" : "light");
+      } catch (e) {
+        return;
+      }
+    }
+  };
+
+  tema.aplicar(tema.estaEscuro());
 
   function esc(texto) {
     return String(texto).replace(/[&<>"']/g, function (c) {
@@ -60,6 +82,68 @@
     },
     quantidade() {
       return this.ler().reduce(function (soma, item) { return soma + item.qtd; }, 0);
+    }
+  };
+
+  const favoritos = {
+    ler() {
+      try {
+        const dados = JSON.parse(localStorage.getItem(CHAVE_FAVORITOS));
+        return Array.isArray(dados) ? dados.filter(function (id) {
+          return typeof id === "string" && /^[a-f0-9]{24}$/i.test(id);
+        }) : [];
+      } catch (erro) {
+        return [];
+      }
+    },
+    salvar(ids) {
+      try {
+        const unicos = Array.from(new Set(ids));
+        localStorage.setItem(CHAVE_FAVORITOS, JSON.stringify(unicos));
+        const el = document.querySelector("#mk-favoritos-qtd");
+        if (el) {
+          el.textContent = unicos.length > 0 ? " (" + unicos.length + ")" : "";
+        }
+        document.querySelectorAll("[data-favorito]").forEach(function (btn) {
+          const ativo = unicos.indexOf(btn.dataset.favorito) >= 0;
+          btn.classList.toggle("ativo", ativo);
+          btn.setAttribute("aria-pressed", ativo ? "true" : "false");
+          btn.setAttribute("title", ativo ? "Remover dos favoritos" : "Favoritar");
+        });
+      } catch (erro) {
+        return;
+      }
+    },
+    tem(id) {
+      return this.ler().indexOf(String(id)) >= 0;
+    },
+    alternar(id) {
+      const strId = String(id);
+      const lista = this.ler();
+      const idx = lista.indexOf(strId);
+      let ativo;
+      if (idx >= 0) {
+        lista.splice(idx, 1);
+        ativo = false;
+      } else {
+        lista.push(strId);
+        ativo = true;
+      }
+      this.salvar(lista);
+      fetch("/api/auth/preferences", {
+        method: "PUT",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ favoritos: this.ler() })
+      }).catch(function () {});
+      return ativo;
+    },
+    quantidade() {
+      return this.ler().length;
+    },
+    botaoEstrela(id) {
+      const ativo = this.tem(id);
+      return '<button type="button" class="btn-favorito' + (ativo ? " ativo" : "") + '" data-favorito="' + esc(id) + '" aria-pressed="' + (ativo ? "true" : "false") + '" aria-label="Favoritar produto" title="' + (ativo ? "Remover dos favoritos" : "Favoritar") + '">★</button>';
     }
   };
 
@@ -180,6 +264,7 @@
 
   function cabecalhoPadrao(placeholder) {
     const qtdCarrinho = carrinho.quantidade();
+    const qtdFav = favoritos.quantidade();
     return (
       '<a class="mk-brand" href="dashboard.html"><span class="mk-brand-logo">' + icone("folha") + '</span>' +
       '<span class="mk-brand-text"><strong>AgroRecursos</strong><small>MarketPlace</small></span></a>' +
@@ -190,7 +275,7 @@
       '<nav class="mk-nav" aria-label="Navegação do marketplace">' +
       '<a href="catalogo.html">' + icone("pacote") + '<span>Catálogo</span></a>' +
       '<a href="cotacoes.html">' + icone("lista") + '<span>Cotações<b id="mk-cotacoes-qtd"></b></span></a>' +
-      '<a href="dashboard.html?page=favoritos">' + icone("coracao") + '<span>Favoritos</span></a>' +
+      '<a href="dashboard.html?page=favoritos">' + icone("coracao") + '<span>Favoritos<b id="mk-favoritos-qtd">' + (qtdFav > 0 ? " (" + qtdFav + ")" : "") + '</b></span></a>' +
       '<a href="checkout.html">' + icone("carrinho") + '<span>Carrinho<b id="mk-carrinho-qtd">' + (qtdCarrinho > 0 ? " (" + qtdCarrinho + ")" : "") + '</b></span></a>' +
       '<a href="minha-conta.html">' + icone("usuario") + '<i id="mk-conta-nome">Conta</i></a></nav></div>'
     );
@@ -221,6 +306,22 @@
       const resultado = await resposta.json();
       if (resposta.ok && resultado.user && resultado.user.name) {
         alvo.textContent = "Conta";
+        if (typeof resultado.user.darkMode === "boolean") {
+          tema.aplicar(resultado.user.darkMode);
+        }
+        if (Array.isArray(resultado.user.favoritos)) {
+          const locais = favoritos.ler();
+          const mesclados = resultado.user.favoritos.length ? resultado.user.favoritos : locais;
+          favoritos.salvar(mesclados);
+          if (!resultado.user.favoritos.length && locais.length) {
+            fetch("/api/auth/preferences", {
+              method: "PUT",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ favoritos: locais })
+            }).catch(function () {});
+          }
+        }
         if (resultado.user.accountType === "produtor") {
           const cotacoes = await fetch("/api/cotacoes", { credentials: "same-origin" }).then(function (r) { return r.json(); });
           const contador = document.querySelector("#mk-cotacoes-qtd");
@@ -280,7 +381,7 @@
     carregarConta();
   }
 
-  window.AgroUI = { icone: icone, iconeProduto: iconeProduto, nomeIconeProduto: nomeIconeProduto, fotoProduto: fotoProduto, lerImagem: lerImagem, esc: esc, moeda: moeda, normalizar: normalizar, carrinho: carrinho, api: api, mascararCep: mascararCep };
+  window.AgroUI = { icone: icone, iconeProduto: iconeProduto, nomeIconeProduto: nomeIconeProduto, fotoProduto: fotoProduto, lerImagem: lerImagem, esc: esc, moeda: moeda, normalizar: normalizar, carrinho: carrinho, favoritos: favoritos, tema: tema, api: api, mascararCep: mascararCep };
 
   document.addEventListener("DOMContentLoaded", iniciar);
 })();

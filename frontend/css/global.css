@@ -639,3 +639,144 @@ body > footer p { margin: 0; }
 .form-grid-two > div { display: flex; flex-direction: column; gap: 10px; }
 @media (max-width: 520px) { .form-grid-two { grid-template-columns: 1fr; } }.forgot-link { align-self: flex-start; margin-top: 4px; font-size: .9rem; font-weight: 600; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Preferências e Switch de Modo Escuro */
+.pref-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0 4px;
+  flex-wrap: wrap;
+}
+.pref-row strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 1rem;
+}
+.pref-row span {
+  color: var(--text-muted);
+  font-size: .9rem;
+}
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 700;
+}
+.theme-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.theme-slider {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  border-radius: 999px;
+  background: #c5d1c8;
+  transition: background .2s ease;
+}
+.theme-slider::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+  transition: transform .2s ease;
+}
+.theme-switch input:checked + .theme-slider {
+  background: #2f9e55;
+}
+.theme-switch input:checked + .theme-slider::after {
+  transform: translateX(22px);
+}
+
+/* ===== MODO ESCURO (GERAL E MINHA CONTA) ===== */
+html.dark-mode {
+  color: #e5efe9;
+  background: #111915;
+  --text-muted: #9cb0a4;
+  --border: #2a3b31;
+  --green-light: #1f3529;
+}
+html.dark-mode body,
+html.dark-mode .auth-page,
+html.dark-mode .dashboard-page,
+html.dark-mode .account-page {
+  background: #111915;
+  color: #e5efe9;
+}
+html.dark-mode a { color: #6fd694; }
+html.dark-mode .topbar,
+html.dark-mode .feature-card,
+html.dark-mode .auth-card,
+html.dark-mode .account-card,
+html.dark-mode .shortcut-card,
+html.dark-mode .quick-card,
+html.dark-mode .summary-card,
+html.dark-mode .empty-state,
+html.dark-mode .dashboard-topbar {
+  background: #19241e;
+  border-color: #2a3b31;
+  color: #e5efe9;
+}
+html.dark-mode .brand,
+html.dark-mode .hero h1,
+html.dark-mode .feature-card h2,
+html.dark-mode .profile-form h3,
+html.dark-mode .back-home,
+html.dark-mode .text-button {
+  color: #7fe3a0;
+}
+html.dark-mode .topbar nav a:not(.button),
+html.dark-mode .hero > p {
+  color: #c2d4c9;
+}
+html.dark-mode .welcome-card,
+html.dark-mode .dashboard-welcome,
+html.dark-mode .notice-card {
+  background: #1b2e23;
+  border-color: #2a4535;
+  color: #e5efe9;
+}
+html.dark-mode .welcome-card p,
+html.dark-mode .account-eyebrow {
+  color: #7fe3a0;
+}
+html.dark-mode .welcome-card span,
+html.dark-mode .card-heading p,
+html.dark-mode .account-card > p,
+html.dark-mode .profile-details span,
+html.dark-mode .shortcut-card > span:not(.shortcut-icon),
+html.dark-mode .profile-form small,
+html.dark-mode .account-footer {
+  color: #9cb0a4;
+}
+html.dark-mode .auth-card input,
+html.dark-mode .auth-card select,
+html.dark-mode .profile-form input,
+html.dark-mode .profile-form select {
+  background: #131c17;
+  border-color: #2e4236;
+  color: #e5efe9;
+}
+html.dark-mode .profile-form input:disabled {
+  background: #1a241e;
+  color: #7e9186;
+}
+html.dark-mode .button-outline {
+  color: #7fe3a0;
+  border-color: #3d6b52;
+}
+html.dark-mode .button-outline:hover {
+  background: #213529;
+  color: #98ebb3;
+}

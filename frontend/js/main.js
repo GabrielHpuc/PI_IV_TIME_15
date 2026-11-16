@@ -1,3 +1,7 @@
+try {
+  document.documentElement.classList.toggle("dark-mode", localStorage.getItem("agro_tema") === "dark");
+} catch (e) {}
+
 async function verificarServidor() {
   try {
     const response = await fetch("/api/health");

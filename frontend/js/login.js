@@ -1,4 +1,8 @@
 
+try {
+  document.documentElement.classList.toggle("dark-mode", localStorage.getItem("agro_tema") === "dark");
+} catch (e) {}
+
 const form = document.querySelector("#login-form");
 const message = document.querySelector("#message");
 const button = form.querySelector('button[type="submit"]');
@@ -27,6 +31,15 @@ form.addEventListener("submit", async (event) => {
 
     if (!response.ok) {
       throw new Error(result.message || "Não foi possível entrar.");
+    }
+
+    if (result.user) {
+      try {
+        localStorage.setItem("agro_tema", result.user.darkMode ? "dark" : "light");
+        if (Array.isArray(result.user.favoritos)) {
+          localStorage.setItem("agro_favoritos", JSON.stringify(result.user.favoritos));
+        }
+      } catch (e) {}
     }
 
     window.location.href = "dashboard.html";
