@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo | AgroRecursos</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/marketplace.css">
+  <link rel="stylesheet" href="css/catalogo-filtros.css">
+  <script src="js/marketplace.js" defer></script>
+  <script src="js/catalogo.js" defer></script>
+</head>
+<body class="mk-page" data-pagina="catalogo">
+  <header id="site-header"></header>
+
+  <main class="mk-content">
+    <div class="catalogo-layout">
+      <aside class="filtros mk-card" aria-label="Filtros">
+        <h2>Categorias</h2>
+        <ul id="filtro-categoria"></ul>
+        <h3>Marca</h3>
+        <ul id="filtro-marca"></ul>
+        <h3>Região</h3>
+        <ul id="filtro-regiao"></ul>
+        <h3>Preço (R$)</h3>
+        <div class="filtro-preco">
+          <label for="preco-min">Mínimo<input id="preco-min" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"></label>
+          <label for="preco-max">Máximo<input id="preco-max" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Sem limite"></label>
+        </div>
+        <p class="filtro-aviso" id="preco-aviso" role="status"></p>
+        <h3>Laudo técnico</h3>
+        <label class="filtro-laudo" for="filtro-laudo"><input id="filtro-laudo" type="checkbox"> Somente com laudo MAPA</label>
+        <button class="mk-btn limpar-filtros" id="limpar-filtros" type="button">Limpar filtros</button>
+      </aside>
+
+      <section aria-live="polite">
+        <div class="catalogo-topo">
+          <h1 id="catalogo-titulo">Todos os produtos</h1>
+          <label class="ordenar" for="ordenar">Ordenar por
+            <select id="ordenar">
+              <option value="preco">Menor Preço</option>
+              <option value="entrega">Tempo de Entrega</option>
+            </select>
+          </label>
+        </div>
+        <div class="grade-produtos" id="grade-produtos"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+</body>
+</html>
