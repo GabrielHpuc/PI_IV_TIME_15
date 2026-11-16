@@ -160,7 +160,7 @@ router.post("/", carregarUsuario, exigirTipo("fornecedor"), async (req, res, nex
       return res.status(409).json({ message: "Você já tem um produto com esse nome e marca." });
     }
 
-    const doc = { ...dados, fornecedorId: fornecedor._id, laudoId: null, imagens: [], vendidos: 0, ativo: true, criadoEm: new Date() };
+    const doc = { ...dados, fornecedorId: fornecedor._id, laudoId: null, imagens: dados.imagens || [], vendidos: 0, ativo: true, criadoEm: new Date() };
     const { insertedId } = await col.insertOne(doc);
     await auditar(req, { acao: "produto.criado", entidade: "produto", entidadeId: insertedId, detalhes: { nome: dados.nome } });
 
@@ -184,9 +184,12 @@ router.put("/:id", carregarUsuario, exigirTipo("fornecedor"), async (req, res, n
       return res.status(409).json({ message: "Você já tem um produto com esse nome e marca." });
     }
 
+    const atualizacao = { ...dados, atualizadoEm: new Date() };
+    if (dados.imagens === undefined) delete atualizacao.imagens;
+
     const resultado = await col.updateOne(
       { _id, fornecedorId: fornecedor._id, ativo: { $ne: false } },
-      { $set: { ...dados, atualizadoEm: new Date() } }
+      { $set: atualizacao }
     );
 
     if (!resultado.matchedCount) return res.status(404).json({ message: "Produto não encontrado." });

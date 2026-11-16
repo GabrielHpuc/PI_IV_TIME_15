@@ -1,5 +1,8 @@
 // Gabriel
 import "dotenv/config";
+import dns from "node:dns";
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
 import express from "express";
 import session from "express-session";
 import MongoStore from "connect-mongo";
@@ -49,8 +52,8 @@ if (!process.env.MONGODB_URI) {
 
 app.disable("x-powered-by");
 app.use(helmet());
-app.use(express.json({ limit: "20kb" }));
-app.use(express.urlencoded({ extended: false, limit: "20kb" }));
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: false, limit: "5mb" }));
 
 app.use(
   session({

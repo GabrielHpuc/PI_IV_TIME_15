@@ -54,7 +54,7 @@
       '<section class="home-banner" aria-label="Ofertas"><div><span>GRANDES OFERTAS DE SEMENTES!</span>' +
       "<strong>CONFIRA NOSSOS PARCEIROS</strong>" +
       '<a class="mk-btn" href="catalogo.html?q=sementes">Ver Ofertas</a></div>' + ui.icone("folha") + "</section>" +
-      '<section class="home-secao"><h2>Suas Cotações em Aberto</h2><div class="home-cotacoes">' + cotacoes + "</div></section>" +
+      '<section class="home-secao"><div class="home-titulo"><h2>Suas Cotações em Aberto</h2><a class="mk-btn mk-btn-verde" href="cotacoes.html">Nova cotação</a></div><div class="home-cotacoes">' + cotacoes + "</div></section>" +
       '<section class="home-secao"><h2>Recomendados para Você</h2><div class="grade-produtos">' + painel.recomendados.map(cartaoProduto).join("") + "</div></section>" +
       '<section class="home-secao"><h2>Status dos seus pedidos</h2>' + tabelaPedidos(painel.pedidos) + "</section>";
 
@@ -87,6 +87,9 @@
       '<label>Cultura<input name="cultura" maxlength="60" placeholder="Soja"></label>' +
       '<label>Tecnologia<input name="tecnologia" maxlength="60"></label>' +
       '<label>Embalagem<input name="embalagem" maxlength="60" placeholder="Saco: 40kg"></label>' +
+      '<label>Foto do produto<input type="file" name="foto" id="foto-produto" accept="image/png,image/jpeg,image/webp,image/gif"></label>' +
+      '<div class="previa-foto" id="previa-foto" hidden><img id="previa-foto-img" alt="Prévia da foto do produto"><button class="mk-btn" type="button" id="remover-foto">Remover foto</button></div>' +
+      '<label>Descrição<textarea name="descricao" rows="3" maxlength="1000"></textarea></label>' +
       '<p class="dialogo-msg" id="msg-produto" role="status"></p>' +
       '<div class="dialogo-acoes"><button class="mk-btn" type="button" data-fechar>Cancelar</button><button class="mk-btn mk-btn-verde" type="submit">Salvar</button></div></form></dialog>' +
       '<dialog class="dialogo" id="dlg-laudo"><h2>Vincular laudo MAPA</h2><form id="form-laudo" novalidate>' +
@@ -218,6 +221,8 @@
     document.querySelector("#novo-produto").addEventListener("click", function () {
       document.querySelector("#form-produto").reset();
       document.querySelector("#msg-produto").textContent = "";
+      const previa = document.querySelector("#previa-foto");
+      if (previa) previa.hidden = true;
       dlgProduto.showModal();
     });
 
@@ -225,6 +230,39 @@
       return;
     }
     ligado = true;
+
+    let fotoSelecionada = "";
+    const campoFoto = document.querySelector("#foto-produto");
+    const previaWrap = document.querySelector("#previa-foto");
+    const previaImg = document.querySelector("#previa-foto-img");
+    const btnRemoverFoto = document.querySelector("#remover-foto");
+
+    if (campoFoto) {
+      campoFoto.addEventListener("change", async function () {
+        const arquivo = campoFoto.files && campoFoto.files[0];
+        if (!arquivo) return;
+        try {
+          document.querySelector("#msg-produto").textContent = "";
+          fotoSelecionada = await ui.lerImagem(arquivo);
+          previaImg.src = fotoSelecionada;
+          previaWrap.hidden = false;
+        } catch (erro) {
+          campoFoto.value = "";
+          fotoSelecionada = "";
+          previaWrap.hidden = true;
+          document.querySelector("#msg-produto").textContent = erro.message;
+        }
+      });
+    }
+
+    if (btnRemoverFoto) {
+      btnRemoverFoto.addEventListener("click", function () {
+        if (campoFoto) campoFoto.value = "";
+        fotoSelecionada = "";
+        previaImg.removeAttribute("src");
+        previaWrap.hidden = true;
+      });
+    }
 
     raiz.addEventListener("change", async function (evento) {
       const msg = document.querySelector("#msg-csv");
@@ -280,13 +318,19 @@
       evento.preventDefault();
       const d = new FormData(evento.target);
       const corpo = {};
-      d.forEach(function (valor, chave) { corpo[chave] = valor; });
+      d.forEach(function (valor, chave) {
+        if (chave !== "foto") corpo[chave] = valor;
+      });
       corpo.preco = Number(String(corpo.preco).replace(/\./g, "").replace(",", "."));
       corpo.entregaDias = Number(corpo.entregaDias);
       corpo.estoque = corpo.estoque === "" ? 0 : Number(corpo.estoque);
+      if (fotoSelecionada) {
+        corpo.imagem = fotoSelecionada;
+      }
 
       try {
         await ui.api("/api/produtos", { method: "POST", body: corpo });
+        fotoSelecionada = "";
         dlgProduto.close();
         iniciar();
       } catch (erro) {

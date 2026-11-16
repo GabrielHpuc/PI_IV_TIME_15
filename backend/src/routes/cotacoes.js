@@ -4,7 +4,7 @@ import { getDatabase } from "../config/database.js";
 import { carregarUsuario, exigirTipo } from "../middleware/auth.js";
 import { auditar } from "../utils/auditoria.js";
 import { fornecedorDoUsuario } from "../utils/fornecedores.js";
-import { garantirCotacoes, proximoNumero, statusPelasPropostas } from "../utils/cotacoes.js";
+import { proximoNumero, statusPelasPropostas } from "../utils/cotacoes.js";
 import { arredondar, escaparRegex, idValido, texto } from "../utils/validacao.js";
 
 const router = Router();
@@ -39,7 +39,6 @@ router.get("/", async (req, res, next) => {
     const filtro = {};
 
     if (req.usuario.tipo === "produtor") {
-      await garantirCotacoes(req.usuario.id);
       filtro.userId = req.usuario.id;
     } else {
       filtro.modelo = { $ne: true };

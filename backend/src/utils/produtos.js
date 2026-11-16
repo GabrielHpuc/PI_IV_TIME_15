@@ -27,6 +27,22 @@ export function lerProduto(corpo) {
   if (!Number.isInteger(entregaDias) || entregaDias < 1 || entregaDias > 60) return { erro: "O prazo de entrega deve ficar entre 1 e 60 dias." };
   if (!Number.isInteger(estoque) || estoque < 0) return { erro: "Estoque inválido." };
 
+  let imagens;
+  if (corpo.imagem !== undefined) {
+    const img = String(corpo.imagem || "").trim();
+    if (img) {
+      if (!/^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=\s]+$/i.test(img)) {
+        return { erro: "Formato de imagem inválido. Envie PNG, JPG, WEBP ou GIF." };
+      }
+      if (img.length > 2_000_000) {
+        return { erro: "A imagem é muito grande (máximo 1,5 MB)." };
+      }
+      imagens = [img];
+    } else {
+      imagens = [];
+    }
+  }
+
   return {
     dados: {
       nome, categoria, marca, regiao, preco, entregaDias, estoque,
@@ -39,7 +55,8 @@ export function lerProduto(corpo) {
       condicao: corpo.condicao === "Usado" ? "Usado" : "Novo",
       germinacao: numero(corpo.germinacao, 0),
       vigor: numero(corpo.vigor, 0),
-      pureza: numero(corpo.pureza, 0)
+      pureza: numero(corpo.pureza, 0),
+      ...(imagens !== undefined ? { imagens } : {})
     }
   };
 }

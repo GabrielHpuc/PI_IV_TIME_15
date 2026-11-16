@@ -113,8 +113,64 @@
     return mapa[produto.categoria] || "pacote";
   }
 
+  function fotoProduto(produto) {
+    if (!produto) return "";
+    if (Array.isArray(produto.imagens) && produto.imagens.length && produto.imagens[0]) {
+      return String(produto.imagens[0]);
+    }
+    if (typeof produto.imagem === "string" && produto.imagem) {
+      return produto.imagem;
+    }
+    return "";
+  }
+
   function iconeProduto(produto) {
+    const foto = fotoProduto(produto);
+    if (foto) {
+      return '<img class="mk-thumb-img" src="' + esc(foto) + '" alt="' + esc(produto.nome || "Produto") + '" loading="lazy">';
+    }
     return icone(nomeIconeProduto(produto));
+  }
+
+  function lerImagem(arquivo) {
+    return new Promise(function (resolve, reject) {
+      if (!arquivo) return resolve("");
+      if (!/^image\/(png|jpe?g|webp|gif)$/i.test(arquivo.type)) {
+        return reject(new Error("Selecione uma imagem PNG, JPG, WEBP ou GIF."));
+      }
+      if (arquivo.size > 10 * 1024 * 1024) {
+        return reject(new Error("A imagem deve ter no máximo 10 MB."));
+      }
+      const leitor = new FileReader();
+      leitor.onerror = function () { reject(new Error("Não foi possível ler a imagem.")); };
+      leitor.onload = function () {
+        const img = new Image();
+        img.onerror = function () { reject(new Error("Arquivo de imagem inválido.")); };
+        img.onload = function () {
+          const max = 600;
+          let largura = img.width;
+          let altura = img.height;
+          if (largura > max || altura > max) {
+            if (largura >= altura) {
+              altura = Math.round((altura * max) / largura);
+              largura = max;
+            } else {
+              largura = Math.round((largura * max) / altura);
+              altura = max;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = largura;
+          canvas.height = altura;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, largura, altura);
+          const tipoSaida = arquivo.type === "image/png" ? "image/png" : "image/jpeg";
+          resolve(canvas.toDataURL(tipoSaida, 0.82));
+        };
+        img.src = leitor.result;
+      };
+      leitor.readAsDataURL(arquivo);
+    });
   }
 
   function cabecalhoPadrao(placeholder) {
@@ -145,11 +201,7 @@
   }
 
   function rodape() {
-    return (
-      '<nav aria-label="Rodapé"><a href="#">Sobre Nós</a><a href="#">Parceiros</a>' +
-      '<a href="#">Termos de Uso</a><a href="#">Ajuda</a><a href="#">Contato</a></nav>' +
-      '<p>© 2026 AgroRecursos MarketPlace</p>'
-    );
+    return '<p>© 2026 AgroRecursos MarketPlace</p>';
   }
 
   async function carregarConta() {
@@ -221,7 +273,7 @@
     carregarConta();
   }
 
-  window.AgroUI = { icone: icone, iconeProduto: iconeProduto, nomeIconeProduto: nomeIconeProduto, esc: esc, moeda: moeda, normalizar: normalizar, carrinho: carrinho, api: api, mascararCep: mascararCep };
+  window.AgroUI = { icone: icone, iconeProduto: iconeProduto, nomeIconeProduto: nomeIconeProduto, fotoProduto: fotoProduto, lerImagem: lerImagem, esc: esc, moeda: moeda, normalizar: normalizar, carrinho: carrinho, api: api, mascararCep: mascararCep };
 
   document.addEventListener("DOMContentLoaded", iniciar);
 })();

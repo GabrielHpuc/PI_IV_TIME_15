@@ -1,5 +1,8 @@
 // gabriel
-import { MongoClient } from "mongodb";
+import dns from "node:dns";
+import { MongoClient, ObjectId } from "mongodb";
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 let client;
 let database;
@@ -57,6 +60,24 @@ export async function connectDatabase() {
       console.warn(`Índice não criado em ${colecao}:`, error.message);
     }
   }
+
+  await database.collection("cotacoes").deleteMany({
+    $or: [
+      { modelo: true },
+      { seed: true },
+      {
+        "propostas.fornecedorId": {
+          $in: [
+            new ObjectId("a10000000000000000000001"),
+            new ObjectId("a10000000000000000000002"),
+            new ObjectId("a10000000000000000000003"),
+            new ObjectId("a10000000000000000000004"),
+            new ObjectId("a10000000000000000000005")
+          ]
+        }
+      }
+    ]
+  });
 
   await database.command({ ping: 1 });
 

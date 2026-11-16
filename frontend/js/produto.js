@@ -16,7 +16,13 @@
   }
 
   function montar(produto) {
-    const miniaturas = [ui.nomeIconeProduto(produto), "pacote", "documento", "caminhao"];
+    const fotoUrl = ui.fotoProduto(produto);
+    const miniaturas = [fotoUrl ? { tipo: "img", valor: fotoUrl } : { tipo: "ico", valor: ui.nomeIconeProduto(produto) }, { tipo: "ico", valor: "pacote" }, { tipo: "ico", valor: "documento" }, { tipo: "ico", valor: "caminhao" }];
+    const renderMidia = function (item, classeImg) {
+      return item.tipo === "img"
+        ? '<img class="' + classeImg + '" src="' + ui.esc(item.valor) + '" alt="' + ui.esc(produto.nome) + '">'
+        : ui.icone(item.valor);
+    };
     let atual = 0;
     const avaliacoes = produto.avaliacoes;
 
@@ -68,11 +74,11 @@
       '<div class="produto-layout">' +
       '<div class="galeria mk-card"><div class="galeria-principal" id="galeria-principal">' +
       '<button class="galeria-seta anterior" type="button" id="foto-anterior" aria-label="Foto anterior">‹</button>' +
-      '<span id="foto-atual">' + ui.icone(miniaturas[0]) + "</span>" +
+      '<span id="foto-atual">' + renderMidia(miniaturas[0], "mk-galeria-img") + "</span>" +
       '<button class="galeria-seta proxima" type="button" id="foto-proxima" aria-label="Próxima foto">›</button></div>' +
       '<div class="galeria-miniaturas" id="miniaturas">' +
       miniaturas.map(function (m, i) {
-        return '<button type="button" class="miniatura' + (i === 0 ? " ativa" : "") + '" data-i="' + i + '" aria-label="Foto ' + (i + 1) + '">' + ui.icone(m) + "</button>";
+        return '<button type="button" class="miniatura' + (i === 0 ? " ativa" : "") + '" data-i="' + i + '" aria-label="Foto ' + (i + 1) + '">' + renderMidia(m, "mk-thumb-img") + "</button>";
       }).join("") + "</div></div>" +
 
       '<div class="produto-info"><small>' + ui.esc(produto.condicao) + " | " + produto.vendidos + " vendidos</small>" +
@@ -113,7 +119,7 @@
 
     function mostrar(indice) {
       atual = (indice + miniaturas.length) % miniaturas.length;
-      foto.innerHTML = ui.icone(miniaturas[atual]);
+      foto.innerHTML = renderMidia(miniaturas[atual], "mk-galeria-img");
       botoes.forEach(function (b, i) { b.classList.toggle("ativa", i === atual); });
     }
 
