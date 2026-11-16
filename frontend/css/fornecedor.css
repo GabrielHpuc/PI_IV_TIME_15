@@ -17,3 +17,5 @@
 .forn-form fieldset input { display: inline; width: auto; margin: 0; }
 .forn-resumo { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin: 0 0 14px; }
 .forn-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.forn-prod-celula { display: flex; align-items: center; gap: 10px; }
+.forn-thumb { width: 42px; height: 42px; flex-shrink: 0; border-radius: 8px; font-size: 1.2rem; }

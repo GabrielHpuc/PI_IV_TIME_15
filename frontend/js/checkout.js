@@ -176,7 +176,7 @@
       localStorage.removeItem("agro_carrinho");
       const contador = document.querySelector("#mk-carrinho-qtd");
       if (contador) {
-        contador.textContent = "0";
+        contador.textContent = "";
       }
       listaItens.innerHTML = '<div class="checkout-sucesso"><h2>Pedido ' + ui.esc(resposta.pedido.numero) + ' registrado</h2>' +
         "<p>Total: <strong>" + ui.moeda(resposta.pedido.total) + '</strong>. Acompanhe o andamento com o fornecedor.</p>' +

@@ -180,6 +180,22 @@
   border-radius: 10px;
   background: linear-gradient(135deg, #f3ead7, #e4efe2);
   font-size: 2.6rem;
+  overflow: hidden;
+}
+
+.mk-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.mk-galeria-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 10px;
 }
 
 .mk-vazio {
@@ -244,7 +260,17 @@
 .produto-card-corpo { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 10px; }
 .produto-card-img { position: relative; }
 .produto-card-img .mk-thumb { font-size: 2rem; }
-.produto-card-img .mk-selo { position: absolute; top: 4px; left: 4px; }
+.produto-card-img .mk-selo {
+  position: absolute;
+  bottom: 3px;
+  left: 3px;
+  padding: 1px 5px;
+  font-size: .54rem;
+  line-height: 1.15;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .18);
+}
 .produto-card h3 { margin: 0 0 4px; font-size: .98rem; line-height: 1.25; }
 .produto-card .preco { display: block; margin-bottom: 2px; font-size: 1.1rem; font-weight: 800; }
 .produto-card .entrega { color: var(--texto-suave); font-size: .85rem; }
@@ -268,6 +294,14 @@
   border-radius: 10px;
   background: linear-gradient(135deg, #efe5d0, #dfeadb);
   font-size: 7rem;
+  overflow: hidden;
+}
+
+.galeria-principal #foto-atual {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
 }
 
 .galeria-seta {
@@ -281,6 +315,7 @@
   background: #ffffffcc;
   color: var(--texto);
   font-size: 1.2rem;
+  z-index: 2;
 }
 
 .galeria-seta.anterior { left: 10px; }
@@ -293,6 +328,8 @@
   border-radius: 8px;
   background: #f1ece0;
   font-size: 1.4rem;
+  overflow: hidden;
+  padding: 0;
 }
 
 .miniatura.ativa { border-color: var(--azul); }
@@ -561,6 +598,9 @@
 .dialogo-acoes { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 .dialogo-msg { min-height: 1.2em; margin: 0; font-size: .85rem; color: #b3261e; }
 .dialogo-msg.ok { color: var(--green-2); }
+.previa-foto { display: flex; align-items: center; gap: 10px; margin: 6px 0 10px; }
+.previa-foto[hidden] { display: none; }
+.previa-foto img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
 .avaliar { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
 .avaliar h3 { margin: 0 0 8px; font-size: .95rem; }
 .avaliar label { display: block; margin-bottom: 8px; font-size: .85rem; font-weight: 600; }

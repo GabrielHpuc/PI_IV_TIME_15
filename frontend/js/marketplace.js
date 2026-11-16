@@ -30,6 +30,11 @@
     salvar(itens) {
       try {
         localStorage.setItem(CHAVE_CARRINHO, JSON.stringify(itens));
+        const el = document.querySelector("#mk-carrinho-qtd");
+        if (el) {
+          const total = itens.reduce(function (s, i) { return s + i.qtd; }, 0);
+          el.textContent = total > 0 ? " (" + total + ")" : "";
+        }
       } catch (erro) {
         return;
       }
@@ -113,11 +118,68 @@
     return mapa[produto.categoria] || "pacote";
   }
 
+  function fotoProduto(produto) {
+    if (!produto) return "";
+    if (Array.isArray(produto.imagens) && produto.imagens.length && produto.imagens[0]) {
+      return String(produto.imagens[0]);
+    }
+    if (typeof produto.imagem === "string" && produto.imagem) {
+      return produto.imagem;
+    }
+    return "";
+  }
+
   function iconeProduto(produto) {
+    const foto = fotoProduto(produto);
+    if (foto) {
+      return '<img class="mk-thumb-img" src="' + esc(foto) + '" alt="' + esc(produto.nome || "Produto") + '" loading="lazy">';
+    }
     return icone(nomeIconeProduto(produto));
   }
 
+  function lerImagem(arquivo) {
+    return new Promise(function (resolve, reject) {
+      if (!arquivo) return resolve("");
+      if (!/^image\/(png|jpe?g|webp|gif)$/i.test(arquivo.type)) {
+        return reject(new Error("Selecione uma imagem PNG, JPG, WEBP ou GIF."));
+      }
+      if (arquivo.size > 10 * 1024 * 1024) {
+        return reject(new Error("A imagem deve ter no máximo 10 MB."));
+      }
+      const leitor = new FileReader();
+      leitor.onerror = function () { reject(new Error("Não foi possível ler a imagem.")); };
+      leitor.onload = function () {
+        const img = new Image();
+        img.onerror = function () { reject(new Error("Arquivo de imagem inválido.")); };
+        img.onload = function () {
+          const max = 600;
+          let largura = img.width;
+          let altura = img.height;
+          if (largura > max || altura > max) {
+            if (largura >= altura) {
+              altura = Math.round((altura * max) / largura);
+              largura = max;
+            } else {
+              largura = Math.round((largura * max) / altura);
+              altura = max;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = largura;
+          canvas.height = altura;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, largura, altura);
+          const tipoSaida = arquivo.type === "image/png" ? "image/png" : "image/jpeg";
+          resolve(canvas.toDataURL(tipoSaida, 0.82));
+        };
+        img.src = leitor.result;
+      };
+      leitor.readAsDataURL(arquivo);
+    });
+  }
+
   function cabecalhoPadrao(placeholder) {
+    const qtdCarrinho = carrinho.quantidade();
     return (
       '<a class="mk-brand" href="dashboard.html"><span class="mk-brand-logo">' + icone("folha") + '</span>' +
       '<span class="mk-brand-text"><strong>AgroRecursos</strong><small>MarketPlace</small></span></a>' +
@@ -126,9 +188,10 @@
       '<input id="mk-busca-input" type="search" autocomplete="off" placeholder="' + esc(placeholder) + '" aria-label="Buscar">' +
       '<button type="submit" aria-label="Pesquisar">' + icone("busca") + "</button></form>" +
       '<nav class="mk-nav" aria-label="Navegação do marketplace">' +
-      '<a href="cotacoes.html">' + icone("lista") + '<span>Cotações (<b id="mk-cotacoes-qtd">0</b>)</span></a>' +
+      '<a href="catalogo.html">' + icone("pacote") + '<span>Catálogo</span></a>' +
+      '<a href="cotacoes.html">' + icone("lista") + '<span>Cotações<b id="mk-cotacoes-qtd"></b></span></a>' +
       '<a href="dashboard.html?page=favoritos">' + icone("coracao") + '<span>Favoritos</span></a>' +
-      '<a href="checkout.html">' + icone("carrinho") + '<span>Carrinho (<b id="mk-carrinho-qtd">' + carrinho.quantidade() + '</b>)</span></a>' +
+      '<a href="checkout.html">' + icone("carrinho") + '<span>Carrinho<b id="mk-carrinho-qtd">' + (qtdCarrinho > 0 ? " (" + qtdCarrinho + ")" : "") + '</b></span></a>' +
       '<a href="minha-conta.html">' + icone("usuario") + '<i id="mk-conta-nome">Conta</i></a></nav></div>'
     );
   }
@@ -145,11 +208,7 @@
   }
 
   function rodape() {
-    return (
-      '<nav aria-label="Rodapé"><a href="#">Sobre Nós</a><a href="#">Parceiros</a>' +
-      '<a href="#">Termos de Uso</a><a href="#">Ajuda</a><a href="#">Contato</a></nav>' +
-      '<p>© 2026 AgroRecursos MarketPlace</p>'
-    );
+    return '<p>© 2026 AgroRecursos MarketPlace</p>';
   }
 
   async function carregarConta() {
@@ -161,13 +220,13 @@
       const resposta = await fetch("/api/auth/me", { credentials: "same-origin" });
       const resultado = await resposta.json();
       if (resposta.ok && resultado.user && resultado.user.name) {
-        const iniciais = resultado.user.name.trim().split(/\s+/).map(function (p) { return p.charAt(0).toUpperCase() + "."; }).slice(0, 2).join(" ");
-        alvo.textContent = "Conta (" + iniciais + ")";
+        alvo.textContent = "Conta";
         if (resultado.user.accountType === "produtor") {
           const cotacoes = await fetch("/api/cotacoes", { credentials: "same-origin" }).then(function (r) { return r.json(); });
           const contador = document.querySelector("#mk-cotacoes-qtd");
           if (contador && Array.isArray(cotacoes.itens)) {
-            contador.textContent = cotacoes.itens.filter(function (c) { return c.status === "analise" || c.status === "aguardando"; }).length;
+            const abertas = cotacoes.itens.filter(function (c) { return c.status === "analise" || c.status === "aguardando"; }).length;
+            contador.textContent = abertas > 0 ? " (" + abertas + ")" : "";
           }
         }
       }
@@ -221,7 +280,7 @@
     carregarConta();
   }
 
-  window.AgroUI = { icone: icone, iconeProduto: iconeProduto, nomeIconeProduto: nomeIconeProduto, esc: esc, moeda: moeda, normalizar: normalizar, carrinho: carrinho, api: api, mascararCep: mascararCep };
+  window.AgroUI = { icone: icone, iconeProduto: iconeProduto, nomeIconeProduto: nomeIconeProduto, fotoProduto: fotoProduto, lerImagem: lerImagem, esc: esc, moeda: moeda, normalizar: normalizar, carrinho: carrinho, api: api, mascararCep: mascararCep };
 
   document.addEventListener("DOMContentLoaded", iniciar);
 })();
