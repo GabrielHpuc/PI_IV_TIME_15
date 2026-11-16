@@ -28,14 +28,58 @@
       '<div class="produto-card-acoes">' + acao + "</div></article>";
   }
 
+  const ETAPAS_PEDIDO = [
+    "Pedido criado",
+    "Confirmado por vendedor",
+    "Em separação",
+    "Enviado",
+    "Chegou ao destino"
+  ];
+
+  let pedidosCache = [];
+
+  function trilhaStatusPedido(status) {
+    const entregue = status === "entregue";
+    return '<ol class="pedido-trilha" aria-label="Andamento do pedido">' +
+      ETAPAS_PEDIDO.map(function (etapa, idx) {
+        const concluida = idx < 4 || (idx === 4 && entregue);
+        const atual = (idx === 3 && !entregue) || (idx === 4 && entregue);
+        const classe = (concluida ? "feito" : "pendente") + (atual ? " atual" : "");
+        return '<li class="pedido-etapa ' + classe + '">' +
+          '<span class="pedido-etapa-icone">' + (concluida ? "✓" : "○") + "</span>" +
+          '<span class="pedido-etapa-nome">' + ui.esc(etapa) + "</span>" +
+          "</li>";
+      }).join('<li class="pedido-etapa-seta" aria-hidden="true">→</li>') +
+      "</ol>";
+  }
+
+  function cartaoPedido(p) {
+    const listaItens = Array.isArray(p.itens) && p.itens.length
+      ? '<p class="pedido-itens">' + p.itens.map(function (i) {
+          return ui.esc(i.quantidade + "x " + i.nome);
+        }).join(" · ") + "</p>"
+      : "";
+    const destino = p.entrega && p.entrega.cidade
+      ? '<span class="pedido-destino">Destino: ' + ui.esc(p.entrega.cidade + "/" + p.entrega.estado) + "</span>"
+      : "";
+
+    return '<article class="pedido-card mk-card">' +
+      '<div class="pedido-card-topo">' +
+      '<div><strong>Pedido ' + ui.esc(p.numero) + '</strong> <span class="pedido-data">· ' + data(p.criadoEm) + "</span> " + destino + "</div>" +
+      '<div class="pedido-card-direita"><strong class="pedido-total">' + ui.moeda(p.total) + '</strong>' +
+      '<button type="button" class="mk-btn mk-btn-verde btn-comparar" data-repetir-pedido="' + ui.esc(p.id) + '">Fazer pedido novamente</button></div>' +
+      "</div>" +
+      listaItens +
+      trilhaStatusPedido(p.status) +
+      "</article>";
+  }
+
   function tabelaPedidos(pedidos) {
-    if (!pedidos.length) {
+    pedidosCache = Array.isArray(pedidos) ? pedidos : [];
+    if (!pedidosCache.length) {
       return '<p class="mk-vazio mk-card">Nenhum pedido até agora.</p>';
     }
-    return '<div class="tabela-wrap mk-card"><table class="tabela-cotacoes"><thead><tr><th>Pedido</th><th>Data</th><th>Status</th><th>Total</th></tr></thead><tbody>' +
-      pedidos.map(function (p) {
-        return "<tr><td>" + ui.esc(p.numero) + "</td><td>" + data(p.criadoEm) + "</td><td>" + ui.esc(rotulosPedido[p.status] || p.status) + "</td><td>" + ui.moeda(p.total) + "</td></tr>";
-      }).join("") + "</tbody></table></div>";
+    return '<div class="lista-pedidos">' + pedidosCache.map(cartaoPedido).join("") + "</div>";
   }
 
   let escutaProdutor = false;
@@ -51,12 +95,38 @@
         }
         return;
       }
+      const repetir = evento.target.closest("[data-repetir-pedido]");
+      if (repetir) {
+        const alvo = pedidosCache.find(function (p) { return p.id === repetir.dataset.repetirPedido; });
+        if (alvo && Array.isArray(alvo.itens) && alvo.itens.length) {
+          alvo.itens.forEach(function (i) {
+            if (i.produtoId) ui.carrinho.adicionar(String(i.produtoId), Number(i.quantidade) || 1);
+          });
+          window.location.href = "checkout.html";
+        }
+        return;
+      }
       const botao = evento.target.closest("[data-comprar]");
       if (botao) {
         ui.carrinho.adicionar(botao.dataset.comprar, 1);
         window.location.href = "checkout.html";
       }
     });
+  }
+
+  async function paginaPedidos() {
+    document.title = "Meus Pedidos | AgroRecursos";
+    vincularCliquesCards();
+    try {
+      const r = await ui.api("/api/pedidos");
+      const itens = r.itens || [];
+      raiz.innerHTML =
+        '<section class="home-secao"><div class="home-titulo"><h2>Meus Pedidos</h2><a class="mk-btn" href="dashboard.html">← Voltar ao início</a></div>' +
+        tabelaPedidos(itens) +
+        "</section>";
+    } catch (erro) {
+      raiz.innerHTML = '<p class="mk-vazio mk-card">' + ui.esc(erro.message) + "</p>";
+    }
   }
 
   async function paginaFavoritos() {
@@ -102,7 +172,7 @@
       '<a class="mk-btn" href="catalogo.html?q=sementes">Ver Ofertas</a></div>' + ui.icone("folha") + "</section>" +
       '<section class="home-secao"><div class="home-titulo"><h2>Suas Cotações em Aberto</h2><a class="mk-btn mk-btn-verde" href="cotacoes.html">Nova cotação</a></div><div class="home-cotacoes">' + cotacoes + "</div></section>" +
       '<section class="home-secao"><h2>Recomendados para Você</h2><div class="grade-produtos">' + painel.recomendados.map(cartaoProduto).join("") + "</div></section>" +
-      '<section class="home-secao"><h2>Status dos seus pedidos</h2>' + tabelaPedidos(painel.pedidos) + "</section>";
+      '<section class="home-secao" id="meus-pedidos"><div class="home-titulo"><h2>Meus Pedidos</h2><a class="mk-btn" href="dashboard.html?page=pedidos">Ver todos os pedidos</a></div>' + tabelaPedidos(painel.pedidos) + "</section>";
 
     vincularCliquesCards();
   }
@@ -397,8 +467,13 @@
   async function iniciar() {
     try {
       const painel = await ui.api("/api/painel");
-      if (new URLSearchParams(window.location.search).get("page") === "favoritos") {
+      const pagina = new URLSearchParams(window.location.search).get("page");
+      if (pagina === "favoritos") {
         await paginaFavoritos();
+        return;
+      }
+      if (pagina === "pedidos" && painel.tipo === "produtor") {
+        await paginaPedidos();
         return;
       }
       await (painel.tipo === "produtor" ? produtor : fornecedor)(painel);

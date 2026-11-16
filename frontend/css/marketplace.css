@@ -678,6 +678,98 @@
 .home-cotacao p { margin: 0 0 4px; font-size: .9rem; }
 .home-numero { font-size: 2rem !important; font-weight: 800; color: var(--green); }
 .home-link { display: inline-block; margin-top: 6px; font-weight: 700; }
+
+/* ===== TRILHA DE STATUS DE PEDIDOS E MEUS PEDIDOS ===== */
+.lista-pedidos {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pedido-card {
+  padding: 16px 20px;
+}
+.pedido-card-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.pedido-card-direita {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pedido-data,
+.pedido-destino {
+  color: var(--texto-suave, #65756b);
+  font-size: .88rem;
+}
+.pedido-total {
+  font-size: 1.1rem;
+  color: var(--green);
+}
+.pedido-itens {
+  margin: 0 0 14px;
+  color: var(--texto-suave, #65756b);
+  font-size: .92rem;
+}
+.pedido-trilha {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px;
+  list-style: none;
+  border-radius: 10px;
+  background: #eef5f0;
+}
+.pedido-etapa {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .84rem;
+  font-weight: 600;
+}
+.pedido-etapa-icone {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: .75rem;
+  font-weight: 800;
+}
+.pedido-etapa.feito {
+  color: #17603a;
+}
+.pedido-etapa.feito .pedido-etapa-icone {
+  background: #2f9e55;
+  color: #fff;
+}
+.pedido-etapa.atual {
+  font-weight: 800;
+}
+.pedido-etapa.pendente {
+  color: #7b8a80;
+  opacity: .75;
+}
+.pedido-etapa.pendente .pedido-etapa-icone {
+  background: #d5dfd8;
+  color: #5d6c62;
+}
+.pedido-etapa-seta {
+  color: #7b8a80;
+  font-weight: 700;
+}
+html.dark-mode .pedido-total { color: #7fe3a0; }
+html.dark-mode .pedido-trilha { background: #141e19; }
+html.dark-mode .pedido-etapa.feito { color: #8ce0a8; }
+html.dark-mode .pedido-etapa.pendente { color: #86998d; }
+html.dark-mode .pedido-etapa.pendente .pedido-etapa-icone { background: #26352c; color: #9cb0a4; }
 @media (max-width: 600px) { .home-banner { padding: 18px; } .home-banner .ico { display: none; } .cad-duas { grid-template-columns: 1fr; } }
 
 /* ===== MODO ESCURO (MARKETPLACE) ===== */

@@ -178,12 +178,7 @@
       if (contador) {
         contador.textContent = "";
       }
-      listaItens.innerHTML = '<div class="checkout-sucesso"><h2>Pedido ' + ui.esc(resposta.pedido.numero) + ' registrado</h2>' +
-        "<p>Total: <strong>" + ui.moeda(resposta.pedido.total) + '</strong>. Acompanhe o andamento com o fornecedor.</p>' +
-        '<a class="mk-btn mk-btn-verde" href="catalogo.html">Continuar comprando</a></div>';
-      aviso.hidden = true;
-      aviso_("Pedido registrado com sucesso.", true);
-      botaoPagar.textContent = "Pedido concluído";
+      window.location.href = "dashboard.html?page=pedidos";
     } catch (erro) {
       botaoPagar.disabled = false;
       botaoPagar.textContent = "Prosseguir para Pagamento ›";

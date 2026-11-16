@@ -6,6 +6,7 @@ const prefMessage = $("#pref-message");
 const darkToggle = $("#dark-mode-toggle");
 const darkLabel = $("#dark-mode-label");
 const favoritesContainer = $("#favorites-list");
+const purchasesContainer = $("#purchases-list");
 const saveButton = $("#save-profile");
 
 function applyTheme(dark) {
@@ -90,6 +91,84 @@ if (favoritesContainer) {
   });
 }
 
+const ETAPAS_PEDIDO = [
+  "Pedido criado",
+  "Confirmado por vendedor",
+  "Em separação",
+  "Enviado",
+  "Chegou ao destino"
+];
+let userOrders = [];
+
+function renderOrderTimeline(status) {
+  const entregue = status === "entregue";
+  return '<ol class="pedido-trilha" aria-label="Andamento do pedido">' +
+    ETAPAS_PEDIDO.map((etapa, idx) => {
+      const concluida = idx < 4 || (idx === 4 && entregue);
+      const atual = (idx === 3 && !entregue) || (idx === 4 && entregue);
+      const classe = (concluida ? "feito" : "pendente") + (atual ? " atual" : "");
+      return '<li class="pedido-etapa ' + classe + '">' +
+        '<span class="pedido-etapa-icone">' + (concluida ? "✓" : "○") + "</span>" +
+        '<span class="pedido-etapa-nome">' + esc(etapa) + "</span></li>";
+    }).join('<li class="pedido-etapa-seta" aria-hidden="true">→</li>') +
+    "</ol>";
+}
+
+async function renderPurchasesSection() {
+  if (!purchasesContainer) return;
+  try {
+    const res = await fetch("/api/pedidos", { credentials: "same-origin" });
+    const data = await res.json();
+    userOrders = Array.isArray(data.itens) ? data.itens : [];
+    if (!userOrders.length) {
+      purchasesContainer.innerHTML = '<div class="account-card empty-state"><h2>Meus pedidos</h2><p>Você ainda não realizou nenhum pedido.</p><a href="catalogo.html" class="button">Explorar o catálogo</a></div>';
+      return;
+    }
+    purchasesContainer.innerHTML = '<div class="lista-pedidos">' + userOrders.map(p => {
+      const dataStr = new Date(p.criadoEm).toLocaleDateString("pt-BR");
+      const listaItens = Array.isArray(p.itens) && p.itens.length
+        ? '<p class="pedido-itens">' + p.itens.map(i => esc(i.quantidade + "x " + i.nome)).join(" · ") + "</p>"
+        : "";
+      const destino = p.entrega && p.entrega.cidade
+        ? '<span class="pedido-destino">Destino: ' + esc(p.entrega.cidade + "/" + p.entrega.estado) + "</span>"
+        : "";
+      return '<article class="pedido-card mk-card">' +
+        '<div class="pedido-card-topo">' +
+        '<div><strong>Pedido ' + esc(p.numero) + '</strong> <span class="pedido-data">· ' + dataStr + "</span> " + destino + "</div>" +
+        '<div class="pedido-card-direita"><strong class="pedido-total">' + moeda(p.total) + '</strong>' +
+        '<button type="button" class="mk-btn mk-btn-verde btn-comparar" data-repetir-pedido="' + esc(p.id) + '">Fazer pedido novamente</button></div>' +
+        "</div>" +
+        listaItens +
+        renderOrderTimeline(p.status) +
+        "</article>";
+    }).join("") + "</div>";
+  } catch (e) {
+    purchasesContainer.innerHTML = '<div class="account-card empty-state"><p>Não foi possível carregar seus pedidos.</p></div>';
+  }
+}
+
+if (purchasesContainer) {
+  purchasesContainer.addEventListener("click", (event) => {
+    const repetir = event.target.closest("[data-repetir-pedido]");
+    if (!repetir) return;
+    const alvo = userOrders.find(p => p.id === repetir.dataset.repetirPedido);
+    if (!alvo || !Array.isArray(alvo.itens)) return;
+    try {
+      const atual = JSON.parse(localStorage.getItem("agro_carrinho")) || [];
+      const carrinho = Array.isArray(atual) ? atual : [];
+      alvo.itens.forEach(i => {
+        const id = String(i.produtoId);
+        const qtd = Number(i.quantidade) || 1;
+        const ex = carrinho.find(c => c.id === id);
+        if (ex) ex.qtd += qtd;
+        else carrinho.push({ id, qtd });
+      });
+      localStorage.setItem("agro_carrinho", JSON.stringify(carrinho));
+      window.location.href = "checkout.html";
+    } catch (e) {}
+  });
+}
+
 if (darkToggle) {
   darkToggle.addEventListener("change", async () => {
     const dark = darkToggle.checked;
@@ -152,6 +231,7 @@ function showSection(name) {
   $("#page-title").textContent = titles[name];
   if (name === "edit-profile" && currentUser) { fillForm(currentUser); profileMessage.textContent = ""; profileMessage.classList.remove("success-message"); }
   if (name === "favorites") { renderFavoritesSection(); }
+  if (name === "purchases") { renderPurchasesSection(); }
 }
 document.querySelectorAll("[data-section]").forEach(el => el.addEventListener("click", () => showSection(el.dataset.section)));
 async function loadAccount() {
@@ -177,7 +257,8 @@ async function loadAccount() {
     $("#profile-phone").textContent = currentUser.phone || "Não informado";
     $("#profile-document").textContent = currentUser.document || "Não informado";
     $("#profile-address").textContent = addressLabel(currentUser.address);
-    fillForm(currentUser); statusElement.hidden = true; showSection("overview");
+    const secaoInicial = new URLSearchParams(window.location.search).get("section");
+    fillForm(currentUser); statusElement.hidden = true; showSection(sections[secaoInicial] ? secaoInicial : "overview");
   } catch (error) { statusElement.hidden = false; statusElement.textContent = error.message; console.error(error); }
 }
 $("#profile-form").addEventListener("submit", async event => {
