@@ -1,3 +1,5 @@
+// Gabriel
+
 # Modelo de dados — AgroRecursos MarketPlace
 
 Banco: MongoDB (`agrorecursos`). Acesso pelo driver oficial `mongodb`. Os índices são criados na inicialização (`backend/src/config/database.js`).
