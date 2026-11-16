@@ -144,7 +144,6 @@
 
     document.querySelector("#add-carrinho").addEventListener("click", function () {
       ui.carrinho.adicionar(produto.id, 1);
-      document.querySelector("#mk-carrinho-qtd").textContent = ui.carrinho.quantidade();
       document.querySelector("#carrinho-aviso").textContent = "Produto adicionado ao carrinho.";
     });
 

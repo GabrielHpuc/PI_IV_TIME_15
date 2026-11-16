@@ -30,6 +30,11 @@
     salvar(itens) {
       try {
         localStorage.setItem(CHAVE_CARRINHO, JSON.stringify(itens));
+        const el = document.querySelector("#mk-carrinho-qtd");
+        if (el) {
+          const total = itens.reduce(function (s, i) { return s + i.qtd; }, 0);
+          el.textContent = total > 0 ? " (" + total + ")" : "";
+        }
       } catch (erro) {
         return;
       }
@@ -174,6 +179,7 @@
   }
 
   function cabecalhoPadrao(placeholder) {
+    const qtdCarrinho = carrinho.quantidade();
     return (
       '<a class="mk-brand" href="dashboard.html"><span class="mk-brand-logo">' + icone("folha") + '</span>' +
       '<span class="mk-brand-text"><strong>AgroRecursos</strong><small>MarketPlace</small></span></a>' +
@@ -182,9 +188,10 @@
       '<input id="mk-busca-input" type="search" autocomplete="off" placeholder="' + esc(placeholder) + '" aria-label="Buscar">' +
       '<button type="submit" aria-label="Pesquisar">' + icone("busca") + "</button></form>" +
       '<nav class="mk-nav" aria-label="Navegação do marketplace">' +
-      '<a href="cotacoes.html">' + icone("lista") + '<span>Cotações (<b id="mk-cotacoes-qtd">0</b>)</span></a>' +
+      '<a href="catalogo.html">' + icone("pacote") + '<span>Catálogo</span></a>' +
+      '<a href="cotacoes.html">' + icone("lista") + '<span>Cotações<b id="mk-cotacoes-qtd"></b></span></a>' +
       '<a href="dashboard.html?page=favoritos">' + icone("coracao") + '<span>Favoritos</span></a>' +
-      '<a href="checkout.html">' + icone("carrinho") + '<span>Carrinho (<b id="mk-carrinho-qtd">' + carrinho.quantidade() + '</b>)</span></a>' +
+      '<a href="checkout.html">' + icone("carrinho") + '<span>Carrinho<b id="mk-carrinho-qtd">' + (qtdCarrinho > 0 ? " (" + qtdCarrinho + ")" : "") + '</b></span></a>' +
       '<a href="minha-conta.html">' + icone("usuario") + '<i id="mk-conta-nome">Conta</i></a></nav></div>'
     );
   }
@@ -213,13 +220,13 @@
       const resposta = await fetch("/api/auth/me", { credentials: "same-origin" });
       const resultado = await resposta.json();
       if (resposta.ok && resultado.user && resultado.user.name) {
-        const iniciais = resultado.user.name.trim().split(/\s+/).map(function (p) { return p.charAt(0).toUpperCase() + "."; }).slice(0, 2).join(" ");
-        alvo.textContent = "Conta (" + iniciais + ")";
+        alvo.textContent = "Conta";
         if (resultado.user.accountType === "produtor") {
           const cotacoes = await fetch("/api/cotacoes", { credentials: "same-origin" }).then(function (r) { return r.json(); });
           const contador = document.querySelector("#mk-cotacoes-qtd");
           if (contador && Array.isArray(cotacoes.itens)) {
-            contador.textContent = cotacoes.itens.filter(function (c) { return c.status === "analise" || c.status === "aguardando"; }).length;
+            const abertas = cotacoes.itens.filter(function (c) { return c.status === "analise" || c.status === "aguardando"; }).length;
+            contador.textContent = abertas > 0 ? " (" + abertas + ")" : "";
           }
         }
       }

@@ -45,8 +45,9 @@
 
     lista.innerHTML = itens.map(function (f) {
       const ativo = filtros[chave].has(f.nome) ? " ativo" : "";
+      const qtd = f.total > 0 ? "<span>(" + f.total + ")</span>" : "";
       return '<li><button type="button" class="filtro-item' + ativo + '" data-chave="' + chave + '" data-valor="' + ui.esc(f.nome) + '">' +
-        "<span>" + ui.esc(f.nome) + "</span><span>(" + f.total + ")</span></button></li>";
+        "<span>" + ui.esc(f.nome) + "</span>" + qtd + "</button></li>";
     }).join("");
   }
 
