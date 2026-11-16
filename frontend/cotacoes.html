@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Cotações | AgroRecursos</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/marketplace.css">
+  <script src="js/marketplace.js" defer></script>
+  <script src="js/cotacoes.js" defer></script>
+</head>
+<body class="mk-page" data-pagina="cotacoes" data-busca="cotacoes">
+  <header id="site-header"></header>
+
+  <main class="mk-content">
+    <h1 class="cotacoes-titulo">Painel de Cotações Web</h1>
+
+    <div class="cotacoes-acoes"><button class="mk-btn mk-btn-verde" type="button" id="nova-cotacao" hidden>Solicitar nova cotação</button></div>
+
+    <div class="tabela-wrap mk-card">
+      <table class="tabela-cotacoes">
+        <thead>
+          <tr>
+            <th>ID Cotação</th>
+            <th>Item Principal</th>
+            <th>Quantidade</th>
+            <th>Criação</th>
+            <th>Vencimento</th>
+            <th>Status</th>
+            <th>Propostas</th>
+            <th><span class="sr-only">Ações</span></th>
+          </tr>
+        </thead>
+        <tbody id="corpo-cotacoes"></tbody>
+      </table>
+      <p class="mk-vazio" id="cotacoes-vazio" hidden>Nenhuma cotação encontrada.</p>
+    </div>
+  </main>
+
+  <dialog class="comparativo" id="comparativo" aria-labelledby="comparativo-titulo">
+    <div class="comparativo-topo">
+      <h2 id="comparativo-titulo">Comparar propostas</h2>
+      <button class="comparativo-fechar" type="button" id="comparativo-fechar" aria-label="Fechar">×</button>
+    </div>
+    <div class="tabela-wrap">
+      <table class="comparativo-tabela" id="comparativo-tabela"></table>
+    </div>
+    <div class="comparativo-acoes" id="comparativo-acoes">
+      <button class="mk-btn mk-btn-verde" type="button" id="aprovar">Aprovar Orçamento</button>
+      <button class="mk-btn" type="button" id="recusar">Recusar Tudo</button>
+    </div>
+    <p class="comparativo-nota" id="comparativo-nota">Clique em uma coluna para escolher o fornecedor.</p>
+  </dialog>
+
+  <dialog class="dialogo" id="dialogo-nova" aria-labelledby="nova-titulo">
+    <h2 id="nova-titulo">Solicitar nova cotação</h2>
+    <form id="form-nova" novalidate>
+      <label>Item<input name="item" maxlength="120" placeholder="Ex.: Sementes de Soja RR 40kg" required></label>
+      <label>Quantidade<input name="quantidade" maxlength="40" placeholder="Ex.: 200 Sacos" required></label>
+      <label>Prazo para receber propostas
+        <select name="diasValidade"><option value="2">2 dias</option><option value="3" selected>3 dias</option><option value="5">5 dias</option><option value="7">7 dias</option></select>
+      </label>
+      <p class="dialogo-msg" id="nova-msg" role="status"></p>
+      <div class="dialogo-acoes"><button class="mk-btn" type="button" data-fechar>Cancelar</button><button class="mk-btn mk-btn-verde" type="submit">Enviar cotação</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="dialogo" id="dialogo-proposta" aria-labelledby="proposta-titulo">
+    <h2 id="proposta-titulo">Enviar proposta</h2>
+    <form id="form-proposta" novalidate>
+      <label>Preço total (R$)<input name="preco" inputmode="decimal" placeholder="0,00" required></label>
+      <label>Prazo de entrega (dias)<input name="prazo" inputmode="numeric" placeholder="3" required></label>
+      <label class="dialogo-check"><input type="checkbox" name="laudo"> Inclui laudo MAPA</label>
+      <p class="dialogo-msg" id="proposta-msg" role="status"></p>
+      <div class="dialogo-acoes"><button class="mk-btn" type="button" data-fechar>Cancelar</button><button class="mk-btn mk-btn-verde" type="submit">Enviar proposta</button></div>
+    </form>
+  </dialog>
+
+  <footer id="site-footer"></footer>
+</body>
+</html>

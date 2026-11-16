@@ -1,0 +1,276 @@
+[
+  {
+    "_id": {
+      "$oid": "c30000000000000000000001"
+    },
+    "numero": "MAPA-00123",
+    "orgao": "MAPA",
+    "produtoId": {
+      "$oid": "b20000000000000000000001"
+    },
+    "fornecedorId": {
+      "$oid": "a10000000000000000000001"
+    },
+    "emissao": {
+      "$date": "2026-03-10T00:00:00Z"
+    },
+    "validade": {
+      "$date": "2027-03-10T00:00:00Z"
+    },
+    "resultados": {
+      "Germinação": "92%",
+      "Vigor": "88%",
+      "Pureza": "99.5%"
+    },
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c30000000000000000000002"
+    },
+    "numero": "MAPA-00124",
+    "orgao": "MAPA",
+    "produtoId": {
+      "$oid": "b20000000000000000000003"
+    },
+    "fornecedorId": {
+      "$oid": "a10000000000000000000003"
+    },
+    "emissao": {
+      "$date": "2026-03-10T00:00:00Z"
+    },
+    "validade": {
+      "$date": "2027-03-10T00:00:00Z"
+    },
+    "resultados": {
+      "Germinação": "94%",
+      "Vigor": "90%",
+      "Pureza": "99.7%"
+    },
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c30000000000000000000003"
+    },
+    "numero": "MAPA-00125",
+    "orgao": "MAPA",
+    "produtoId": {
+      "$oid": "b20000000000000000000006"
+    },
+    "fornecedorId": {
+      "$oid": "a10000000000000000000001"
+    },
+    "emissao": {
+      "$date": "2026-03-10T00:00:00Z"
+    },
+    "validade": {
+      "$date": "2027-03-10T00:00:00Z"
+    },
+    "resultados": {
+      "Germinação": "93%",
+      "Vigor": "89%",
+      "Pureza": "99.6%"
+    },
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c30000000000000000000004"
+    },
+    "numero": "MAPA-00126",
+    "orgao": "MAPA",
+    "produtoId": {
+      "$oid": "b20000000000000000000008"
+    },
+    "fornecedorId": {
+      "$oid": "a10000000000000000000003"
+    },
+    "emissao": {
+      "$date": "2026-03-10T00:00:00Z"
+    },
+    "validade": {
+      "$date": "2027-03-10T00:00:00Z"
+    },
+    "resultados": {
+      "Conformidade": "Aprovado",
+      "Parâmetros": "Ureia 45% N"
+    },
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c30000000000000000000005"
+    },
+    "numero": "MAPA-00127",
+    "orgao": "MAPA",
+    "produtoId": {
+      "$oid": "b20000000000000000000009"
+    },
+    "fornecedorId": {
+      "$oid": "a10000000000000000000004"
+    },
+    "emissao": {
+      "$date": "2026-03-10T00:00:00Z"
+    },
+    "validade": {
+      "$date": "2027-03-10T00:00:00Z"
+    },
+    "resultados": {
+      "Conformidade": "Aprovado",
+      "Parâmetros": "MAP 11-52-00"
+    },
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c30000000000000000000006"
+    },
+    "numero": "MAPA-00128",
+    "orgao": "MAPA",
+    "produtoId": {
+      "$oid": "b20000000000000000000010"
+    },
+    "fornecedorId": {
+      "$oid": "a10000000000000000000005"
+    },
+    "emissao": {
+      "$date": "2026-03-10T00:00:00Z"
+    },
+    "validade": {
+      "$date": "2027-03-10T00:00:00Z"
+    },
+    "resultados": {
+      "Conformidade": "Aprovado",
+      "Parâmetros": "Glifosato"
+    },
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c30000000000000000000007"
+    },
+    "numero": "MAPA-00129",
+    "orgao": "MAPA",
+    "produtoId": {
+      "$oid": "b20000000000000000000013"
+    },
+    "fornecedorId": {
+      "$oid": "a10000000000000000000003"
+    },
+    "emissao": {
+      "$date": "2026-03-10T00:00:00Z"
+    },
+    "validade": {
+      "$date": "2027-03-10T00:00:00Z"
+    },
+    "resultados": {
+      "Germinação": "96%",
+      "Vigor": "92%",
+      "Pureza": "99.9%"
+    },
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c30000000000000000000008"
+    },
+    "numero": "MAPA-00130",
+    "orgao": "MAPA",
+    "produtoId": {
+      "$oid": "b20000000000000000000015"
+    },
+    "fornecedorId": {
+      "$oid": "a10000000000000000000005"
+    },
+    "emissao": {
+      "$date": "2026-03-10T00:00:00Z"
+    },
+    "validade": {
+      "$date": "2027-03-10T00:00:00Z"
+    },
+    "resultados": {
+      "Conformidade": "Aprovado",
+      "Parâmetros": "NPK 20-05-20"
+    },
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c30000000000000000000009"
+    },
+    "numero": "MAPA-00131",
+    "orgao": "MAPA",
+    "produtoId": {
+      "$oid": "b20000000000000000000017"
+    },
+    "fornecedorId": {
+      "$oid": "a10000000000000000000002"
+    },
+    "emissao": {
+      "$date": "2026-03-10T00:00:00Z"
+    },
+    "validade": {
+      "$date": "2027-03-10T00:00:00Z"
+    },
+    "resultados": {
+      "Conformidade": "Aprovado",
+      "Parâmetros": "Triazol"
+    },
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "c30000000000000000000010"
+    },
+    "numero": "MAPA-00132",
+    "orgao": "MAPA",
+    "produtoId": {
+      "$oid": "b20000000000000000000018"
+    },
+    "fornecedorId": {
+      "$oid": "a10000000000000000000003"
+    },
+    "emissao": {
+      "$date": "2026-03-10T00:00:00Z"
+    },
+    "validade": {
+      "$date": "2027-03-10T00:00:00Z"
+    },
+    "resultados": {
+      "Conformidade": "Aprovado",
+      "Parâmetros": "Piretroide"
+    },
+    "seed": true,
+    "criadoEm": {
+      "$date": "2026-03-10T12:00:00Z"
+    }
+  }
+]
