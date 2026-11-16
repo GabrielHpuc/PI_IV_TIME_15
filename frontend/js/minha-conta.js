@@ -2,7 +2,120 @@
 const $ = (selector) => document.querySelector(selector);
 const statusElement = $("#account-status");
 const profileMessage = $("#profile-message");
+const prefMessage = $("#pref-message");
+const darkToggle = $("#dark-mode-toggle");
+const darkLabel = $("#dark-mode-label");
+const favoritesContainer = $("#favorites-list");
 const saveButton = $("#save-profile");
+
+function applyTheme(dark) {
+  const isDark = Boolean(dark);
+  document.documentElement.classList.toggle("dark-mode", isDark);
+  try {
+    localStorage.setItem("agro_tema", isDark ? "dark" : "light");
+  } catch (e) {}
+  if (darkToggle) darkToggle.checked = isDark;
+  if (darkLabel) darkLabel.textContent = isDark ? "Ativado" : "Desativado";
+}
+
+try {
+  applyTheme(localStorage.getItem("agro_tema") === "dark");
+} catch (e) {}
+
+const esc = (texto) => String(texto ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const moeda = (valor) => Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+function readFavs() {
+  try {
+    const d = JSON.parse(localStorage.getItem("agro_favoritos"));
+    return Array.isArray(d) ? d.filter(id => typeof id === "string" && /^[a-f0-9]{24}$/i.test(id)) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveFavs(ids) {
+  const unique = Array.from(new Set(ids));
+  try {
+    localStorage.setItem("agro_favoritos", JSON.stringify(unique));
+  } catch (e) {}
+  return unique;
+}
+
+async function renderFavoritesSection() {
+  if (!favoritesContainer) return;
+  const ids = readFavs();
+  if (!ids.length) {
+    favoritesContainer.innerHTML = '<div class="account-card empty-state"><h2>Seus favoritos</h2><p>Você ainda não favoritou nenhum produto.</p><a href="catalogo.html" class="button">Explorar o catálogo</a></div>';
+    return;
+  }
+  try {
+    const res = await fetch("/api/produtos?ids=" + encodeURIComponent(ids.join(",")) + "&limite=48", { credentials: "same-origin" });
+    const data = await res.json();
+    const itens = Array.isArray(data.itens) ? data.itens : [];
+    if (!itens.length) {
+      favoritesContainer.innerHTML = '<div class="account-card empty-state"><h2>Seus favoritos</h2><p>Você ainda não favoritou nenhum produto.</p><a href="catalogo.html" class="button">Explorar o catálogo</a></div>';
+      return;
+    }
+    favoritesContainer.innerHTML = '<div class="grade-produtos">' + itens.map(p => {
+      const selo = p.laudo ? '<span class="mk-selo">Laudo MAPA</span>' : "";
+      const foto = (Array.isArray(p.imagens) && p.imagens[0]) || p.imagem || "";
+      const thumb = foto
+        ? '<img class="mk-thumb-img" src="' + esc(foto) + '" alt="' + esc(p.nome) + '">'
+        : "🌱";
+      return '<article class="produto-card mk-card"><div class="produto-card-corpo">' +
+        '<div class="produto-card-img"><div class="mk-thumb">' + thumb + "</div>" + selo + "</div>" +
+        '<div class="produto-card-info"><h3>' + esc(p.nome) + '</h3><span class="preco">' + moeda(p.preco) + "</span></div>" +
+        '<button type="button" class="btn-favorito ativo" data-favorito="' + esc(p.id) + '" aria-pressed="true" title="Remover dos favoritos">★</button></div>' +
+        '<div class="produto-card-acoes"><a class="mk-btn" href="produto.html?id=' + esc(p.id) + '">Ver Detalhes</a></div></article>';
+    }).join("") + "</div>";
+  } catch (e) {
+    favoritesContainer.innerHTML = '<div class="account-card empty-state"><p>Não foi possível carregar seus favoritos.</p></div>';
+  }
+}
+
+if (favoritesContainer) {
+  favoritesContainer.addEventListener("click", async (event) => {
+    const btn = event.target.closest("[data-favorito]");
+    if (!btn) return;
+    const alvo = btn.dataset.favorito;
+    const novaLista = saveFavs(readFavs().filter(id => id !== alvo));
+    fetch("/api/auth/preferences", {
+      method: "PUT",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ favoritos: novaLista })
+    }).catch(() => {});
+    renderFavoritesSection();
+  });
+}
+
+if (darkToggle) {
+  darkToggle.addEventListener("change", async () => {
+    const dark = darkToggle.checked;
+    applyTheme(dark);
+    if (prefMessage) {
+      prefMessage.textContent = "Salvando preferência...";
+      prefMessage.classList.add("success-message");
+    }
+    try {
+      const res = await fetch("/api/auth/preferences", {
+        method: "PUT",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ darkMode: dark })
+      });
+      if (!res.ok) throw new Error("Não foi possível salvar a preferência.");
+      if (currentUser) currentUser.darkMode = dark;
+      if (prefMessage) prefMessage.textContent = "Preferência de tema salva na sua conta!";
+    } catch (err) {
+      if (prefMessage) {
+        prefMessage.classList.remove("success-message");
+        prefMessage.textContent = err.message;
+      }
+    }
+  });
+}
 const fields = {
   name: $("#edit-name"), email: $("#edit-email"), phone: $("#edit-phone"),
   document: $("#edit-document"), cep: $("#edit-cep"), street: $("#edit-street"),
@@ -38,6 +151,7 @@ function showSection(name) {
   document.querySelectorAll(".account-nav-item[data-section]").forEach(button => button.classList.toggle("active", button.dataset.section === name));
   $("#page-title").textContent = titles[name];
   if (name === "edit-profile" && currentUser) { fillForm(currentUser); profileMessage.textContent = ""; profileMessage.classList.remove("success-message"); }
+  if (name === "favorites") { renderFavoritesSection(); }
 }
 document.querySelectorAll("[data-section]").forEach(el => el.addEventListener("click", () => showSection(el.dataset.section)));
 async function loadAccount() {
@@ -47,6 +161,12 @@ async function loadAccount() {
     const result = await response.json();
     if (!response.ok || !result.user) throw new Error(result.message || "Não foi possível carregar sua conta.");
     currentUser = result.user;
+    if (typeof currentUser.darkMode === "boolean") {
+      applyTheme(currentUser.darkMode);
+    }
+    if (Array.isArray(currentUser.favoritos) && currentUser.favoritos.length) {
+      saveFavs(currentUser.favoritos);
+    }
     $("#sidebar-name").textContent = currentUser.name || "Usuário";
     $("#sidebar-type").textContent = typeLabel(currentUser.accountType);
     $("#user-avatar").textContent = (currentUser.name || "U").charAt(0).toUpperCase();

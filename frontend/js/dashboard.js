@@ -23,7 +23,8 @@
 
     return '<article class="produto-card mk-card"><div class="produto-card-corpo">' +
       '<div class="produto-card-img"><div class="mk-thumb">' + ui.iconeProduto(produto) + "</div>" + selo + "</div>" +
-      "<div><h3>" + ui.esc(produto.nome) + '</h3><span class="preco">' + ui.moeda(produto.preco) + "</span></div></div>" +
+      '<div class="produto-card-info"><h3>' + ui.esc(produto.nome) + '</h3><span class="preco">' + ui.moeda(produto.preco) + "</span></div>" +
+      ui.favoritos.botaoEstrela(produto.id) + "</div>" +
       '<div class="produto-card-acoes">' + acao + "</div></article>";
   }
 
@@ -35,6 +36,51 @@
       pedidos.map(function (p) {
         return "<tr><td>" + ui.esc(p.numero) + "</td><td>" + data(p.criadoEm) + "</td><td>" + ui.esc(rotulosPedido[p.status] || p.status) + "</td><td>" + ui.moeda(p.total) + "</td></tr>";
       }).join("") + "</tbody></table></div>";
+  }
+
+  let escutaProdutor = false;
+  function vincularCliquesCards() {
+    if (escutaProdutor) return;
+    escutaProdutor = true;
+    raiz.addEventListener("click", function (evento) {
+      const fav = evento.target.closest("[data-favorito]");
+      if (fav) {
+        ui.favoritos.alternar(fav.dataset.favorito);
+        if (new URLSearchParams(window.location.search).get("page") === "favoritos") {
+          paginaFavoritos();
+        }
+        return;
+      }
+      const botao = evento.target.closest("[data-comprar]");
+      if (botao) {
+        ui.carrinho.adicionar(botao.dataset.comprar, 1);
+        window.location.href = "checkout.html";
+      }
+    });
+  }
+
+  async function paginaFavoritos() {
+    document.title = "Meus Favoritos | AgroRecursos";
+    vincularCliquesCards();
+    const ids = ui.favoritos.ler();
+    if (!ids.length) {
+      raiz.innerHTML =
+        '<section class="home-secao"><div class="home-titulo"><h2>Meus Favoritos</h2><a class="mk-btn" href="dashboard.html">← Voltar ao início</a></div>' +
+        '<p class="mk-vazio mk-card">Você ainda não favoritou nenhum produto. <a href="catalogo.html">Explorar o catálogo</a></p></section>';
+      return;
+    }
+    try {
+      const r = await ui.api("/api/produtos?ids=" + encodeURIComponent(ids.join(",")) + "&limite=48");
+      const itens = r.itens || [];
+      raiz.innerHTML =
+        '<section class="home-secao"><div class="home-titulo"><h2>Meus Favoritos</h2><a class="mk-btn" href="dashboard.html">← Voltar ao início</a></div>' +
+        (itens.length
+          ? '<div class="grade-produtos">' + itens.map(cartaoProduto).join("") + "</div>"
+          : '<p class="mk-vazio mk-card">Você ainda não favoritou nenhum produto. <a href="catalogo.html">Explorar o catálogo</a></p>') +
+        "</section>";
+    } catch (erro) {
+      raiz.innerHTML = '<p class="mk-vazio mk-card">' + ui.esc(erro.message) + "</p>";
+    }
   }
 
   function produtor(painel) {
@@ -58,13 +104,7 @@
       '<section class="home-secao"><h2>Recomendados para Você</h2><div class="grade-produtos">' + painel.recomendados.map(cartaoProduto).join("") + "</div></section>" +
       '<section class="home-secao"><h2>Status dos seus pedidos</h2>' + tabelaPedidos(painel.pedidos) + "</section>";
 
-    raiz.addEventListener("click", function (evento) {
-      const botao = evento.target.closest("[data-comprar]");
-      if (botao) {
-        ui.carrinho.adicionar(botao.dataset.comprar, 1);
-        window.location.href = "checkout.html";
-      }
-    });
+    vincularCliquesCards();
   }
 
   let ligado = false;
@@ -357,6 +397,10 @@
   async function iniciar() {
     try {
       const painel = await ui.api("/api/painel");
+      if (new URLSearchParams(window.location.search).get("page") === "favoritos") {
+        await paginaFavoritos();
+        return;
+      }
       await (painel.tipo === "produtor" ? produtor : fornecedor)(painel);
     } catch (erro) {
       if (erro.status === 401) {

@@ -29,8 +29,9 @@
 
     return '<article class="produto-card mk-card"><div class="produto-card-corpo">' +
       '<div class="produto-card-img"><div class="mk-thumb">' + ui.iconeProduto(produto) + "</div>" + selo + "</div>" +
-      "<div><h3>" + ui.esc(produto.nome) + '</h3><span class="preco">' + ui.moeda(produto.preco) + "</span>" +
-      '<span class="entrega">Entrega em ' + produto.entregaDias + " dias</span></div></div>" +
+      '<div class="produto-card-info"><h3>' + ui.esc(produto.nome) + '</h3><span class="preco">' + ui.moeda(produto.preco) + "</span>" +
+      '<span class="entrega">Entrega em ' + produto.entregaDias + " dias</span></div>" +
+      ui.favoritos.botaoEstrela(produto.id) + "</div>" +
       '<div class="produto-card-acoes">' + acao + "</div></article>";
   }
 
@@ -161,6 +162,11 @@
   });
 
   grade.addEventListener("click", function (evento) {
+    const fav = evento.target.closest("[data-favorito]");
+    if (fav) {
+      ui.favoritos.alternar(fav.dataset.favorito);
+      return;
+    }
     const botao = evento.target.closest("[data-comprar]");
     if (!botao) {
       return;

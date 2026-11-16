@@ -30,6 +30,10 @@ router.get("/", async (req, res, next) => {
     const col = getDatabase().collection("produtos");
     const { base, filtro, ordem, pagina, limite } = montarConsulta(req.query);
     if (idValido(req.query.fornecedor)) filtro.fornecedorId = new ObjectId(req.query.fornecedor);
+    if (req.query.ids) {
+      const listaIds = String(req.query.ids).split(",").map(s => s.trim()).filter(idValido).slice(0, 100).map(id => new ObjectId(id));
+      filtro._id = { $in: listaIds };
+    }
 
     const [itens, total, facetas] = await Promise.all([
       col.find(filtro).sort(ordem).skip((pagina - 1) * limite).limit(limite).toArray(),

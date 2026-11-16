@@ -45,6 +45,7 @@ router.post("/register", async (req, res, next) => {
       await profiles.insertOne({ userId, name, accountType, phone: phone || null, document: document || null,
         companyName: companyName || null, tradeName: tradeName || null, stateRegistration: stateRegistration || null, categories,
         address: { cep: "", street: "", number: "", complement: "", neighborhood: "", city: "", state: "" },
+        darkMode: false, favoritos: [],
         registrationStatus: "basic", createdAt: now, updatedAt: now });
       if (accountType === "fornecedor") {
         await db.collection("fornecedores").insertOne({
@@ -64,7 +65,7 @@ router.post("/register", async (req, res, next) => {
       req.session.save(async saveError => {
         if (saveError) return next(saveError);
         await auditar(req, { acao: "conta.criada", entidade: "usuario", entidadeId: userId, userId, detalhes: { tipo: accountType } });
-        return res.status(201).json({ message: "Conta criada com sucesso!", user: { id: userId.toString(), name, email, accountType } });
+        return res.status(201).json({ message: "Conta criada com sucesso!", user: { id: userId.toString(), name, email, accountType, darkMode: false, favoritos: [] } });
       });
     });
   } catch (error) { next(error); }
@@ -92,7 +93,10 @@ router.post("/login", async (req, res, next) => {
       req.session.save(async saveError => {
         if (saveError) return next(saveError);
         await auditar(req, { acao: "login", entidade: "usuario", entidadeId: user._id, userId: user._id });
-        return res.json({ message: "Login realizado com sucesso!", user: { id: user._id.toString(), name: profile.name, email: user.email, accountType: profile.accountType } });
+        return res.json({ message: "Login realizado com sucesso!", user: {
+          id: user._id.toString(), name: profile.name, email: user.email, accountType: profile.accountType,
+          darkMode: Boolean(profile.darkMode), favoritos: (profile.favoritos || []).map(String)
+        } });
       });
     });
   } catch (error) { next(error); }
@@ -108,7 +112,8 @@ router.get("/me", async (req, res, next) => {
     return res.json({ user: {
       id: user._id.toString(), name: profile.name, email: user.email, accountType: profile.accountType,
       registrationStatus: profile.registrationStatus || "basic", phone: profile.phone || "",
-      document: profile.document || "", address: profile.address || {}
+      document: profile.document || "", address: profile.address || {},
+      darkMode: Boolean(profile.darkMode), favoritos: (profile.favoritos || []).map(String)
     }});
   } catch (error) { next(error); }
 });
@@ -160,10 +165,52 @@ router.put("/profile", async (req, res, next) => {
     return res.json({ message: "Perfil atualizado com sucesso.", user: {
       id: userId.toString(), name: saved.name, email, accountType: saved.accountType,
       registrationStatus: saved.registrationStatus, phone: saved.phone || "",
-      document: saved.document || "", address: saved.address || {}
+      document: saved.document || "", address: saved.address || {},
+      darkMode: Boolean(saved.darkMode), favoritos: (saved.favoritos || []).map(String)
     }});
   } catch (error) {
     if (error.code === 11000) return res.status(409).json({ message: "E-mail ou documento já está sendo utilizado." });
+    next(error);
+  }
+});
+
+router.put("/preferences", async (req, res, next) => {
+  try {
+    if (!req.session.userId || !ObjectId.isValid(req.session.userId)) {
+      return res.status(401).json({ message: "Faça login para salvar suas preferências." });
+    }
+    const db = getDatabase(), userId = new ObjectId(req.session.userId);
+    const profiles = db.collection("profiles");
+    const profile = await profiles.findOne({ userId });
+    if (!profile) return res.status(404).json({ message: "Perfil não encontrado." });
+
+    const atualizacao = { updatedAt: new Date() };
+    if (typeof req.body.darkMode === "boolean") {
+      atualizacao.darkMode = req.body.darkMode;
+    }
+
+    let listaFavoritos = Array.isArray(profile.favoritos) ? profile.favoritos.map(String) : [];
+    if (Array.isArray(req.body.favoritos)) {
+      listaFavoritos = [...new Set(req.body.favoritos.map(String).filter(id => /^[a-f0-9]{24}$/i.test(id)))].slice(0, 200);
+      atualizacao.favoritos = listaFavoritos;
+    } else if (typeof req.body.toggleFavorito === "string" && /^[a-f0-9]{24}$/i.test(req.body.toggleFavorito)) {
+      const alvo = req.body.toggleFavorito;
+      if (listaFavoritos.includes(alvo)) {
+        listaFavoritos = listaFavoritos.filter(id => id !== alvo);
+      } else {
+        listaFavoritos = [...listaFavoritos, alvo].slice(0, 200);
+      }
+      atualizacao.favoritos = listaFavoritos;
+    }
+
+    await profiles.updateOne({ userId }, { $set: atualizacao });
+    const atualizado = await profiles.findOne({ userId });
+    return res.json({
+      message: "Preferências atualizadas.",
+      darkMode: Boolean(atualizado.darkMode),
+      favoritos: (atualizado.favoritos || []).map(String)
+    });
+  } catch (error) {
     next(error);
   }
 });
