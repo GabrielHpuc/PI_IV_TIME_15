@@ -46,6 +46,16 @@ router.get("/:numero/download", async (req, res, next) => {
     if (!encontrado) return res.status(404).json({ message: "Laudo não encontrado." });
 
     const { laudo, produto } = encontrado;
+    if (typeof laudo.arquivoPdf === "string" && laudo.arquivoPdf.startsWith("data:application/pdf;base64,")) {
+      const base64 = laudo.arquivoPdf.slice("data:application/pdf;base64,".length);
+      const buffer = Buffer.from(base64, "base64");
+      res.set({
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${laudo.numero}.pdf"`
+      });
+      return res.send(buffer);
+    }
+
     const resultados = Object.entries(laudo.resultados ?? {}).map(([chave, valor]) => ({ texto: `${chave}: ${valor}` }));
 
     const pdf = gerarPdf([
@@ -79,11 +89,18 @@ router.post("/", carregarUsuario, exigirTipo("fornecedor"), async (req, res, nex
     const emissao = new Date(req.body.emissao);
     const validade = new Date(req.body.validade);
     const resultados = req.body.resultados && typeof req.body.resultados === "object" ? req.body.resultados : {};
+    const arquivoPdf = typeof req.body.arquivoPdf === "string" ? req.body.arquivoPdf.trim() : "";
 
     if (!/^[A-Z0-9-]{4,40}$/.test(numero)) return res.status(400).json({ message: "Informe um número de laudo válido." });
     if (!idValido(req.body.produtoId)) return res.status(400).json({ message: "Produto inválido." });
     if (Number.isNaN(emissao.getTime()) || Number.isNaN(validade.getTime()) || validade <= emissao) {
       return res.status(400).json({ message: "Informe datas de emissão e validade válidas." });
+    }
+    if (!arquivoPdf || !/^data:application\/pdf;base64,[A-Za-z0-9+/=\s]+$/i.test(arquivoPdf)) {
+      return res.status(400).json({ message: "Anexe o arquivo PDF do laudo MAPA." });
+    }
+    if (arquivoPdf.length > 4_800_000) {
+      return res.status(400).json({ message: "O arquivo PDF deve ter no máximo 3,5 MB." });
     }
 
     const db = getDatabase();
@@ -98,7 +115,7 @@ router.post("/", carregarUsuario, exigirTipo("fornecedor"), async (req, res, nex
     for (const [chave, valor] of Object.entries(resultados).slice(0, 12)) limpos[texto(chave, 40)] = texto(valor, 80);
 
     const { insertedId } = await db.collection("laudos").insertOne({
-      numero, orgao: "MAPA", produtoId, fornecedorId: fornecedor._id, emissao, validade, resultados: limpos, criadoEm: new Date()
+      numero, orgao: "MAPA", produtoId, fornecedorId: fornecedor._id, emissao, validade, resultados: limpos, arquivoPdf, criadoEm: new Date()
     });
     await db.collection("produtos").updateOne({ _id: produtoId }, { $set: { laudoId: insertedId } });
 

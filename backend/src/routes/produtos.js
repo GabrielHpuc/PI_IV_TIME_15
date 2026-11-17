@@ -210,7 +210,7 @@ export async function removerProdutos(req, fornecedor, ids) {
   const proprios = await db.collection("produtos").find({ _id: { $in: objetos }, fornecedorId: fornecedor._id, ativo: { $ne: false } }, { projection: { _id: 1, nome: 1 } }).toArray();
 
   const emAndamento = new Set((await db.collection("pedidos").find(
-    { "itens.produtoId": { $in: proprios.map(p => p._id) }, status: { $in: ["aguardando_pagamento", "em_analise", "pago", "enviado"] } },
+    { "itens.produtoId": { $in: proprios.map(p => p._id) }, status: { $in: ["criado", "confirmado", "em_separacao", "aguardando_pagamento", "em_analise", "pago", "enviado"] } },
     { projection: { itens: 1 } }
   ).toArray()).flatMap(p => p.itens.map(i => String(i.produtoId))));
 

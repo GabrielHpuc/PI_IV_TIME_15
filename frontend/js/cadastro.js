@@ -180,6 +180,10 @@ form.addEventListener("submit", async (event) => {
       throw new Error(result.message || "Não foi possível criar a conta.");
     }
 
+    try {
+      localStorage.setItem("agro_tipo_conta", tipo);
+    } catch (e) {}
+
     window.location.href = "dashboard.html";
   } catch (error) {
     message.textContent = error.message;

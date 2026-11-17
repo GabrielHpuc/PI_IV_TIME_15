@@ -52,7 +52,9 @@
       const resposta = await ui.api("/api/cotacoes" + (busca ? "?busca=" + encodeURIComponent(busca) : ""));
       corpo.innerHTML = resposta.itens.map(function (c) {
         const botao = tipo === "fornecedor"
-          ? '<button class="mk-btn" type="button" data-proposta="' + c.id + '">Enviar proposta</button>'
+          ? (c.jaEnviouProposta
+              ? '<button class="mk-btn" type="button" disabled>Proposta enviada</button>'
+              : '<button class="mk-btn" type="button" data-proposta="' + c.id + '">Enviar proposta</button>')
           : '<button class="mk-btn btn-comparar" type="button" data-id="' + c.id + '" aria-label="Comparar propostas de ' + ui.esc(c.codigo) + '">Comparar</button>';
         return "<tr><td>" + ui.esc(c.codigo) + "</td><td>" + ui.esc(c.item) + "</td><td>" + ui.esc(c.quantidade) + "</td>" +
           "<td>" + data(c.criadoEm) + "</td><td>" + data(c.vencimento) + "</td>" +

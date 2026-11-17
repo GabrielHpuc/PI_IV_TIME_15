@@ -72,6 +72,42 @@ body > footer p { margin: 0; }
 }
 .auth-card input:focus, .auth-card select:focus { border-color: #55966c; box-shadow: 0 0 0 3px #dcefe1; }
 .auth-card .button { margin-top: 12px; }
+.account-choice {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #f4f8f5;
+}
+.account-choice-title {
+  margin: 0 0 10px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--green);
+}
+.account-choice-buttons {
+  display: grid;
+  gap: 10px;
+}
+.account-choice-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  margin-top: 0 !important;
+  padding: 12px 16px;
+}
+.account-choice-btn small {
+  font-weight: 500;
+  opacity: .9;
+}
+html.dark-mode .account-choice {
+  background: #131c17;
+  border-color: #2e4236;
+}
+html.dark-mode .account-choice-title {
+  color: #7fe3a0;
+}
 .form-message { min-height: 1.2em; color: #a32d2d; overflow-wrap: anywhere; }
 .auth-footer { margin: 20px 0 0; text-align: center; color: var(--text-muted); }
 .auth-footer a { font-weight: 700; }

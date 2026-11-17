@@ -32,11 +32,19 @@ router.post("/register", async (req, res, next) => {
     if (phone && (digitsOnly(phone).length < 10 || digitsOnly(phone).length > 13)) return res.status(400).json({ message: "Informe um telefone válido com DDD." });
 
     const db = getDatabase(), users = db.collection("users"), profiles = db.collection("profiles");
-    if (document && await profiles.findOne({ document })) return res.status(409).json({ message: "Não foi possível criar a conta com esses dados." });
-    if (await users.findOne({ email })) return res.status(409).json({ message: "Não foi possível criar a conta com esse e-mail." });
+    if (document && await profiles.findOne({ document, accountType })) {
+      return res.status(409).json({ message: "Já existe uma conta deste tipo com esse CPF/CNPJ." });
+    }
+    const usuariosMesmoEmail = await users.find({ email, status: { $ne: "inactive" } }, { projection: { _id: 1 } }).toArray();
+    if (usuariosMesmoEmail.length) {
+      const perfisMesmoEmail = await profiles.find({ userId: { $in: usuariosMesmoEmail.map(u => u._id) } }, { projection: { accountType: 1 } }).toArray();
+      if (perfisMesmoEmail.some(p => p.accountType === accountType)) {
+        return res.status(409).json({ message: `Já existe uma conta de ${accountType === "produtor" ? "produtor rural" : "fornecedor"} com esse e-mail.` });
+      }
+    }
     const passwordHash = await bcrypt.hash(password, 12), userId = new ObjectId(), now = new Date();
     try {
-      await users.insertOne({ _id: userId, email, passwordHash, status: "active", emailVerified: false, createdAt: now, updatedAt: now });
+      await users.insertOne({ _id: userId, email, accountType, passwordHash, status: "active", emailVerified: false, createdAt: now, updatedAt: now });
     } catch (error) {
       if (error.code === 11000) return res.status(409).json({ message: "Não foi possível criar a conta com esse e-mail." });
       throw error;
@@ -74,19 +82,56 @@ router.post("/register", async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
   try {
     const identificador = String(req.body.login ?? req.body.email ?? "").trim(), password = String(req.body.password ?? "");
+    const chosenType = req.body.accountType;
     if (!identificador || identificador.length > 254 || !password || password.length > 72) return res.status(400).json({ message: "Informe CNPJ/CPF ou e-mail e a senha." });
     const db = getDatabase();
-    let user = null;
+
+    let candidatos = [];
     if (identificador.includes("@")) {
-      user = await db.collection("users").findOne({ email: normalizeEmail(identificador) });
+      const usuarios = await db.collection("users").find({ email: normalizeEmail(identificador), status: "active" }).toArray();
+      const perfis = usuarios.length
+        ? await db.collection("profiles").find({ userId: { $in: usuarios.map(u => u._id) } }).toArray()
+        : [];
+      const mapaPerfis = new Map(perfis.map(p => [String(p.userId), p]));
+      candidatos = usuarios.map(u => ({ user: u, profile: mapaPerfis.get(String(u._id)) })).filter(c => c.profile);
     } else {
       const doc = digitsOnly(identificador);
-      const perfil = [11, 14].includes(doc.length) ? await db.collection("profiles").findOne({ document: doc }) : null;
-      if (perfil) user = await db.collection("users").findOne({ _id: perfil.userId });
+      const perfis = [11, 14].includes(doc.length) ? await db.collection("profiles").find({ document: doc }).toArray() : [];
+      const usuarios = perfis.length
+        ? await db.collection("users").find({ _id: { $in: perfis.map(p => p.userId) }, status: "active" }).toArray()
+        : [];
+      const mapaUsuarios = new Map(usuarios.map(u => [String(u._id), u]));
+      candidatos = perfis.map(p => ({ user: mapaUsuarios.get(String(p.userId)), profile: p })).filter(c => c.user);
     }
-    if (!user || user.status !== "active" || !(await bcrypt.compare(password, user.passwordHash))) return res.status(401).json({ message: "E-mail ou senha incorretos." });
-    const profile = await db.collection("profiles").findOne({ userId: user._id });
-    if (!profile) return res.status(500).json({ message: "Não foi possível carregar seu perfil." });
+
+    if (!candidatos.length) return res.status(401).json({ message: "E-mail ou senha incorretos." });
+
+    const checados = await Promise.all(candidatos.map(async c => ({
+      ...c,
+      senhaOk: await bcrypt.compare(password, c.user.passwordHash)
+    })));
+
+    if (!checados.some(c => c.senhaOk)) {
+      return res.status(401).json({ message: "E-mail ou senha incorretos." });
+    }
+
+    if (candidatos.length > 1 && !chosenType) {
+      return res.json({
+        chooseAccountType: true,
+        accounts: candidatos.map(c => ({
+          accountType: c.profile.accountType,
+          name: c.profile.tradeName || c.profile.companyName || c.profile.name
+        }))
+      });
+    }
+
+    const escolhido = chosenType
+      ? (checados.find(c => c.profile.accountType === chosenType && c.senhaOk) || candidatos.find(c => c.profile.accountType === chosenType))
+      : (checados.find(c => c.senhaOk) || candidatos[0]);
+
+    if (!escolhido) return res.status(401).json({ message: "Conta selecionada não encontrada." });
+    const { user, profile } = escolhido;
+
     req.session.regenerate(sessionError => {
       if (sessionError) return next(sessionError);
       req.session.userId = user._id.toString();
@@ -141,9 +186,13 @@ router.put("/profile", async (req, res, next) => {
     const users = db.collection("users"), profiles = db.collection("profiles");
     const currentUser = await users.findOne({ _id: userId });
     if (!currentUser || currentUser.status !== "active") return res.status(401).json({ message: "Conta não encontrada ou inativa." });
-    if (await users.findOne({ email, _id: { $ne: userId } })) return res.status(409).json({ message: "Este e-mail já está sendo utilizado." });
     const oldProfile = await profiles.findOne({ userId });
     if (!oldProfile) return res.status(404).json({ message: "Perfil não encontrado." });
+    const outrosUsuariosEmail = await users.find({ email, _id: { $ne: userId }, status: { $ne: "inactive" } }, { projection: { _id: 1 } }).toArray();
+    if (outrosUsuariosEmail.length) {
+      const conflito = await profiles.findOne({ userId: { $in: outrosUsuariosEmail.map(u => u._id) }, accountType: oldProfile.accountType });
+      if (conflito) return res.status(409).json({ message: "Este e-mail já está sendo utilizado em outra conta do mesmo tipo." });
+    }
 
     const complete = Boolean(phone && [11, 14].includes(document.length) &&
       address.cep && address.street && address.number && address.neighborhood && address.city && address.state);

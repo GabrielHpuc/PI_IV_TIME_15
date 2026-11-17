@@ -21,6 +21,9 @@ function applyTheme(dark) {
 
 try {
   applyTheme(localStorage.getItem("agro_tema") === "dark");
+  if (localStorage.getItem("agro_tipo_conta") === "fornecedor") {
+    document.querySelectorAll("[data-buyer-only]").forEach(el => { el.hidden = true; });
+  }
 } catch (e) {}
 
 const esc = (texto) => String(texto ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -100,12 +103,26 @@ const ETAPAS_PEDIDO = [
 ];
 let userOrders = [];
 
+const INDICE_STATUS = {
+  criado: 0,
+  aguardando_pagamento: 0,
+  em_analise: 0,
+  confirmado: 1,
+  pago: 1,
+  em_separacao: 2,
+  enviado: 3,
+  entregue: 4
+};
+
 function renderOrderTimeline(status) {
-  const entregue = status === "entregue";
+  if (status === "cancelado") {
+    return '<div class="pedido-trilha"><span class="status recusada">Pedido cancelado</span></div>';
+  }
+  const indiceAtual = INDICE_STATUS[status] !== undefined ? INDICE_STATUS[status] : 0;
   return '<ol class="pedido-trilha" aria-label="Andamento do pedido">' +
     ETAPAS_PEDIDO.map((etapa, idx) => {
-      const concluida = idx < 4 || (idx === 4 && entregue);
-      const atual = (idx === 3 && !entregue) || (idx === 4 && entregue);
+      const concluida = idx <= indiceAtual;
+      const atual = idx === indiceAtual;
       const classe = (concluida ? "feito" : "pendente") + (atual ? " atual" : "");
       return '<li class="pedido-etapa ' + classe + '">' +
         '<span class="pedido-etapa-icone">' + (concluida ? "✓" : "○") + "</span>" +
@@ -241,6 +258,11 @@ async function loadAccount() {
     const result = await response.json();
     if (!response.ok || !result.user) throw new Error(result.message || "Não foi possível carregar sua conta.");
     currentUser = result.user;
+    const isFornecedor = currentUser.accountType === "fornecedor";
+    try {
+      localStorage.setItem("agro_tipo_conta", currentUser.accountType || "produtor");
+    } catch (e) {}
+    document.querySelectorAll("[data-buyer-only]").forEach(el => { el.hidden = isFornecedor; });
     if (typeof currentUser.darkMode === "boolean") {
       applyTheme(currentUser.darkMode);
     }
@@ -258,7 +280,8 @@ async function loadAccount() {
     $("#profile-document").textContent = currentUser.document || "Não informado";
     $("#profile-address").textContent = addressLabel(currentUser.address);
     const secaoInicial = new URLSearchParams(window.location.search).get("section");
-    fillForm(currentUser); statusElement.hidden = true; showSection(sections[secaoInicial] ? secaoInicial : "overview");
+    const secaoValida = !isFornecedor && sections[secaoInicial] ? secaoInicial : "overview";
+    fillForm(currentUser); statusElement.hidden = true; showSection(secaoValida);
   } catch (error) { statusElement.hidden = false; statusElement.textContent = error.message; console.error(error); }
 }
 $("#profile-form").addEventListener("submit", async event => {

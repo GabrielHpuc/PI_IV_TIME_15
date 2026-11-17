@@ -9,9 +9,9 @@
 <div class="sidebar-user"><div class="user-avatar" id="user-avatar">A</div><div><strong id="sidebar-name">Carregando...</strong><span id="sidebar-type">Minha conta</span></div></div>
 <nav class="account-nav" aria-label="Menu da conta">
 <button type="button" class="account-nav-item active" data-section="overview">⌂ Minha conta</button>
-<button type="button" class="account-nav-item" data-section="cart">🛒 Carrinho</button>
-<button type="button" class="account-nav-item" data-section="favorites">♡ Favoritos</button>
-<button type="button" class="account-nav-item" data-section="purchases">▤ Minhas compras</button>
+<button type="button" class="account-nav-item" data-section="cart" data-buyer-only>🛒 Carrinho</button>
+<button type="button" class="account-nav-item" data-section="favorites" data-buyer-only>♡ Favoritos</button>
+<button type="button" class="account-nav-item" data-section="purchases" data-buyer-only>▤ Minhas compras</button>
 <a class="account-nav-item" href="dashboard.html">⌂ Início</a>
 </nav><button id="logout-button" class="logout-button" type="button">↪ Sair da conta</button>
 </aside>
@@ -28,7 +28,7 @@
 <div class="pref-row"><div><strong>Modo escuro</strong><span>Ative o tema escuro em todas as telas do AgroRecursos.</span></div><label class="theme-switch" for="dark-mode-toggle"><input type="checkbox" id="dark-mode-toggle"><span class="theme-slider"></span><span class="theme-label" id="dark-mode-label">Desativado</span></label></div>
 <p id="pref-message" class="account-message" role="status" aria-live="polite"></p>
 </div>
-<div class="account-shortcuts"><button type="button" class="shortcut-card" data-section="purchases"><strong>Minhas compras</strong><span>Consulte seus pedidos</span></button><button type="button" class="shortcut-card" data-section="favorites"><strong>Meus favoritos</strong><span>Reúna produtos de interesse</span></button></div>
+<div class="account-shortcuts" data-buyer-only><button type="button" class="shortcut-card" data-section="purchases"><strong>Minhas compras</strong><span>Consulte seus pedidos</span></button><button type="button" class="shortcut-card" data-section="favorites"><strong>Meus favoritos</strong><span>Reúna produtos de interesse</span></button></div>
 </section>
 <section id="edit-profile-section" class="account-section" hidden><div class="account-card"><h2>Editar perfil</h2><p>Preencha os dados que faltam ou altere-os depois.</p>
 <form id="profile-form" class="profile-form">

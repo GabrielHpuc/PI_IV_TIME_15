@@ -21,10 +21,14 @@ export async function connectDatabase() {
 
   database = client.db("agrorecursos");
 
-  await database.collection("users").createIndex(
-    { email: 1 },
-    { unique: true }
-  );
+  try {
+    await database.collection("users").dropIndex("email_1");
+  } catch {}
+  try {
+    await database.collection("profiles").dropIndex("document_1");
+  } catch {}
+
+  await database.collection("users").createIndex({ email: 1 });
 
   await database.collection("profiles").createIndex(
     { userId: 1 },
@@ -50,7 +54,7 @@ export async function connectDatabase() {
     ["pedidos", { "itens.fornecedorId": 1 }],
     ["password_resets", { expiresAt: 1 }, { expireAfterSeconds: 0 }],
     ["password_resets", { tokenHash: 1 }],
-    ["profiles", { document: 1 }, { unique: true, partialFilterExpression: { document: { $type: "string" } } }]
+    ["profiles", { document: 1, accountType: 1 }, { unique: true, partialFilterExpression: { document: { $type: "string" } } }]
   ];
 
   for (const [colecao, chaves, opcoes] of indices) {
