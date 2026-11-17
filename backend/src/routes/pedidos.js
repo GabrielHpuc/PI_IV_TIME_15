@@ -1,4 +1,5 @@
 import { Router } from "express";
+import crypto from "node:crypto";
 import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
 import { carregarUsuario, exigirTipo } from "../middleware/auth.js";
@@ -83,6 +84,63 @@ router.post("/", exigirTipo("produtor"), async (req, res, next) => {
       criadoEm: new Date()
     };
     const { insertedId } = await db.collection("pedidos").insertOne(pedido);
+
+    try {
+      const perfil = await db.collection("profiles").findOne({ userId: req.usuario.id });
+      if (perfil) {
+        const lista = Array.isArray(perfil.addresses) ? [...perfil.addresses] : [];
+        if (!lista.length && perfil.address && (perfil.address.cep || perfil.address.street)) {
+          lista.push({
+            id: perfil.address.id || crypto.randomUUID(),
+            label: perfil.address.label || "Endereço principal",
+            cep: String(perfil.address.cep || "").replace(/\D/g, ""),
+            street: perfil.address.street || "",
+            number: perfil.address.number || "",
+            complement: perfil.address.complement || "",
+            neighborhood: perfil.address.neighborhood || "",
+            city: perfil.address.city || "",
+            state: perfil.address.state || "",
+            observacoes: perfil.address.observacoes || "",
+            principal: true
+          });
+        }
+        const cepLimpo = String(entrega.cep || "").replace(/\D/g, "");
+        const chaveNova = `${cepLimpo}|${String(entrega.rua || "").trim().toLowerCase()}|${String(entrega.numero || "").trim().toLowerCase()}`;
+        const idxExistente = lista.findIndex(a =>
+          `${String(a.cep || "").replace(/\D/g, "")}|${String(a.street || a.rua || "").trim().toLowerCase()}|${String(a.number || a.numero || "").trim().toLowerCase()}` === chaveNova
+        );
+        const novoItem = {
+          id: idxExistente >= 0 && lista[idxExistente].id ? lista[idxExistente].id : crypto.randomUUID(),
+          label: (idxExistente >= 0 && lista[idxExistente].label) ? lista[idxExistente].label : (lista.length === 0 ? "Endereço principal" : `Endereço ${lista.length + 1}`),
+          cep: cepLimpo,
+          street: entrega.rua,
+          number: entrega.numero,
+          complement: entrega.complemento || "",
+          neighborhood: entrega.bairro,
+          city: entrega.cidade,
+          state: entrega.estado,
+          observacoes: entrega.observacoes || "",
+          principal: idxExistente >= 0 ? Boolean(lista[idxExistente].principal) : lista.length === 0
+        };
+        if (idxExistente >= 0) {
+          lista[idxExistente] = novoItem;
+        } else {
+          lista.push(novoItem);
+        }
+        const endPrincipal = lista.find(a => a.principal) || lista[0];
+        const temEndPrincipal = Boolean(perfil.address && perfil.address.cep && perfil.address.street);
+        await db.collection("profiles").updateOne(
+          { userId: req.usuario.id },
+          {
+            $set: {
+              addresses: lista,
+              address: temEndPrincipal ? perfil.address : endPrincipal,
+              updatedAt: new Date()
+            }
+          }
+        );
+      }
+    } catch {}
 
     await auditar(req, { acao: "pedido.criado", entidade: "pedido", entidadeId: insertedId, detalhes: { numero: pedido.numero, total } });
     await Promise.all(itens.map(i => db.collection("produtos").updateOne({ _id: i.produtoId }, { $inc: { vendidos: i.quantidade } })));

@@ -327,6 +327,11 @@
         if (typeof resultado.user.darkMode === "boolean") {
           tema.aplicar(resultado.user.darkMode);
         }
+        if (Array.isArray(resultado.user.addresses) && resultado.user.addresses.length) {
+          try {
+            localStorage.setItem("agro_enderecos", JSON.stringify(resultado.user.addresses));
+          } catch (e) {}
+        }
         if (Array.isArray(resultado.user.favoritos)) {
           const locais = favoritos.ler();
           const mesclados = resultado.user.favoritos.length ? resultado.user.favoritos : locais;

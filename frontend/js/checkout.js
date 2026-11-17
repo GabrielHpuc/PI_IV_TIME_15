@@ -137,6 +137,166 @@
 
   document.querySelector("#calcular-frete").addEventListener("click", calcular);
 
+  const enderecosWrap = document.querySelector("#enderecos-salvos-wrap");
+  const seletorEndereco = document.querySelector("#seletor-endereco");
+  let enderecosSalvos = [];
+
+  function formatarCep(valor) {
+    const d = String(valor || "").replace(/\D/g, "").slice(0, 8);
+    return d.length > 5 ? d.slice(0, 5) + "-" + d.slice(5) : d;
+  }
+
+  function normalizarEnd(item) {
+    if (!item || typeof item !== "object") return null;
+    const cep = String(item.cep || "").replace(/\D/g, "").slice(0, 8);
+    const rua = String(item.rua ?? item.street ?? "").trim();
+    const numero = String(item.numero ?? item.number ?? "").trim();
+    const complemento = String(item.complemento ?? item.complement ?? "").trim();
+    const bairro = String(item.bairro ?? item.neighborhood ?? "").trim();
+    const cidade = String(item.cidade ?? item.city ?? "").trim();
+    const estado = String(item.estado ?? item.state ?? "").trim().toUpperCase().slice(0, 2);
+    const observacoes = String(item.observacoes ?? "").trim();
+    const label = String(item.label ?? item.apelido ?? "").trim();
+    if (!cep && !rua && !cidade) return null;
+    return {
+      id: item.id || "",
+      label: label,
+      cep: cep,
+      rua: rua,
+      numero: numero,
+      complemento: complemento,
+      bairro: bairro,
+      cidade: cidade,
+      estado: estado,
+      observacoes: observacoes,
+      principal: Boolean(item.principal)
+    };
+  }
+
+  function chaveEnd(e) {
+    return [e.cep, e.rua.toLowerCase(), e.numero.toLowerCase()].join("|");
+  }
+
+  function textoOpcaoEndereco(e, idx) {
+    const titulo = e.label || (e.principal ? "Endereço principal" : "Endereço " + (idx + 1));
+    const ruaNum = [e.rua, e.numero].filter(Boolean).join(", ");
+    const cidUf = [e.cidade, e.estado].filter(Boolean).join("/");
+    const cepFmt = e.cep ? "CEP " + formatarCep(e.cep) : "";
+    return [titulo + ":", ruaNum, e.bairro, cidUf, cepFmt].filter(Boolean).join(" · ");
+  }
+
+  function preencherFormularioEndereco(end) {
+    if (!end) return;
+    formulario.elements.cep.value = formatarCep(end.cep);
+    formulario.elements.rua.value = end.rua || "";
+    formulario.elements.numero.value = end.numero || "";
+    formulario.elements.complemento.value = end.complemento || "";
+    formulario.elements.bairro.value = end.bairro || "";
+    formulario.elements.cidade.value = end.cidade || "";
+    formulario.elements.estado.value = end.estado || "";
+    if (formulario.elements.observacoes && end.observacoes !== undefined) {
+      formulario.elements.observacoes.value = end.observacoes || "";
+    }
+    ["cep", "rua", "numero", "bairro", "cidade", "estado"].forEach(function (nome) {
+      if (formulario.elements[nome].value.trim()) {
+        formulario.elements[nome].classList.remove("campo-erro");
+      }
+    });
+    if (end.cep && end.cep.length === 8) {
+      calcular();
+    }
+  }
+
+  function salvarEnderecoLocal(entrega) {
+    const norm = normalizarEnd(entrega);
+    if (!norm) return;
+    try {
+      localStorage.setItem("agro_ultimo_endereco", JSON.stringify(norm));
+      const atuais = JSON.parse(localStorage.getItem("agro_enderecos")) || [];
+      const lista = Array.isArray(atuais) ? atuais.map(normalizarEnd).filter(Boolean) : [];
+      const chave = chaveEnd(norm);
+      const filtrada = lista.filter(function (item) { return chaveEnd(item) !== chave; });
+      filtrada.unshift(norm);
+      localStorage.setItem("agro_enderecos", JSON.stringify(filtrada.slice(0, 15)));
+    } catch (e) {}
+  }
+
+  async function carregarEnderecosSalvos() {
+    const acumulados = [];
+    const vistos = new Set();
+
+    function adicionar(item) {
+      const n = normalizarEnd(item);
+      if (!n) return;
+      const ch = chaveEnd(n);
+      if (vistos.has(ch)) return;
+      vistos.add(ch);
+      acumulados.push(n);
+    }
+
+    try {
+      const me = await fetch("/api/auth/me", { credentials: "same-origin" }).then(function (r) { return r.ok ? r.json() : null; });
+      if (me && me.user) {
+        if (Array.isArray(me.user.addresses)) {
+          const ordenados = me.user.addresses.slice().sort(function (a, b) {
+            return (b.principal ? 1 : 0) - (a.principal ? 1 : 0);
+          });
+          ordenados.forEach(adicionar);
+        }
+        if (me.user.address) {
+          adicionar(me.user.address);
+        }
+      }
+    } catch (e) {}
+
+    try {
+      const ultimo = JSON.parse(localStorage.getItem("agro_ultimo_endereco"));
+      if (ultimo) adicionar(ultimo);
+    } catch (e) {}
+
+    try {
+      const locais = JSON.parse(localStorage.getItem("agro_enderecos"));
+      if (Array.isArray(locais)) locais.forEach(adicionar);
+    } catch (e) {}
+
+    if (!acumulados.length) {
+      try {
+        const ped = await fetch("/api/pedidos", { credentials: "same-origin" }).then(function (r) { return r.ok ? r.json() : null; });
+        if (ped && Array.isArray(ped.itens)) {
+          ped.itens.forEach(function (p) { if (p.entrega) adicionar(p.entrega); });
+        }
+      } catch (e) {}
+    }
+
+    enderecosSalvos = acumulados;
+
+    if (enderecosSalvos.length && enderecosWrap && seletorEndereco) {
+      seletorEndereco.innerHTML = enderecosSalvos.map(function (e, idx) {
+        return '<option value="' + idx + '">' + ui.esc(textoOpcaoEndereco(e, idx)) + "</option>";
+      }).join("") + '<option value="novo">+ Usar outro endereço</option>';
+      enderecosWrap.hidden = false;
+      preencherFormularioEndereco(enderecosSalvos[0]);
+    }
+  }
+
+  if (seletorEndereco) {
+    seletorEndereco.addEventListener("change", function () {
+      if (seletorEndereco.value === "novo") {
+        ["cep", "rua", "numero", "complemento", "bairro", "cidade", "estado", "observacoes"].forEach(function (nome) {
+          if (formulario.elements[nome]) formulario.elements[nome].value = "";
+        });
+        frete = null;
+        atualizarResumo();
+        campoCep.focus();
+        return;
+      }
+      const escolhido = enderecosSalvos[Number(seletorEndereco.value)];
+      if (escolhido) {
+        preencherFormularioEndereco(escolhido);
+      }
+    });
+  }
+
   // Digitou os 8 números do CEP: preenche rua, bairro, cidade e UF e já calcula frete e prazo.
   window.AgroCep.aoCompletar(campoCep, function (endereco) {
     ["rua", "bairro", "cidade", "estado"].forEach(function (nome) {
@@ -186,18 +346,20 @@
 
     try {
       const dados = new FormData(formulario);
+      const dadosEntrega = {
+        cep: dados.get("cep"), rua: dados.get("rua"), numero: dados.get("numero"), complemento: dados.get("complemento"),
+        bairro: dados.get("bairro"), cidade: dados.get("cidade"), estado: dados.get("estado"), observacoes: dados.get("observacoes")
+      };
       const resposta = await ui.api("/api/pedidos", {
         method: "POST",
         body: {
           itens: itens.map(function (i) { return { produtoId: i.produto.id, quantidade: i.qtd }; }),
-          entrega: {
-            cep: dados.get("cep"), rua: dados.get("rua"), numero: dados.get("numero"), complemento: dados.get("complemento"),
-            bairro: dados.get("bairro"), cidade: dados.get("cidade"), estado: dados.get("estado"), observacoes: dados.get("observacoes")
-          },
+          entrega: dadosEntrega,
           pagamento: { metodo: metodo(), parcelas: Number(parcelas.value) }
         }
       });
 
+      salvarEnderecoLocal(dadosEntrega);
       finalizado = true;
       localStorage.removeItem("agro_carrinho");
       const contador = document.querySelector("#mk-carrinho-qtd");
@@ -212,5 +374,8 @@
     }
   });
 
-  carregarItens().then(render);
+  carregarItens().then(function () {
+    render();
+    carregarEnderecosSalvos();
+  });
 })();

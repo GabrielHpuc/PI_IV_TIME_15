@@ -37,9 +37,7 @@
   function cartaoProduto(produto) {
     const selo = produto.laudo ? '<span class="mk-selo">Laudo MAPA</span>' : "";
     const detalhes = '<a class="mk-btn" href="produto.html?id=' + produto.id + '">Ver Detalhes</a>';
-    const acao = produto.categoria === "Outros"
-      ? detalhes
-      : '<button class="mk-btn" type="button" data-comprar="' + produto.id + '">Comprar</button>' + detalhes;
+    const acao = '<button class="mk-btn" type="button" data-comprar="' + produto.id + '">Comprar</button>' + detalhes;
 
     return '<article class="produto-card mk-card"><div class="produto-card-corpo">' +
       '<div class="produto-card-img"><div class="mk-thumb">' + ui.iconeProduto(produto) + "</div>" + selo + "</div>" +
@@ -231,7 +229,13 @@
       '<label>Validade<input name="validade" type="date" required></label>' +
       '<label>Arquivo do laudo (PDF)<input name="arquivoPdf" id="laudo-pdf" type="file" accept=".pdf,application/pdf" required></label>' +
       '<p class="dialogo-msg" id="msg-laudo" role="status"></p>' +
-      '<div class="dialogo-acoes"><button class="mk-btn" type="button" data-fechar>Cancelar</button><button class="mk-btn mk-btn-verde" type="submit">Vincular</button></div></form></dialog>');
+      '<div class="dialogo-acoes"><button class="mk-btn" type="button" data-fechar>Cancelar</button><button class="mk-btn mk-btn-verde" type="submit">Vincular</button></div></form></dialog>' +
+      '<dialog class="dialogo dialogo-largo" id="dlg-csv-fotos"><h2>Fotos dos produtos importados</h2>' +
+      '<p class="muted" style="margin:0 0 10px;font-size:.88rem">Todo produto precisa ter foto. Caso o CSV já tenha a coluna <strong>imagem</strong> (URL ou base64), ela já aparece abaixo. Você também pode selecionar várias fotos de uma vez ou escolher individualmente para cada produto.</p>' +
+      '<label class="csv-lote-label">Selecionar várias fotos de uma vez (associa por nome do arquivo ou na ordem da lista)<input type="file" id="csv-fotos-lote" multiple accept="image/png,image/jpeg,image/webp,image/gif"></label>' +
+      '<div id="csv-lista-produtos" class="csv-lista-produtos"></div>' +
+      '<p class="dialogo-msg" id="msg-dlg-csv" role="status"></p>' +
+      '<div class="dialogo-acoes"><button class="mk-btn" type="button" data-fechar>Cancelar</button><button class="mk-btn mk-btn-verde" type="button" id="confirmar-csv">Confirmar importação</button></div></dialog>');
 
     document.querySelectorAll("[data-fechar]").forEach(function (b) {
       b.addEventListener("click", function () { b.closest("dialog").close(); });
@@ -263,7 +267,7 @@
 
   function ferramentasCsv() {
     return '<section class="home-secao"><h2>Importar e exportar (CSV)</h2><div class="mk-card cad-bloco">' +
-      '<p>Cadastre vários produtos de uma vez. Colunas obrigatórias: nome, categoria, marca, regiao, preco, entregaDias.</p>' +
+      '<p>Cadastre vários produtos de uma vez com foto. Colunas obrigatórias: nome, categoria, marca, regiao, preco, entregaDias (e coluna <strong>imagem</strong> ou seleção das fotos na importação).</p>' +
       '<div class="home-titulo"><a class="mk-btn" href="/api/csv/modelo-produtos">Baixar modelo</a>' +
       '<label class="mk-btn mk-btn-verde" for="csv-arquivo">Importar produtos</label>' +
       '<input type="file" id="csv-arquivo" accept=".csv,text/csv" class="sr-only">' +
@@ -302,19 +306,133 @@
     msg.textContent = "Exportação concluída.";
   }
 
-  async function importarCsv(arquivo, msg) {
-    msg.textContent = "Importando...";
+  function parseCsvCliente(texto) {
+    const t = String(texto || "").replace(/^\uFEFF/, "");
+    const primeira = t.split(/\r?\n/, 1)[0] || "";
+    const sep = (primeira.match(/;/g) || []).length >= (primeira.match(/,/g) || []).length ? ";" : ",";
+    const linhas = [];
+    let campo = "";
+    let linha = [];
+    let aspas = false;
+    for (let i = 0; i < t.length; i += 1) {
+      const c = t[i];
+      if (aspas) {
+        if (c === '"') {
+          if (t[i + 1] === '"') { campo += '"'; i += 1; }
+          else { aspas = false; }
+        } else { campo += c; }
+      } else if (c === '"') {
+        aspas = true;
+      } else if (c === sep) {
+        linha.push(campo); campo = "";
+      } else if (c === "\n" || c === "\r") {
+        if (c === "\r" && t[i + 1] === "\n") i += 1;
+        linha.push(campo); campo = ""; linhas.push(linha); linha = [];
+      } else {
+        campo += c;
+      }
+    }
+    if (campo !== "" || linha.length) {
+      linha.push(campo);
+      linhas.push(linha);
+    }
+    const uteis = linhas.filter(function (l) { return l.some(function (x) { return x.trim() !== ""; }); });
+    if (uteis.length < 2) return [];
+    const cab = uteis[0].map(function (h) { return h.trim(); });
+    return uteis.slice(1).map(function (l, i) {
+      const valores = {};
+      cab.forEach(function (h, k) { valores[h] = (l[k] || "").trim(); });
+      return { linha: i + 2, valores: valores };
+    });
+  }
+
+  let estadoImportacaoCsv = null;
+
+  function ehImagemValidaCsv(str) {
+    const s = String(str || "").trim();
+    return /^(data:image\/|https?:\/\/|\/|[a-z0-9_\-./]+\.(png|jpe?g|webp|gif|svg)$)/i.test(s) && (/^(data:image\/|https?:\/\/|\/)/i.test(s));
+  }
+
+  function renderListaImportacaoCsv() {
+    const container = document.querySelector("#csv-lista-produtos");
+    if (!container || !estadoImportacaoCsv) return;
+    container.innerHTML = estadoImportacaoCsv.registros.map(function (reg, idx) {
+      const v = reg.valores;
+      const foto = estadoImportacaoCsv.fotos[reg.linha] || "";
+      const refOriginal = v.imagem || v.foto || "";
+      const thumbHtml = foto
+        ? '<img class="mk-thumb-img" src="' + ui.esc(foto) + '" alt="' + ui.esc(v.nome || "Produto") + '">'
+        : '<span class="csv-sem-foto">Sem foto</span>';
+      return '<div class="csv-item-produto" data-linha="' + reg.linha + '">' +
+        '<div class="mk-thumb csv-item-thumb">' + thumbHtml + '</div>' +
+        '<div class="csv-item-info"><strong>' + ui.esc(v.nome || ("Linha " + reg.linha)) + '</strong>' +
+        '<small>' + ui.esc([v.categoria, v.marca, v.preco ? "R$ " + v.preco : ""].filter(Boolean).join(" · ")) +
+        (refOriginal && !foto ? " (Arquivo: " + ui.esc(refOriginal) + ")" : "") + '</small></div>' +
+        '<label class="mk-btn btn-comparar">Escolher foto<input type="file" class="sr-only" data-foto-linha="' + reg.linha + '" accept="image/png,image/jpeg,image/webp,image/gif"></label>' +
+      '</div>';
+    }).join("");
+  }
+
+  async function prepararImportacaoCsv(arquivo, msg) {
+    const texto = await arquivo.text();
+    const registros = parseCsvCliente(texto);
+    if (!registros.length) {
+      msg.textContent = "O arquivo CSV não possui linhas válidas para importar.";
+      return;
+    }
+    const fotos = {};
+    registros.forEach(function (reg) {
+      const bruto = reg.valores.imagem || reg.valores.foto || reg.valores.imagem_url || reg.valores.url_imagem || "";
+      if (ehImagemValidaCsv(bruto)) {
+        fotos[reg.linha] = bruto.trim();
+      }
+    });
+
+    estadoImportacaoCsv = { texto: texto, registros: registros, fotos: fotos, msgFora: msg };
+    const dlgCsv = document.querySelector("#dlg-csv-fotos");
+    const msgDlg = document.querySelector("#msg-dlg-csv");
+    const inputLote = document.querySelector("#csv-fotos-lote");
+    if (msgDlg) msgDlg.textContent = "";
+    if (inputLote) inputLote.value = "";
+    renderListaImportacaoCsv();
+    dlgCsv.showModal();
+  }
+
+  async function enviarImportacaoCsvConfirmada() {
+    if (!estadoImportacaoCsv) return;
+    const msgDlg = document.querySelector("#msg-dlg-csv");
+    const faltandoFoto = estadoImportacaoCsv.registros.filter(function (r) {
+      return !estadoImportacaoCsv.fotos[r.linha];
+    });
+    if (faltandoFoto.length) {
+      msgDlg.textContent = "Selecione uma foto para todos os produtos antes de importar (" + faltandoFoto.length + " produto(s) sem foto).";
+      return;
+    }
+
+    msgDlg.textContent = "Importando produtos...";
+    const mapaImagens = {};
+    Object.keys(estadoImportacaoCsv.fotos).forEach(function (k) {
+      mapaImagens[String(k)] = estadoImportacaoCsv.fotos[k];
+    });
+
     const resposta = await fetch("/api/csv/produtos", {
-      method: "POST", credentials: "same-origin", headers: { "Content-Type": "text/csv" }, body: await arquivo.text()
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ csv: estadoImportacaoCsv.texto, imagens: mapaImagens })
     });
     const dados = await resposta.json().catch(function () { return {}; });
     if (!resposta.ok) {
-      msg.textContent = dados.message || dados.erro || "Falha na importação.";
-      return false;
+      msgDlg.textContent = dados.message || dados.erro || "Falha na importação.";
+      return;
     }
     const ignoradas = (dados.ignorados || []).map(function (i) { return "linha " + i.linha + ": " + i.motivo; }).join("; ");
-    msg.textContent = (dados.importados || 0) + " produto(s) importado(s)." + (ignoradas ? " Ignoradas: " + ignoradas : "");
-    return true;
+    const resumoTexto = (dados.importados || 0) + " produto(s) importado(s) com foto." + (ignoradas ? " Ignoradas: " + ignoradas : "");
+    document.querySelector("#dlg-csv-fotos").close();
+    estadoImportacaoCsv = null;
+    await iniciar();
+    const msgCsv = document.querySelector("#msg-csv");
+    if (msgCsv) msgCsv.textContent = resumoTexto;
   }
 
   async function fornecedor(painel) {
@@ -329,7 +447,7 @@
     ]);
 
     const linhasProdutos = produtos.itens.map(function (p) {
-      return "<tr><td>" + ui.esc(p.nome) + "</td><td>" + ui.esc(p.categoria) + "</td><td>" + ui.moeda(p.preco) + "</td><td>" + p.entregaDias + " dias</td>" +
+      return '<tr><td><div class="forn-prod-celula"><div class="mk-thumb forn-thumb">' + ui.iconeProduto(p) + "</div><span>" + ui.esc(p.nome) + "</span></div></td><td>" + ui.esc(p.categoria) + "</td><td>" + ui.moeda(p.preco) + "</td><td>" + p.entregaDias + " dias</td>" +
         "<td>" + (p.laudo ? '<span class="mk-selo">MAPA</span>' : '<button class="mk-btn btn-comparar" type="button" data-laudo="' + p.id + '">Vincular laudo</button>') + "</td>" +
         '<td><button class="mk-btn btn-comparar" type="button" data-remover="' + p.id + '">Remover</button></td></tr>';
     }).join("");
@@ -405,15 +523,79 @@
       });
     }
 
+    const dlgCsv = document.querySelector("#dlg-csv-fotos");
+    const inputFotosLote = document.querySelector("#csv-fotos-lote");
+    const btnConfirmarCsv = document.querySelector("#confirmar-csv");
+
+    if (inputFotosLote) {
+      inputFotosLote.addEventListener("change", async function () {
+        if (!estadoImportacaoCsv || !inputFotosLote.files || !inputFotosLote.files.length) return;
+        const msgDlg = document.querySelector("#msg-dlg-csv");
+        if (msgDlg) msgDlg.textContent = "Processando fotos...";
+        const arquivos = Array.from(inputFotosLote.files);
+        const lidas = [];
+        for (let i = 0; i < arquivos.length; i += 1) {
+          try {
+            const dataUrl = await ui.lerImagem(arquivos[i]);
+            lidas.push({ nome: (arquivos[i].name || "").toLowerCase(), semExt: (arquivos[i].name || "").replace(/\.[^.]+$/, "").toLowerCase(), dataUrl: dataUrl });
+          } catch (e) {}
+        }
+        const usadas = new Set();
+        estadoImportacaoCsv.registros.forEach(function (reg) {
+          const ref = String(reg.valores.imagem || reg.valores.foto || "").trim().toLowerCase();
+          const nomeProd = String(reg.valores.nome || "").trim().toLowerCase();
+          const match = lidas.find(function (img, idx) {
+            if (usadas.has(idx)) return false;
+            return (ref && (img.nome === ref || img.semExt === ref)) || (nomeProd && img.semExt === nomeProd);
+          });
+          if (match) {
+            usadas.add(lidas.indexOf(match));
+            estadoImportacaoCsv.fotos[reg.linha] = match.dataUrl;
+          }
+        });
+        let cursor = 0;
+        estadoImportacaoCsv.registros.forEach(function (reg) {
+          if (estadoImportacaoCsv.fotos[reg.linha]) return;
+          while (cursor < lidas.length && usadas.has(cursor)) cursor += 1;
+          if (cursor < lidas.length) {
+            usadas.add(cursor);
+            estadoImportacaoCsv.fotos[reg.linha] = lidas[cursor].dataUrl;
+            cursor += 1;
+          }
+        });
+        if (msgDlg) msgDlg.textContent = "";
+        renderListaImportacaoCsv();
+      });
+    }
+
+    if (dlgCsv) {
+      dlgCsv.addEventListener("change", async function (evento) {
+        const inputLinha = evento.target.closest("[data-foto-linha]");
+        if (!inputLinha || !estadoImportacaoCsv) return;
+        const arq = inputLinha.files && inputLinha.files[0];
+        if (!arq) return;
+        const msgDlg = document.querySelector("#msg-dlg-csv");
+        try {
+          if (msgDlg) msgDlg.textContent = "";
+          const dataUrl = await ui.lerImagem(arq);
+          estadoImportacaoCsv.fotos[Number(inputLinha.dataset.fotoLinha)] = dataUrl;
+          renderListaImportacaoCsv();
+        } catch (erro) {
+          if (msgDlg) msgDlg.textContent = erro.message;
+        }
+      });
+    }
+
+    if (btnConfirmarCsv) {
+      btnConfirmarCsv.addEventListener("click", enviarImportacaoCsvConfirmada);
+    }
+
     raiz.addEventListener("change", async function (evento) {
       const msg = document.querySelector("#msg-csv");
       if (evento.target.matches("#csv-arquivo") && evento.target.files[0]) {
-        const ok = await importarCsv(evento.target.files[0], msg);
-        const texto = msg.textContent;
-        if (ok) {
-          await iniciar();
-          document.querySelector("#msg-csv").textContent = texto;
-        }
+        const arq = evento.target.files[0];
+        evento.target.value = "";
+        await prepararImportacaoCsv(arq, msg);
       }
       if (evento.target.matches("[data-pedido]") && evento.target.value) {
         try {

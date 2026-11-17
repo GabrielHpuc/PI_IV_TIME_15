@@ -23,9 +23,7 @@
   function cartao(produto) {
     const selo = produto.laudo ? '<span class="mk-selo">Laudo MAPA</span>' : "";
     const detalhes = '<a class="mk-btn" href="produto.html?id=' + produto.id + '">Ver Detalhes</a>';
-    const acao = produto.categoria === "Outros"
-      ? detalhes
-      : '<button class="mk-btn" type="button" data-comprar="' + produto.id + '">Comprar</button>' + detalhes;
+    const acao = '<button class="mk-btn" type="button" data-comprar="' + produto.id + '">Comprar</button>' + detalhes;
 
     return '<article class="produto-card mk-card"><div class="produto-card-corpo">' +
       '<div class="produto-card-img"><div class="mk-thumb">' + ui.iconeProduto(produto) + "</div>" + selo + "</div>" +

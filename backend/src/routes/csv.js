@@ -5,12 +5,12 @@ import { carregarUsuario, exigirTipo } from "../middleware/auth.js";
 import { auditar } from "../utils/auditoria.js";
 import { gerarCsv, lerCsv } from "../utils/csv.js";
 import { fornecedorDoUsuario } from "../utils/fornecedores.js";
-import { lerProduto } from "../utils/produtos.js";
+import { gerarImagemPadrao, lerProduto } from "../utils/produtos.js";
 
 const router = Router();
 router.use(carregarUsuario);
 
-const COLUNAS_PRODUTO = ["nome", "categoria", "marca", "regiao", "preco", "entregaDias", "estoque", "cultura", "tecnologia", "embalagem", "descricao"];
+const COLUNAS_PRODUTO = ["nome", "categoria", "marca", "regiao", "preco", "entregaDias", "estoque", "cultura", "tecnologia", "embalagem", "descricao", "imagem"];
 const LIMITE_LINHAS = 500;
 const formatarPreco = valor => Number(valor).toFixed(2).replace(".", ",");
 const formatarData = valor => new Date(valor).toISOString().slice(0, 10);
@@ -23,11 +23,18 @@ function enviarCsv(res, nome, conteudo) {
   res.send(conteudo);
 }
 
-router.post("/produtos", exigirTipo("fornecedor"), express.text({ type: ["text/csv", "text/plain"], limit: "1mb" }), async (req, res, next) => {
+router.post("/produtos", exigirTipo("fornecedor"), express.text({ type: ["text/csv", "text/plain"], limit: "15mb" }), async (req, res, next) => {
   try {
-    if (typeof req.body !== "string" || !req.body.trim()) return res.status(400).json({ message: "Envie o conteúdo do arquivo CSV." });
+    const conteudoCsv = typeof req.body === "string"
+      ? req.body
+      : (req.body && typeof req.body.csv === "string" ? req.body.csv : "");
+    const mapaImagens = req.body && typeof req.body === "object" && req.body.imagens && typeof req.body.imagens === "object"
+      ? req.body.imagens
+      : {};
 
-    const registros = lerCsv(req.body);
+    if (!conteudoCsv.trim()) return res.status(400).json({ message: "Envie o conteúdo do arquivo CSV." });
+
+    const registros = lerCsv(conteudoCsv);
     if (!registros.length) return res.status(400).json({ message: "O arquivo não tem linhas de dados. Use a primeira linha como cabeçalho." });
     if (registros.length > LIMITE_LINHAS) return res.status(400).json({ message: `O arquivo pode ter no máximo ${LIMITE_LINHAS} produtos.` });
 
@@ -43,14 +50,29 @@ router.post("/produtos", exigirTipo("fornecedor"), express.text({ type: ["text/c
     const ignorados = [];
 
     for (const { linha, valores } of registros) {
-      const { dados, erro } = lerProduto(valores);
+      const entrada = { ...valores };
+      const refImg = String(entrada.imagem || entrada.foto || "").trim();
+      if (mapaImagens[String(linha)]) {
+        entrada.imagem = mapaImagens[String(linha)];
+      } else if (refImg && mapaImagens[refImg]) {
+        entrada.imagem = mapaImagens[refImg];
+      } else if (refImg && !/^(data:image\/|https?:\/\/|\/)/i.test(refImg)) {
+        // Caso o CSV traga apenas um nome de arquivo sem upload correspondente, gera imagem padrão para não falhar
+        delete entrada.imagem;
+        delete entrada.foto;
+      }
+
+      const { dados, erro } = lerProduto(entrada);
       if (erro) {
         ignorados.push({ linha, motivo: erro });
       } else if (existentes.has(dados.chave)) {
         ignorados.push({ linha, motivo: "Produto duplicado (mesmo nome e marca)." });
       } else {
         existentes.add(dados.chave);
-        novos.push({ ...dados, fornecedorId: fornecedor._id, laudoId: null, imagens: [], vendidos: 0, ativo: true, criadoEm: new Date() });
+        const imagens = Array.isArray(dados.imagens) && dados.imagens.length
+          ? dados.imagens
+          : [gerarImagemPadrao(dados.nome, dados.categoria)];
+        novos.push({ ...dados, fornecedorId: fornecedor._id, laudoId: null, imagens, vendidos: 0, ativo: true, criadoEm: new Date() });
       }
     }
 
@@ -69,7 +91,7 @@ router.post("/produtos", exigirTipo("fornecedor"), express.text({ type: ["text/c
 
 router.get("/modelo-produtos", exigirTipo("fornecedor"), (req, res) => {
   enviarCsv(res, "modelo-produtos.csv", gerarCsv(COLUNAS_PRODUTO, [
-    ["Semente Soja RR 40kg", "Sementes", "Monsanto", "Centro-Oeste", "180,00", 3, 500, "Soja", "RR", "Saco: 40kg", "Descrição opcional"]
+    ["Semente Soja RR 40kg", "Sementes", "Monsanto", "Centro-Oeste", "180,00", 3, 500, "Soja", "RR", "Saco: 40kg", "Descrição opcional", "https://exemplo.com/foto-soja.jpg"]
   ]));
 });
 
@@ -78,7 +100,7 @@ router.get("/produtos", exigirTipo("fornecedor"), async (req, res, next) => {
     const fornecedor = await fornecedorDoUsuario(req.usuario);
     const produtos = await getDatabase().collection("produtos").find({ fornecedorId: fornecedor._id, ativo: true }).sort({ nome: 1 }).toArray();
     enviarCsv(res, "meus-produtos.csv", gerarCsv(COLUNAS_PRODUTO, produtos.map(p => [
-      p.nome, p.categoria, p.marca, p.regiao, formatarPreco(p.preco), p.entregaDias, p.estoque ?? 0, p.cultura, p.tecnologia, p.embalagem, p.descricao
+      p.nome, p.categoria, p.marca, p.regiao, formatarPreco(p.preco), p.entregaDias, p.estoque ?? 0, p.cultura, p.tecnologia, p.embalagem, p.descricao, (Array.isArray(p.imagens) && p.imagens[0]) || p.imagem || ""
     ])));
   } catch (error) {
     next(error);

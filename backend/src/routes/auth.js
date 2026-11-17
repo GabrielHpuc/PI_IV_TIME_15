@@ -10,6 +10,48 @@ const router = Router();
 const normalizeEmail = email => String(email ?? "").trim().toLowerCase();
 const cleanString = (value, max = 120) => String(value ?? "").trim().slice(0, max);
 const digitsOnly = value => String(value ?? "").replace(/\D/g, "");
+const EMPTY_ADDRESS = { cep: "", street: "", number: "", complement: "", neighborhood: "", city: "", state: "" };
+
+function normalizeAddressItem(input = {}, defaultPrincipal = false) {
+  if (!input || typeof input !== "object") return null;
+  const cep = digitsOnly(input.cep).slice(0, 8);
+  const street = cleanString(input.street ?? input.rua, 120);
+  const number = cleanString(input.number ?? input.numero, 20);
+  const complement = cleanString(input.complement ?? input.complemento, 80);
+  const neighborhood = cleanString(input.neighborhood ?? input.bairro, 80);
+  const city = cleanString(input.city ?? input.cidade, 80);
+  const state = cleanString(input.state ?? input.estado, 2).toUpperCase();
+  const label = cleanString(input.label ?? input.apelido, 60);
+  const observacoes = cleanString(input.observacoes, 300);
+  if (!cep && !street && !number && !complement && !neighborhood && !city && !state) return null;
+  return {
+    id: cleanString(input.id, 64) || crypto.randomUUID(),
+    label,
+    cep,
+    street,
+    number,
+    complement,
+    neighborhood,
+    city,
+    state,
+    observacoes,
+    principal: Boolean(input.principal ?? defaultPrincipal)
+  };
+}
+
+function getProfileAddresses(profile) {
+  const list = Array.isArray(profile?.addresses)
+    ? profile.addresses.map((a, idx) => normalizeAddressItem(a, idx === 0)).filter(Boolean)
+    : [];
+  if (!list.length && profile?.address) {
+    const single = normalizeAddressItem(profile.address, true);
+    if (single) list.push(single);
+  }
+  if (list.length && !list.some(a => a.principal)) {
+    list[0].principal = true;
+  }
+  return list;
+}
 
 router.post("/register", async (req, res, next) => {
   try {
@@ -53,6 +95,7 @@ router.post("/register", async (req, res, next) => {
       await profiles.insertOne({ userId, name, accountType, phone: phone || null, document: document || null,
         companyName: companyName || null, tradeName: tradeName || null, stateRegistration: stateRegistration || null, categories,
         address: { cep: "", street: "", number: "", complement: "", neighborhood: "", city: "", state: "" },
+        addresses: [],
         darkMode: false, favoritos: [],
         registrationStatus: "basic", createdAt: now, updatedAt: now });
       if (accountType === "fornecedor") {
@@ -154,10 +197,32 @@ router.get("/me", async (req, res, next) => {
     const user = await db.collection("users").findOne({ _id: userId }, { projection: { passwordHash: 0 } });
     const profile = await db.collection("profiles").findOne({ userId });
     if (!user || !profile || user.status !== "active") return res.status(401).json({ message: "Sessão inválida. Entre novamente." });
+
+    let addresses = getProfileAddresses(profile);
+    if (!addresses.length && profile.accountType === "produtor") {
+      const pedidos = await db.collection("pedidos").find({ userId }).sort({ criadoEm: -1 }).limit(10).toArray();
+      const vistos = new Set();
+      for (const p of pedidos) {
+        const item = normalizeAddressItem(p.entrega, addresses.length === 0);
+        if (item) {
+          const chave = `${item.cep}|${item.street.toLowerCase()}|${item.number.toLowerCase()}`;
+          if (!vistos.has(chave)) {
+            vistos.add(chave);
+            item.label = item.label || (addresses.length === 0 ? "Endereço principal" : `Endereço ${addresses.length + 1}`);
+            addresses.push(item);
+          }
+        }
+      }
+      if (addresses.length) {
+        await db.collection("profiles").updateOne({ userId }, { $set: { addresses, address: addresses[0], updatedAt: new Date() } });
+      }
+    }
+
+    const primaryAddress = addresses.find(a => a.principal) || addresses[0] || profile.address || EMPTY_ADDRESS;
     return res.json({ user: {
       id: user._id.toString(), name: profile.name, email: user.email, accountType: profile.accountType,
       registrationStatus: profile.registrationStatus || "basic", phone: profile.phone || "",
-      document: profile.document || "", address: profile.address || {},
+      document: profile.document || "", address: primaryAddress, addresses,
       darkMode: Boolean(profile.darkMode), favoritos: (profile.favoritos || []).map(String)
     }});
   } catch (error) { next(error); }
@@ -168,19 +233,28 @@ router.put("/profile", async (req, res, next) => {
     if (!req.session.userId || !ObjectId.isValid(req.session.userId)) return res.status(401).json({ message: "Faça login para atualizar seu perfil." });
     const name = String(req.body.name ?? "").trim(), email = normalizeEmail(req.body.email);
     const phone = cleanString(req.body.phone, 20), document = digitsOnly(req.body.document);
-    const input = req.body.address && typeof req.body.address === "object" ? req.body.address : {};
     if (name.length < 2 || name.length > 100) return res.status(400).json({ message: "O nome deve ter entre 2 e 100 caracteres." });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return res.status(400).json({ message: "Informe um e-mail válido." });
     if (phone && (digitsOnly(phone).length < 10 || digitsOnly(phone).length > 13)) return res.status(400).json({ message: "Informe um telefone válido com DDD." });
     if (document && !validarCpfCnpj(document)) return res.status(400).json({ message: "Informe um CPF ou CNPJ válido." });
-    const address = {
-      cep: digitsOnly(input.cep).slice(0, 8), street: cleanString(input.street, 120),
-      number: cleanString(input.number, 20), complement: cleanString(input.complement, 80),
-      neighborhood: cleanString(input.neighborhood, 80), city: cleanString(input.city, 80),
-      state: cleanString(input.state, 2).toUpperCase()
-    };
-    if (address.cep && address.cep.length !== 8) return res.status(400).json({ message: "O CEP deve conter 8 dígitos." });
-    if (address.state && !/^[A-Z]{2}$/.test(address.state)) return res.status(400).json({ message: "Selecione uma UF válida." });
+
+    let addresses = [];
+    if (Array.isArray(req.body.addresses)) {
+      addresses = req.body.addresses.slice(0, 15).map((a, idx) => normalizeAddressItem(a, idx === 0)).filter(Boolean);
+    } else if (req.body.address && typeof req.body.address === "object") {
+      const unico = normalizeAddressItem(req.body.address, true);
+      if (unico) addresses = [unico];
+    }
+
+    for (const addr of addresses) {
+      if (addr.cep && addr.cep.length !== 8) return res.status(400).json({ message: "O CEP deve conter 8 dígitos." });
+      if (addr.state && !/^[A-Z]{2}$/.test(addr.state)) return res.status(400).json({ message: "Selecione uma UF válida." });
+    }
+
+    if (addresses.length && !addresses.some(a => a.principal)) {
+      addresses[0].principal = true;
+    }
+    const address = addresses.find(a => a.principal) || addresses[0] || { ...EMPTY_ADDRESS };
 
     const db = getDatabase(), userId = new ObjectId(req.session.userId);
     const users = db.collection("users"), profiles = db.collection("profiles");
@@ -198,7 +272,7 @@ router.put("/profile", async (req, res, next) => {
       address.cep && address.street && address.number && address.neighborhood && address.city && address.state);
     const now = new Date();
     await profiles.updateOne({ userId }, { $set: {
-      name, phone: phone || null, document: document || null, address,
+      name, phone: phone || null, document: document || null, address, addresses,
       registrationStatus: complete ? "complete" : "basic", updatedAt: now
     }});
     try {
@@ -206,15 +280,17 @@ router.put("/profile", async (req, res, next) => {
     } catch (error) {
       await profiles.updateOne({ userId }, { $set: {
         name: oldProfile.name, phone: oldProfile.phone ?? null, document: oldProfile.document ?? null,
-        address: oldProfile.address ?? {}, registrationStatus: oldProfile.registrationStatus ?? "basic", updatedAt: new Date()
+        address: oldProfile.address ?? {}, addresses: oldProfile.addresses ?? [],
+        registrationStatus: oldProfile.registrationStatus ?? "basic", updatedAt: new Date()
       }});
       throw error;
     }
     const saved = await profiles.findOne({ userId });
+    const savedAddresses = getProfileAddresses(saved);
     return res.json({ message: "Perfil atualizado com sucesso.", user: {
       id: userId.toString(), name: saved.name, email, accountType: saved.accountType,
       registrationStatus: saved.registrationStatus, phone: saved.phone || "",
-      document: saved.document || "", address: saved.address || {},
+      document: saved.document || "", address: saved.address || {}, addresses: savedAddresses,
       darkMode: Boolean(saved.darkMode), favoritos: (saved.favoritos || []).map(String)
     }});
   } catch (error) {
