@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { montarConsulta, ORDENS } from "../backend/src/utils/produtos.js";
+import { montarConsulta, ORDENS, lerProduto, gerarImagemPadrao } from "../backend/src/utils/produtos.js";
 
 test("consulta padrão só traz produtos ativos, 12 por página, mais vendidos primeiro", () => {
   const c = montarConsulta({});
@@ -42,4 +42,16 @@ test("categoria e marca aceitam várias opções; limite e página são limitado
 test("ordem desconhecida cai no padrão", () => {
   const c = montarConsulta({ ordem: "xyz" });
   assert.deepEqual(c.ordem, { ...ORDENS.vendidos, _id: 1 });
+});
+
+test("lerProduto aceita imagem base64, URL http/https e campo foto", () => {
+  const base = { nome: "Trator Agrícola", categoria: "Outros", marca: "AgroMax", regiao: "Sul", preco: "150,00", entregaDias: 5 };
+  const comUrl = lerProduto({ ...base, imagem: "https://exemplo.com/foto.png" });
+  assert.equal(comUrl.erro, undefined);
+  assert.deepEqual(comUrl.dados.imagens, ["https://exemplo.com/foto.png"]);
+
+  const svgPadrao = gerarImagemPadrao("Trator Agrícola", "Outros");
+  const comFotoSvg = lerProduto({ ...base, foto: svgPadrao });
+  assert.equal(comFotoSvg.erro, undefined);
+  assert.deepEqual(comFotoSvg.dados.imagens, [svgPadrao]);
 });

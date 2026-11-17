@@ -48,11 +48,28 @@
       const f = await ui.api("/api/fornecedores/" + encodeURIComponent(id));
       const lista = await ui.api("/api/produtos?fornecedor=" + encodeURIComponent(id) + "&limite=48");
       const cartoes = lista.itens.filter(function (p) { return p.fornecedor && p.fornecedor.id === id; }).map(function (p) {
-        return '<article class="mk-card" style="padding:12px"><strong>' + ui.esc(p.nome) + "</strong><br><small>" + ui.esc(p.marca) + "</small><p>" + ui.moeda(p.preco) +
-          '</p><a class="mk-btn" href="produto.html?id=' + p.id + '">Ver detalhes</a></article>';
+        const selo = p.laudo ? '<span class="mk-selo">Laudo MAPA</span>' : "";
+        return '<article class="produto-card mk-card"><div class="produto-card-corpo">' +
+          '<div class="produto-card-img"><div class="mk-thumb">' + ui.iconeProduto(p) + "</div>" + selo + "</div>" +
+          '<div class="produto-card-info"><h3>' + ui.esc(p.nome) + "</h3><small>" + ui.esc(p.marca) + '</small><span class="preco">' + ui.moeda(p.preco) + "</span></div>" +
+          ui.favoritos.botaoEstrela(p.id) + "</div>" +
+          '<div class="produto-card-acoes"><button class="mk-btn" type="button" data-comprar="' + p.id + '">Comprar</button>' +
+          '<a class="mk-btn" href="produto.html?id=' + p.id + '">Ver Detalhes</a></div></article>';
       }).join("");
       raiz.innerHTML = '<div class="forn-topo"><h1>' + ui.esc(f.nomeFantasia || f.nome) + "</h1></div>" + resumo(f) +
-        '<div class="forn-grade">' + (cartoes || '<p class="forn-vazio">Nenhum produto disponível.</p>') + "</div>";
+        '<div class="grade-produtos">' + (cartoes || '<p class="forn-vazio">Nenhum produto disponível.</p>') + "</div>";
+      raiz.addEventListener("click", function (evento) {
+        const fav = evento.target.closest("[data-favorito]");
+        if (fav) {
+          ui.favoritos.alternar(fav.dataset.favorito);
+          return;
+        }
+        const botao = evento.target.closest("[data-comprar]");
+        if (botao) {
+          ui.carrinho.adicionar(botao.dataset.comprar, 1);
+          window.location.href = "checkout.html";
+        }
+      });
     } catch (e) {
       erro(e.status === 404 ? "Fornecedor não encontrado." : e.message);
     }

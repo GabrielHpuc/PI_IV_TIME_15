@@ -18,6 +18,9 @@
       <h1>Meus produtos</h1>
       <div>
         <a class="mk-btn" href="fornecedor.html?meu=1">Dados da empresa</a>
+        <a class="mk-btn" href="/api/csv/modelo-produtos">Modelo CSV</a>
+        <label class="mk-btn" for="csv-arquivo">Importar produtos (CSV)</label>
+        <input type="file" id="csv-arquivo" accept=".csv,text/csv" class="sr-only">
         <button class="mk-btn mk-btn-verde" type="button" id="novo-produto">Novo produto</button>
       </div>
     </div>
@@ -53,6 +56,20 @@
         <button class="mk-btn mk-btn-verde" type="submit">Salvar</button>
       </div>
     </form>
+  </dialog>
+
+  <dialog class="dialogo dialogo-largo" id="dlg-csv-fotos">
+    <h2>Fotos dos produtos importados</h2>
+    <p class="muted" style="margin:0 0 10px;font-size:.88rem">Todo produto precisa ter foto. Caso o CSV já tenha a coluna <strong>imagem</strong> (URL ou base64), ela já aparece abaixo. Você também pode selecionar várias fotos de uma vez ou escolher individualmente para cada produto.</p>
+    <label class="csv-lote-label">Selecionar várias fotos de uma vez (associa por nome do arquivo ou na ordem da lista)
+      <input type="file" id="csv-fotos-lote" multiple accept="image/png,image/jpeg,image/webp,image/gif">
+    </label>
+    <div id="csv-lista-produtos" class="csv-lista-produtos"></div>
+    <p class="dialogo-msg" id="msg-dlg-csv" role="status"></p>
+    <div class="dialogo-acoes">
+      <button class="mk-btn" type="button" id="cancelar-csv">Cancelar</button>
+      <button class="mk-btn mk-btn-verde" type="button" id="confirmar-csv">Confirmar importação</button>
+    </div>
   </dialog>
 
   <footer id="site-footer"></footer>

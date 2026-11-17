@@ -816,3 +816,70 @@ html.dark-mode .button-outline:hover {
   background: #213529;
   color: #98ebb3;
 }
+
+/* Múltiplos endereços no perfil */
+.profile-form select {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 12px;
+  border: 1px solid #cbd8ce;
+  border-radius: 8px;
+  background: white;
+  color: #20352b;
+  font: inherit;
+}
+.profile-address-item {
+  margin-bottom: 6px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+.profile-address-item:last-child {
+  margin-bottom: 0;
+}
+.extra-addresses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 14px;
+}
+.extra-address-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #f8fbf8;
+}
+.extra-address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.extra-address-header h4 {
+  margin: 0;
+  color: var(--green);
+  font-size: 1rem;
+}
+.extra-address-btns {
+  display: flex;
+  gap: 14px;
+}
+.btn-remove-address {
+  color: #b3261e;
+}
+.extra-addresses-actions {
+  margin: 10px 0 6px;
+}
+html.dark-mode .extra-address-card {
+  background: #141e19;
+  border-color: #2a3b31;
+}
+html.dark-mode .extra-address-header h4 {
+  color: #7fe3a0;
+}
+html.dark-mode .btn-remove-address {
+  color: #ff897d;
+}

@@ -37,15 +37,19 @@
 <label for="edit-phone">Telefone</label><input id="edit-phone" name="phone" type="tel" autocomplete="tel" maxlength="20" placeholder="(19) 99999-9999">
 <label for="edit-document">CPF ou CNPJ</label><input id="edit-document" name="document" inputmode="numeric" maxlength="18" placeholder="CPF ou CNPJ">
 <small>Campos complementares podem ser preenchidos aos poucos.</small>
-<h3>Endereço</h3><label for="edit-cep">CEP</label><input id="edit-cep" name="cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000">
+<h3>Endereços</h3>
+<label for="edit-address-label">Identificação do endereço principal (opcional)</label><input id="edit-address-label" name="addressLabel" maxlength="60" placeholder="Ex: Fazenda Santa Luzia, Sede...">
+<label for="edit-cep">CEP</label><input id="edit-cep" name="cep" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000">
 <label for="edit-street">Rua / Logradouro</label><input id="edit-street" name="street" autocomplete="address-line1" maxlength="120">
 <div class="form-grid-two"><div><label for="edit-number">Número</label><input id="edit-number" name="number" maxlength="20"></div><div><label for="edit-complement">Complemento</label><input id="edit-complement" name="complement" maxlength="80"></div></div>
 <label for="edit-neighborhood">Bairro</label><input id="edit-neighborhood" name="neighborhood" maxlength="80">
 <div class="form-grid-two"><div><label for="edit-city">Cidade</label><input id="edit-city" name="city" maxlength="80"></div><div><label for="edit-state">Estado (UF)</label><select id="edit-state" name="state"><option value="">Selecione</option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select></div></div>
+<div id="extra-addresses-list" class="extra-addresses-list"></div>
+<div class="extra-addresses-actions"><button type="button" id="add-address-btn" class="button button-outline button-small">+ Adicionar outro endereço</button></div>
 <label for="edit-account-type">Tipo de conta</label><input id="edit-account-type" disabled><small>O tipo de conta controla as permissões e não é alterado nesta tela.</small>
 <p id="profile-message" class="account-message" role="status" aria-live="polite"></p><div class="form-actions"><button type="button" class="button button-outline" data-section="overview">Cancelar</button><button id="save-profile" type="submit" class="button">Salvar alterações</button></div>
 </form></div></section>
-<section id="cart-section" class="account-section" hidden><div class="account-card empty-state"><h2>Seu carrinho</h2><p>Será conectado ao catálogo em uma próxima etapa.</p><a href="dashboard.html" class="button">Voltar ao painel</a></div></section>
+<section id="cart-section" class="account-section" hidden><div id="cart-list"><div class="account-card empty-state"><h2>Seu carrinho</h2><p>Seu carrinho está vazio.</p><a href="catalogo.html" class="button">Explorar o catálogo</a></div></div></section>
 <section id="favorites-section" class="account-section" hidden><div id="favorites-list"><div class="account-card empty-state"><h2>Seus favoritos</h2><p>Você ainda não favoritou nenhum produto.</p><a href="catalogo.html" class="button">Explorar o catálogo</a></div></div></section>
 <section id="purchases-section" class="account-section" hidden><div id="purchases-list"><div class="account-card empty-state"><h2>Meus pedidos</h2><p>Você ainda não realizou nenhum pedido.</p><a href="catalogo.html" class="button">Explorar o catálogo</a></div></div></section>
 <footer class="account-footer">AgroRecursos MarketPlace · Projeto Integrador IV · PUC-Campinas</footer>

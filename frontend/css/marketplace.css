@@ -859,3 +859,110 @@ html.dark-mode .cad-tipo.ativo { border-color: #38b262; color: #8ce0a8; }
 html.dark-mode .btn-favorito { color: #63736a; }
 html.dark-mode .btn-favorito:hover { color: #d4a017; }
 html.dark-mode .btn-favorito.ativo { color: #f5b301; }
+
+/* Seletor de endereços salvos no Checkout */
+.enderecos-salvos-wrap {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  background: #eef5f0;
+}
+.enderecos-salvos-wrap label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: .88rem;
+  font-weight: 700;
+}
+.seletor-endereco {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--borda);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--texto);
+  font: inherit;
+  font-weight: 500;
+}
+html.dark-mode .enderecos-salvos-wrap {
+  background: #141e19;
+  border-color: #2a3b31;
+}
+html.dark-mode .seletor-endereco {
+  background: #131c17;
+  border-color: #2e4236;
+  color: #e5efe9;
+}
+
+/* Modal de fotos na importação CSV e miniatura na tabela do painel */
+.dialogo-largo {
+  width: min(620px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+}
+.csv-lote-label {
+  display: block;
+  padding: 10px 12px;
+  border: 1px dashed var(--borda);
+  border-radius: 8px;
+  background: #f4f8f5;
+  margin-bottom: 12px;
+}
+.csv-lista-produtos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 45vh;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+.csv-item-produto {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+}
+.csv-item-thumb {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  font-size: .72rem;
+  text-align: center;
+}
+.csv-sem-foto {
+  color: #b3261e;
+  font-weight: 700;
+  font-size: .72rem;
+}
+.csv-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.csv-item-info small {
+  color: var(--texto-suave);
+}
+.forn-prod-celula {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.forn-thumb {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  font-size: 1.3rem;
+}
+html.dark-mode .csv-lote-label {
+  background: #141e19;
+  border-color: #2a3b31;
+}
+html.dark-mode .csv-sem-foto {
+  color: #ff897d;
+}

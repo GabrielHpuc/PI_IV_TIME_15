@@ -52,9 +52,18 @@ if (!process.env.MONGODB_URI) {
 }
 
 app.disable("x-powered-by");
-app.use(helmet());
-app.use(express.json({ limit: "5mb" }));
-app.use(express.urlencoded({ extended: false, limit: "5mb" }));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "img-src": ["'self'", "data:", "blob:", "https:", "http:"]
+      }
+    }
+  })
+);
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: false, limit: "15mb" }));
 
 app.use(
   session({
