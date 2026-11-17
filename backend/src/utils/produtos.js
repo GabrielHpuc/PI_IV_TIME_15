@@ -48,22 +48,31 @@ export function lerProduto(corpo) {
   if (!Number.isInteger(entregaDias) || entregaDias < 1 || entregaDias > 60) return { erro: "O prazo de entrega deve ficar entre 1 e 60 dias." };
   if (!Number.isInteger(estoque) || estoque < 0) return { erro: "Estoque inválido." };
 
-  const campoImagem = corpo.imagem !== undefined
-    ? corpo.imagem
-    : corpo.foto !== undefined
-      ? corpo.foto
-      : corpo.imagem_url !== undefined
-        ? corpo.imagem_url
-        : corpo.url_imagem !== undefined
-          ? corpo.url_imagem
-          : Array.isArray(corpo.imagens) && corpo.imagens.length
-            ? corpo.imagens[0]
+  let listaBruta;
+  if (Array.isArray(corpo.imagens)) {
+    listaBruta = corpo.imagens;
+  } else {
+    const campoImagem = corpo.imagem !== undefined
+      ? corpo.imagem
+      : corpo.foto !== undefined
+        ? corpo.foto
+        : corpo.imagem_url !== undefined
+          ? corpo.imagem_url
+          : corpo.url_imagem !== undefined
+            ? corpo.url_imagem
             : undefined;
+    if (campoImagem !== undefined) {
+      const s = String(campoImagem || "").trim();
+      listaBruta = s ? [s] : [];
+    }
+  }
 
   let imagens;
-  if (campoImagem !== undefined) {
-    const img = String(campoImagem || "").trim();
-    if (img) {
+  if (listaBruta !== undefined) {
+    imagens = [];
+    for (const item of listaBruta.slice(0, 6)) {
+      const img = String(item || "").trim();
+      if (!img) continue;
       const ehBase64 = /^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,[A-Za-z0-9+/=\s]+$/i.test(img);
       const ehUrl = /^https?:\/\/[^\s"<>]+$/i.test(img);
       const ehCaminhoRelativo = /^(\/|[a-z0-9_\-./]+\.(png|jpe?g|webp|gif|svg))$/i.test(img);
@@ -73,9 +82,7 @@ export function lerProduto(corpo) {
       if (img.length > 2_000_000) {
         return { erro: "A imagem é muito grande (máximo 1,5 MB)." };
       }
-      imagens = [img];
-    } else {
-      imagens = [];
+      imagens.push(img);
     }
   }
 

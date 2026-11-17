@@ -9,10 +9,14 @@ const favoritesContainer = $("#favorites-list");
 const purchasesContainer = $("#purchases-list");
 const saveButton = $("#save-profile");
 
-function applyTheme(dark) {
+function applyTheme(dark, userId) {
   const isDark = Boolean(dark);
   document.documentElement.classList.toggle("dark-mode", isDark);
   try {
+    if (userId) {
+      localStorage.setItem("agro_ultima_conta_id", String(userId));
+    }
+    localStorage.setItem("agro_tema_ultima_conta", isDark ? "dark" : "light");
     localStorage.setItem("agro_tema", isDark ? "dark" : "light");
   } catch (e) {}
   if (darkToggle) darkToggle.checked = isDark;
@@ -20,7 +24,8 @@ function applyTheme(dark) {
 }
 
 try {
-  applyTheme(localStorage.getItem("agro_tema") === "dark");
+  const hasLastAccount = Boolean(localStorage.getItem("agro_ultima_conta_id"));
+  applyTheme(hasLastAccount && localStorage.getItem("agro_tema_ultima_conta") === "dark");
   if (localStorage.getItem("agro_tipo_conta") === "fornecedor") {
     document.querySelectorAll("[data-buyer-only]").forEach(el => { el.hidden = true; });
   }
@@ -207,7 +212,7 @@ if (purchasesContainer) {
 if (darkToggle) {
   darkToggle.addEventListener("change", async () => {
     const dark = darkToggle.checked;
-    applyTheme(dark);
+    applyTheme(dark, currentUser ? currentUser.id : undefined);
     if (prefMessage) {
       prefMessage.textContent = "Salvando preferência...";
       prefMessage.classList.add("success-message");
@@ -499,9 +504,7 @@ async function loadAccount() {
       localStorage.setItem("agro_tipo_conta", currentUser.accountType || "produtor");
     } catch (e) {}
     document.querySelectorAll("[data-buyer-only]").forEach(el => { el.hidden = isFornecedor; });
-    if (typeof currentUser.darkMode === "boolean") {
-      applyTheme(currentUser.darkMode);
-    }
+    applyTheme(Boolean(currentUser.darkMode), currentUser.id);
     if (Array.isArray(currentUser.favoritos) && currentUser.favoritos.length) {
       saveFavs(currentUser.favoritos);
     }

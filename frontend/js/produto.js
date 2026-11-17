@@ -16,8 +16,13 @@
   }
 
   function montar(produto) {
-    const fotoUrl = ui.fotoProduto(produto);
-    const miniaturas = [fotoUrl ? { tipo: "img", valor: fotoUrl } : { tipo: "ico", valor: ui.nomeIconeProduto(produto) }, { tipo: "ico", valor: "pacote" }, { tipo: "ico", valor: "documento" }, { tipo: "ico", valor: "caminhao" }];
+    const fotosSalvas = Array.isArray(produto.imagens) && produto.imagens.length
+      ? produto.imagens.filter(Boolean).map(String)
+      : (typeof produto.imagem === "string" && produto.imagem.trim() ? [produto.imagem.trim()] : []);
+    const miniaturas = fotosSalvas.length
+      ? fotosSalvas.map(function (src) { return { tipo: "img", valor: src }; })
+      : [{ tipo: "ico", valor: ui.nomeIconeProduto(produto) }];
+    const temVariasFotos = fotosSalvas.length > 1;
     const renderMidia = function (item, classeImg) {
       return item.tipo === "img"
         ? '<img class="' + classeImg + '" src="' + ui.esc(item.valor) + '" alt="' + ui.esc(produto.nome) + '">'
@@ -73,13 +78,16 @@
     raiz.innerHTML =
       '<div class="produto-layout">' +
       '<div class="galeria mk-card"><div class="galeria-principal" id="galeria-principal">' +
-      '<button class="galeria-seta anterior" type="button" id="foto-anterior" aria-label="Foto anterior">‹</button>' +
+      '<button class="galeria-seta anterior" type="button" id="foto-anterior" aria-label="Foto anterior"' + (temVariasFotos ? "" : " hidden") + '>‹</button>' +
       '<span id="foto-atual">' + renderMidia(miniaturas[0], "mk-galeria-img") + "</span>" +
-      '<button class="galeria-seta proxima" type="button" id="foto-proxima" aria-label="Próxima foto">›</button></div>' +
-      '<div class="galeria-miniaturas" id="miniaturas">' +
-      miniaturas.map(function (m, i) {
-        return '<button type="button" class="miniatura' + (i === 0 ? " ativa" : "") + '" data-i="' + i + '" aria-label="Foto ' + (i + 1) + '">' + renderMidia(m, "mk-thumb-img") + "</button>";
-      }).join("") + "</div></div>" +
+      '<button class="galeria-seta proxima" type="button" id="foto-proxima" aria-label="Próxima foto"' + (temVariasFotos ? "" : " hidden") + '>›</button></div>' +
+      (temVariasFotos
+        ? '<div class="galeria-miniaturas" id="miniaturas">' +
+          miniaturas.map(function (m, i) {
+            return '<button type="button" class="miniatura' + (i === 0 ? " ativa" : "") + '" data-i="' + i + '" aria-label="Foto ' + (i + 1) + '">' + renderMidia(m, "mk-thumb-img") + "</button>";
+          }).join("") + "</div>"
+        : "") +
+      "</div>" +
 
       '<div class="produto-info"><small>' + ui.esc(produto.condicao) + " | " + produto.vendidos + " vendidos</small>" +
       "<h1>" + ui.esc(produto.nome) + "</h1>" +

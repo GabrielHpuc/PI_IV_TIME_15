@@ -69,9 +69,7 @@ router.post("/produtos", exigirTipo("fornecedor"), express.text({ type: ["text/c
         ignorados.push({ linha, motivo: "Produto duplicado (mesmo nome e marca)." });
       } else {
         existentes.add(dados.chave);
-        const imagens = Array.isArray(dados.imagens) && dados.imagens.length
-          ? dados.imagens
-          : [gerarImagemPadrao(dados.nome, dados.categoria)];
+        const imagens = Array.isArray(dados.imagens) ? dados.imagens : [];
         novos.push({ ...dados, fornecedorId: fornecedor._id, laudoId: null, imagens, vendidos: 0, ativo: true, criadoEm: new Date() });
       }
     }

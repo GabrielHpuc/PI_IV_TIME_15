@@ -1,6 +1,8 @@
 
 try {
-  document.documentElement.classList.toggle("dark-mode", localStorage.getItem("agro_tema") === "dark");
+  const ultimaConta = localStorage.getItem("agro_ultima_conta_id");
+  const escuro = Boolean(ultimaConta) && localStorage.getItem("agro_tema_ultima_conta") === "dark";
+  document.documentElement.classList.toggle("dark-mode", escuro);
 } catch (e) {}
 
 const form = document.querySelector("#login-form");
@@ -55,8 +57,11 @@ async function enviarLogin(accountType) {
 
     if (result.user) {
       try {
+        const escuro = Boolean(result.user.darkMode);
         localStorage.setItem("agro_tipo_conta", result.user.accountType || "produtor");
-        localStorage.setItem("agro_tema", result.user.darkMode ? "dark" : "light");
+        localStorage.setItem("agro_ultima_conta_id", String(result.user.id || ""));
+        localStorage.setItem("agro_tema_ultima_conta", escuro ? "dark" : "light");
+        localStorage.setItem("agro_tema", escuro ? "dark" : "light");
         if (Array.isArray(result.user.favoritos)) {
           localStorage.setItem("agro_favoritos", JSON.stringify(result.user.favoritos));
         }

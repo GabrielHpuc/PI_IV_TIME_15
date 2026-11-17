@@ -1,6 +1,35 @@
-try {
-  document.documentElement.classList.toggle("dark-mode", localStorage.getItem("agro_tema") === "dark");
-} catch (e) {}
+function aplicarTemaInicial() {
+  try {
+    const ultimaConta = localStorage.getItem("agro_ultima_conta_id");
+    const temaUltimaConta = localStorage.getItem("agro_tema_ultima_conta");
+    const escuro = Boolean(ultimaConta) && temaUltimaConta === "dark";
+    document.documentElement.classList.toggle("dark-mode", escuro);
+    if (!escuro) {
+      localStorage.setItem("agro_tema", "light");
+    }
+  } catch (e) {
+    document.documentElement.classList.remove("dark-mode");
+  }
+}
+
+aplicarTemaInicial();
+
+async function sincronizarTemaSessao() {
+  try {
+    const res = await fetch("/api/auth/me", { credentials: "same-origin" });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.user && data.user.id) {
+      const escuro = Boolean(data.user.darkMode);
+      localStorage.setItem("agro_ultima_conta_id", String(data.user.id));
+      localStorage.setItem("agro_tema_ultima_conta", escuro ? "dark" : "light");
+      localStorage.setItem("agro_tema", escuro ? "dark" : "light");
+      document.documentElement.classList.toggle("dark-mode", escuro);
+    }
+  } catch (e) {}
+}
+
+sincronizarTemaSessao();
 
 async function verificarServidor() {
   try {
