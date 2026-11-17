@@ -3,19 +3,26 @@
   const CHAVE_CARRINHO = "agro_carrinho";
   const CHAVE_FAVORITOS = "agro_favoritos";
   const CHAVE_TEMA = "agro_tema";
+  const CHAVE_TEMA_CONTA = "agro_tema_ultima_conta";
+  const CHAVE_ULTIMA_CONTA = "agro_ultima_conta_id";
 
   const tema = {
     estaEscuro() {
       try {
-        return localStorage.getItem(CHAVE_TEMA) === "dark";
+        return Boolean(localStorage.getItem(CHAVE_ULTIMA_CONTA)) && localStorage.getItem(CHAVE_TEMA_CONTA) === "dark";
       } catch (e) {
         return false;
       }
     },
-    aplicar(escuro) {
-      document.documentElement.classList.toggle("dark-mode", Boolean(escuro));
+    aplicar(escuro, userId) {
+      const ativo = Boolean(escuro);
+      document.documentElement.classList.toggle("dark-mode", ativo);
       try {
-        localStorage.setItem(CHAVE_TEMA, escuro ? "dark" : "light");
+        if (userId) {
+          localStorage.setItem(CHAVE_ULTIMA_CONTA, String(userId));
+        }
+        localStorage.setItem(CHAVE_TEMA_CONTA, ativo ? "dark" : "light");
+        localStorage.setItem(CHAVE_TEMA, ativo ? "dark" : "light");
       } catch (e) {
         return;
       }
@@ -325,7 +332,7 @@
           formBusca.hidden = ehFornecedor;
         }
         if (typeof resultado.user.darkMode === "boolean") {
-          tema.aplicar(resultado.user.darkMode);
+          tema.aplicar(resultado.user.darkMode, resultado.user.id);
         }
         if (Array.isArray(resultado.user.addresses) && resultado.user.addresses.length) {
           try {

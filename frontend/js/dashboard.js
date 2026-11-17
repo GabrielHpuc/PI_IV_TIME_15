@@ -218,7 +218,7 @@
       '<label>Cultura<input name="cultura" maxlength="60" placeholder="Soja"></label>' +
       '<label>Tecnologia<input name="tecnologia" maxlength="60"></label>' +
       '<label>Embalagem<input name="embalagem" maxlength="60" placeholder="Saco: 40kg"></label>' +
-      '<label>Foto do produto<input type="file" name="foto" id="foto-produto" accept="image/png,image/jpeg,image/webp,image/gif"></label>' +
+      '<label>Foto(s) do produto<input type="file" name="foto" id="foto-produto" multiple accept="image/png,image/jpeg,image/webp,image/gif"></label>' +
       '<div class="previa-foto" id="previa-foto" hidden><img id="previa-foto-img" alt="Prévia da foto do produto"><button class="mk-btn" type="button" id="remover-foto">Remover foto</button></div>' +
       '<label>Descrição<textarea name="descricao" rows="3" maxlength="1000"></textarea></label>' +
       '<p class="dialogo-msg" id="msg-produto" role="status"></p>' +
@@ -490,7 +490,7 @@
     }
     ligado = true;
 
-    let fotoSelecionada = "";
+    let fotosSelecionadas = [];
     const campoFoto = document.querySelector("#foto-produto");
     const previaWrap = document.querySelector("#previa-foto");
     const previaImg = document.querySelector("#previa-foto-img");
@@ -498,16 +498,16 @@
 
     if (campoFoto) {
       campoFoto.addEventListener("change", async function () {
-        const arquivo = campoFoto.files && campoFoto.files[0];
-        if (!arquivo) return;
+        const arquivos = campoFoto.files ? Array.from(campoFoto.files).slice(0, 6) : [];
+        if (!arquivos.length) return;
         try {
           document.querySelector("#msg-produto").textContent = "";
-          fotoSelecionada = await ui.lerImagem(arquivo);
-          previaImg.src = fotoSelecionada;
+          fotosSelecionadas = await Promise.all(arquivos.map(function (a) { return ui.lerImagem(a); }));
+          previaImg.src = fotosSelecionadas[0];
           previaWrap.hidden = false;
         } catch (erro) {
           campoFoto.value = "";
-          fotoSelecionada = "";
+          fotosSelecionadas = [];
           previaWrap.hidden = true;
           document.querySelector("#msg-produto").textContent = erro.message;
         }
@@ -517,7 +517,7 @@
     if (btnRemoverFoto) {
       btnRemoverFoto.addEventListener("click", function () {
         if (campoFoto) campoFoto.value = "";
-        fotoSelecionada = "";
+        fotosSelecionadas = [];
         previaImg.removeAttribute("src");
         previaWrap.hidden = true;
       });
@@ -647,13 +647,14 @@
       corpo.preco = Number(String(corpo.preco).replace(/\./g, "").replace(",", "."));
       corpo.entregaDias = Number(corpo.entregaDias);
       corpo.estoque = corpo.estoque === "" ? 0 : Number(corpo.estoque);
-      if (fotoSelecionada) {
-        corpo.imagem = fotoSelecionada;
+      if (fotosSelecionadas.length) {
+        corpo.imagens = fotosSelecionadas;
+        corpo.imagem = fotosSelecionadas[0];
       }
 
       try {
         await ui.api("/api/produtos", { method: "POST", body: corpo });
-        fotoSelecionada = "";
+        fotosSelecionadas = [];
         dlgProduto.close();
         iniciar();
       } catch (erro) {

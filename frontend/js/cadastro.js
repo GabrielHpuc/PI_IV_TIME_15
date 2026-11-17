@@ -1,4 +1,9 @@
 const form = document.querySelector("#register-form");
+try {
+  const ultimaConta = localStorage.getItem("agro_ultima_conta_id");
+  const escuro = Boolean(ultimaConta) && localStorage.getItem("agro_tema_ultima_conta") === "dark";
+  document.documentElement.classList.toggle("dark-mode", escuro);
+} catch (e) {}
 const message = document.querySelector("#message");
 const avancar = document.querySelector("#cad-avancar");
 const voltar = document.querySelector("#cad-voltar");
@@ -182,6 +187,11 @@ form.addEventListener("submit", async (event) => {
 
     try {
       localStorage.setItem("agro_tipo_conta", tipo);
+      if (result.user && result.user.id) {
+        localStorage.setItem("agro_ultima_conta_id", String(result.user.id));
+      }
+      localStorage.setItem("agro_tema_ultima_conta", "light");
+      localStorage.setItem("agro_tema", "light");
     } catch (e) {}
 
     window.location.href = "dashboard.html";

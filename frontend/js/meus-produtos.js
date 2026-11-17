@@ -13,7 +13,7 @@
   const btnRemoverFoto = document.querySelector("#remover-foto");
   let produtos = [];
   let editandoId = null;
-  let imagemAtual = undefined;
+  let imagensAtuais = undefined;
 
   const opcoes = function (lista) {
     return lista.map(function (v) { return '<option value="' + v + '">' + v + "</option>"; }).join("");
@@ -21,9 +21,10 @@
   form.categoria.innerHTML = opcoes(CATEGORIAS);
   form.regiao.innerHTML = opcoes(REGIOES);
 
-  function atualizarPrevia(src) {
-    if (src) {
-      previaImg.src = src;
+  function atualizarPrevia(lista) {
+    const arr = Array.isArray(lista) ? lista.filter(Boolean) : (lista ? [lista] : []);
+    if (arr.length) {
+      previaImg.src = arr[0];
       previaWrap.hidden = false;
     } else {
       previaImg.removeAttribute("src");
@@ -32,12 +33,12 @@
   }
 
   campoFoto.addEventListener("change", async function () {
-    const arquivo = campoFoto.files && campoFoto.files[0];
-    if (!arquivo) return;
+    const arquivos = campoFoto.files ? Array.from(campoFoto.files).slice(0, 6) : [];
+    if (!arquivos.length) return;
     try {
       msg.textContent = "";
-      imagemAtual = await ui.lerImagem(arquivo);
-      atualizarPrevia(imagemAtual);
+      imagensAtuais = await Promise.all(arquivos.map(function (a) { return ui.lerImagem(a); }));
+      atualizarPrevia(imagensAtuais);
     } catch (erro) {
       campoFoto.value = "";
       msg.textContent = erro.message;
@@ -46,8 +47,8 @@
 
   btnRemoverFoto.addEventListener("click", function () {
     campoFoto.value = "";
-    imagemAtual = "";
-    atualizarPrevia("");
+    imagensAtuais = [];
+    atualizarPrevia([]);
   });
 
   function desenhar() {
@@ -81,7 +82,7 @@
 
   function abrir(produto) {
     editandoId = produto ? produto.id : null;
-    imagemAtual = undefined;
+    imagensAtuais = undefined;
     form.reset();
     msg.textContent = "";
     document.querySelector("#dlg-titulo").textContent = produto ? "Editar produto" : "Cadastrar produto";
@@ -90,9 +91,9 @@
         if (form[c]) form[c].value = produto[c] === undefined || produto[c] === null ? "" : produto[c];
       });
       form.preco.value = String(produto.preco).replace(".", ",");
-      atualizarPrevia(ui.fotoProduto(produto));
+      atualizarPrevia(Array.isArray(produto.imagens) && produto.imagens.length ? produto.imagens : ui.fotoProduto(produto));
     } else {
-      atualizarPrevia("");
+      atualizarPrevia([]);
     }
     dialogo.showModal();
   }
@@ -132,8 +133,9 @@
     corpo.preco = Number(String(corpo.preco).replace(/\./g, "").replace(",", "."));
     corpo.entregaDias = Number(corpo.entregaDias);
     corpo.estoque = corpo.estoque === "" ? 0 : Number(corpo.estoque);
-    if (imagemAtual !== undefined) {
-      corpo.imagem = imagemAtual;
+    if (imagensAtuais !== undefined) {
+      corpo.imagens = imagensAtuais;
+      corpo.imagem = imagensAtuais[0] || "";
     }
     try {
       await ui.api(editandoId ? "/api/produtos/" + editandoId : "/api/produtos", { method: editandoId ? "PUT" : "POST", body: corpo });
