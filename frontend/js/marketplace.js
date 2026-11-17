@@ -265,18 +265,25 @@
   function cabecalhoPadrao(placeholder) {
     const qtdCarrinho = carrinho.quantidade();
     const qtdFav = favoritos.quantidade();
+    let ehFornecedor = false;
+    try {
+      ehFornecedor = localStorage.getItem("agro_tipo_conta") === "fornecedor";
+    } catch (e) {}
+    const ocultarAttr = ehFornecedor ? " hidden" : "";
+    const ocultarBusca = ehFornecedor && document.body.dataset.busca !== "cotacoes" ? " hidden" : "";
+
     return (
       '<a class="mk-brand" href="dashboard.html"><span class="mk-brand-logo">' + icone("folha") + '</span>' +
       '<span class="mk-brand-text"><strong>AgroRecursos</strong><small>MarketPlace</small></span></a>' +
       '<div class="mk-header-body">' +
-      '<form class="mk-search" id="mk-busca" role="search">' +
+      '<form class="mk-search" id="mk-busca" role="search"' + ocultarBusca + '>' +
       '<input id="mk-busca-input" type="search" autocomplete="off" placeholder="' + esc(placeholder) + '" aria-label="Buscar">' +
       '<button type="submit" aria-label="Pesquisar">' + icone("busca") + "</button></form>" +
       '<nav class="mk-nav" aria-label="Navegação do marketplace">' +
-      '<a href="catalogo.html">' + icone("pacote") + '<span>Catálogo</span></a>' +
-      '<a href="cotacoes.html">' + icone("lista") + '<span>Cotações<b id="mk-cotacoes-qtd"></b></span></a>' +
-      '<a href="dashboard.html?page=favoritos">' + icone("coracao") + '<span>Favoritos<b id="mk-favoritos-qtd">' + (qtdFav > 0 ? " (" + qtdFav + ")" : "") + '</b></span></a>' +
-      '<a href="checkout.html">' + icone("carrinho") + '<span>Carrinho<b id="mk-carrinho-qtd">' + (qtdCarrinho > 0 ? " (" + qtdCarrinho + ")" : "") + '</b></span></a>' +
+      '<a href="catalogo.html" data-nav-comprador' + ocultarAttr + '>' + icone("pacote") + '<span>Catálogo</span></a>' +
+      '<a href="cotacoes.html" data-nav-comprador' + ocultarAttr + '>' + icone("lista") + '<span>Cotações<b id="mk-cotacoes-qtd"></b></span></a>' +
+      '<a href="dashboard.html?page=favoritos" data-nav-comprador' + ocultarAttr + '>' + icone("coracao") + '<span>Favoritos<b id="mk-favoritos-qtd">' + (qtdFav > 0 ? " (" + qtdFav + ")" : "") + '</b></span></a>' +
+      '<a href="checkout.html" data-nav-comprador' + ocultarAttr + '>' + icone("carrinho") + '<span>Carrinho<b id="mk-carrinho-qtd">' + (qtdCarrinho > 0 ? " (" + qtdCarrinho + ")" : "") + '</b></span></a>' +
       '<a href="minha-conta.html">' + icone("usuario") + '<i id="mk-conta-nome">Conta</i></a></nav></div>'
     );
   }
@@ -306,6 +313,17 @@
       const resultado = await resposta.json();
       if (resposta.ok && resultado.user && resultado.user.name) {
         alvo.textContent = "Conta";
+        const ehFornecedor = resultado.user.accountType === "fornecedor";
+        try {
+          localStorage.setItem("agro_tipo_conta", resultado.user.accountType || "produtor");
+        } catch (e) {}
+        document.querySelectorAll("[data-nav-comprador]").forEach(function (el) {
+          el.hidden = ehFornecedor;
+        });
+        const formBusca = document.querySelector("#mk-busca");
+        if (formBusca && document.body.dataset.busca !== "cotacoes") {
+          formBusca.hidden = ehFornecedor;
+        }
         if (typeof resultado.user.darkMode === "boolean") {
           tema.aplicar(resultado.user.darkMode);
         }

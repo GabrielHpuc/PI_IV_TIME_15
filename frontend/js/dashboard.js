@@ -5,7 +5,27 @@
 
   const rotulosCotacao = { analise: "Em análise", aguardando: "Aguardando propostas", fechada: "Fechada", recusada: "Recusada" };
   const classesCotacao = { analise: "analise", aguardando: "aguardando", fechada: "aprovada", recusada: "recusada" };
-  const rotulosPedido = { aguardando_pagamento: "Aguardando pagamento", em_analise: "Em análise", pago: "Pago", enviado: "Enviado", entregue: "Entregue", cancelado: "Cancelado" };
+  const rotulosPedido = {
+    criado: "Pedido criado",
+    aguardando_pagamento: "Pedido criado",
+    em_analise: "Pedido criado",
+    confirmado: "Confirmado por vendedor",
+    pago: "Confirmado por vendedor",
+    em_separacao: "Em separação",
+    enviado: "Enviado",
+    entregue: "Chegou ao destino",
+    cancelado: "Cancelado"
+  };
+  const INDICE_STATUS = {
+    criado: 0,
+    aguardando_pagamento: 0,
+    em_analise: 0,
+    confirmado: 1,
+    pago: 1,
+    em_separacao: 2,
+    enviado: 3,
+    entregue: 4
+  };
 
   const data = valor => new Date(valor).toLocaleDateString("pt-BR");
 
@@ -39,11 +59,14 @@
   let pedidosCache = [];
 
   function trilhaStatusPedido(status) {
-    const entregue = status === "entregue";
+    if (status === "cancelado") {
+      return '<div class="pedido-trilha"><span class="status recusada">Pedido cancelado</span></div>';
+    }
+    const indiceAtual = INDICE_STATUS[status] !== undefined ? INDICE_STATUS[status] : 0;
     return '<ol class="pedido-trilha" aria-label="Andamento do pedido">' +
       ETAPAS_PEDIDO.map(function (etapa, idx) {
-        const concluida = idx < 4 || (idx === 4 && entregue);
-        const atual = (idx === 3 && !entregue) || (idx === 4 && entregue);
+        const concluida = idx <= indiceAtual;
+        const atual = idx === indiceAtual;
         const classe = (concluida ? "feito" : "pendente") + (atual ? " atual" : "");
         return '<li class="pedido-etapa ' + classe + '">' +
           '<span class="pedido-etapa-icone">' + (concluida ? "✓" : "○") + "</span>" +
@@ -206,6 +229,7 @@
       '<label>Número do laudo<input name="numero" maxlength="40" placeholder="MAPA-00123" required></label>' +
       '<label>Data de emissão<input name="emissao" type="date" required></label>' +
       '<label>Validade<input name="validade" type="date" required></label>' +
+      '<label>Arquivo do laudo (PDF)<input name="arquivoPdf" id="laudo-pdf" type="file" accept=".pdf,application/pdf" required></label>' +
       '<p class="dialogo-msg" id="msg-laudo" role="status"></p>' +
       '<div class="dialogo-acoes"><button class="mk-btn" type="button" data-fechar>Cancelar</button><button class="mk-btn mk-btn-verde" type="submit">Vincular</button></div></form></dialog>');
 
@@ -216,8 +240,15 @@
 
 
   const proximos = {
-    aguardando_pagamento: ["pago", "cancelado"], em_analise: ["pago", "cancelado"],
-    pago: ["enviado", "cancelado"], enviado: ["entregue"], entregue: [], cancelado: []
+    criado: ["confirmado", "em_separacao", "enviado", "entregue", "cancelado"],
+    aguardando_pagamento: ["confirmado", "em_separacao", "enviado", "entregue", "cancelado"],
+    em_analise: ["confirmado", "em_separacao", "enviado", "entregue", "cancelado"],
+    confirmado: ["em_separacao", "enviado", "entregue", "cancelado"],
+    pago: ["em_separacao", "enviado", "entregue", "cancelado"],
+    em_separacao: ["enviado", "entregue", "cancelado"],
+    enviado: ["entregue"],
+    entregue: [],
+    cancelado: []
   };
 
   function seletorStatus(venda) {
@@ -448,13 +479,32 @@
       }
     });
 
+    function lerPdfBase64(arquivo) {
+      return new Promise(function (resolve, reject) {
+        if (!arquivo) return reject(new Error("Anexe o arquivo PDF do laudo MAPA."));
+        const ehPdf = arquivo.type === "application/pdf" || /\.pdf$/i.test(arquivo.name || "");
+        if (!ehPdf) return reject(new Error("Selecione um arquivo no formato PDF."));
+        if (arquivo.size > 3.5 * 1024 * 1024) return reject(new Error("O arquivo PDF deve ter no máximo 3,5 MB."));
+        const leitor = new FileReader();
+        leitor.onerror = function () { reject(new Error("Não foi possível ler o arquivo PDF.")); };
+        leitor.onload = function () {
+          const res = String(leitor.result || "");
+          resolve(res.replace(/^data:[^;]+;base64,/i, "data:application/pdf;base64,"));
+        };
+        leitor.readAsDataURL(arquivo);
+      });
+    }
+
     document.querySelector("#form-laudo").addEventListener("submit", async function (evento) {
       evento.preventDefault();
       const d = new FormData(evento.target);
+      const campoPdf = document.querySelector("#laudo-pdf");
+      const arquivo = campoPdf && campoPdf.files ? campoPdf.files[0] : null;
       try {
+        const arquivoPdf = await lerPdfBase64(arquivo);
         await ui.api("/api/laudos", {
           method: "POST",
-          body: { produtoId: laudoAlvo, numero: d.get("numero"), emissao: d.get("emissao"), validade: d.get("validade"), resultados: {} }
+          body: { produtoId: laudoAlvo, numero: d.get("numero"), emissao: d.get("emissao"), validade: d.get("validade"), arquivoPdf: arquivoPdf, resultados: {} }
         });
         dlgLaudo.close();
         iniciar();

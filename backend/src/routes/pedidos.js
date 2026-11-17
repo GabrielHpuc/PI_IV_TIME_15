@@ -79,7 +79,7 @@ router.post("/", exigirTipo("produtor"), async (req, res, next) => {
       frete: { valor: frete.valor, prazo: frete.prazo },
       total, entrega,
       pagamento: { metodo, parcelas, valorParcelas: dividirParcelas(total, parcelas), status: "confirmado" },
-      status: "enviado",
+      status: "criado",
       criadoEm: new Date()
     };
     const { insertedId } = await db.collection("pedidos").insertOne(pedido);
@@ -125,9 +125,12 @@ router.get("/vendas", exigirTipo("fornecedor"), async (req, res, next) => {
 });
 
 const TRANSICOES = {
-  aguardando_pagamento: ["pago", "cancelado"],
-  em_analise: ["pago", "cancelado"],
-  pago: ["enviado", "cancelado"],
+  criado: ["confirmado", "em_separacao", "enviado", "entregue", "cancelado"],
+  aguardando_pagamento: ["confirmado", "pago", "em_separacao", "enviado", "entregue", "cancelado"],
+  em_analise: ["confirmado", "pago", "em_separacao", "enviado", "entregue", "cancelado"],
+  confirmado: ["em_separacao", "enviado", "entregue", "cancelado"],
+  pago: ["em_separacao", "enviado", "entregue", "cancelado"],
+  em_separacao: ["enviado", "entregue", "cancelado"],
   enviado: ["entregue"]
 };
 

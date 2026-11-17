@@ -12,7 +12,7 @@ router.use(carregarUsuario);
 
 const ABERTAS = ["aguardando", "analise"];
 
-function formatar(cotacao, completo = true) {
+function formatar(cotacao, completo = true, meuFornecedorId = null) {
   const propostas = (cotacao.propostas || []).map(p => ({
     id: String(p._id), fornecedorId: String(p.fornecedorId ?? ""), fornecedor: p.fornecedor,
     preco: p.preco, laudo: Boolean(p.laudo), prazo: p.prazo, avaliacao: p.avaliacao ?? 0
@@ -27,6 +27,7 @@ function formatar(cotacao, completo = true) {
     vencimento: cotacao.vencimento,
     status: cotacao.status,
     totalPropostas: propostas.length,
+    jaEnviouProposta: meuFornecedorId ? propostas.some(p => p.fornecedorId === String(meuFornecedorId)) : false,
     propostaAprovadaId: cotacao.propostaAprovadaId ? String(cotacao.propostaAprovadaId) : null,
     ...(completo ? { propostas } : {})
   };
@@ -37,10 +38,13 @@ router.get("/", async (req, res, next) => {
     const col = getDatabase().collection("cotacoes");
     const busca = texto(req.query.busca, 20);
     const filtro = {};
+    let meuFornecedorId = null;
 
     if (req.usuario.tipo === "produtor") {
       filtro.userId = req.usuario.id;
     } else {
+      const fornecedor = await fornecedorDoUsuario(req.usuario);
+      meuFornecedorId = fornecedor._id;
       filtro.modelo = { $ne: true };
       filtro.status = { $in: ABERTAS };
       filtro.vencimento = { $gte: new Date() };
@@ -50,7 +54,7 @@ router.get("/", async (req, res, next) => {
     if (req.query.status) filtro.status = String(req.query.status);
 
     const itens = await col.find(filtro).sort({ criadoEm: -1 }).limit(100).toArray();
-    res.json({ itens: itens.map(c => formatar(c, false)) });
+    res.json({ itens: itens.map(c => formatar(c, false, meuFornecedorId)) });
   } catch (error) {
     next(error);
   }
@@ -129,13 +133,15 @@ router.post("/:id/propostas", exigirTipo("fornecedor"), async (req, res, next) =
     }
 
     const fornecedor = await fornecedorDoUsuario(req.usuario);
+    if ((cotacao.propostas || []).some(p => String(p.fornecedorId) === String(fornecedor._id))) {
+      return res.status(409).json({ message: "Você já enviou uma proposta para esta cotação." });
+    }
     const proposta = {
       _id: new ObjectId(), fornecedorId: fornecedor._id, fornecedor: fornecedor.nomeFantasia || fornecedor.nome,
       preco, prazo, laudo: Boolean(req.body.laudo), avaliacao: fornecedor.avaliacao ?? 0, criadoEm: new Date()
     };
 
-    const outras = (cotacao.propostas || []).filter(p => String(p.fornecedorId) !== String(fornecedor._id));
-    const propostas = [...outras, proposta];
+    const propostas = [...(cotacao.propostas || []), proposta];
     await col.updateOne({ _id: cotacao._id }, { $set: { propostas, status: statusPelasPropostas(propostas.length) } });
 
     await auditar(req, { acao: "cotacao.proposta", entidade: "cotacao", entidadeId: cotacao._id, detalhes: { preco, prazo } });
