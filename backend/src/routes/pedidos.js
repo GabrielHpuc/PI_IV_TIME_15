@@ -6,7 +6,7 @@ import { carregarUsuario, exigirTipo } from "../middleware/auth.js";
 import { fornecedorDoUsuario } from "../utils/fornecedores.js";
 import { proximoNumero } from "../utils/cotacoes.js";
 import { auditar } from "../utils/auditoria.js";
-import { dividirParcelas, totalItens, totalPedido } from "../utils/calculos.js";
+import { calcularPedidoNoServidorJava } from "../utils/calculos.js";
 import { calcularFrete } from "../utils/frete.js";
 import { METODOS_PAGAMENTO, arredondar, idValido, texto } from "../utils/validacao.js";
 
@@ -70,8 +70,7 @@ router.post("/", exigirTipo("produtor"), async (req, res, next) => {
         subtotal: arredondar(p.preco * quantidade)
       };
     });
-    const subtotal = totalItens(itens);
-    const total = totalPedido(itens, frete.valor);
+    const { subtotal, total, valorParcelas } = await calcularPedidoNoServidorJava(itens, frete.valor, parcelas);
     const numero = await proximoNumero("pedido");
 
     const pedido = {
@@ -79,7 +78,7 @@ router.post("/", exigirTipo("produtor"), async (req, res, next) => {
       userId: req.usuario.id, itens, subtotal,
       frete: { valor: frete.valor, prazo: frete.prazo },
       total, entrega,
-      pagamento: { metodo, parcelas, valorParcelas: dividirParcelas(total, parcelas), status: "confirmado" },
+      pagamento: { metodo, parcelas, valorParcelas, status: "confirmado" },
       status: "criado",
       criadoEm: new Date()
     };
