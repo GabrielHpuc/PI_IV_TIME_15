@@ -30,14 +30,18 @@ export async function connectDatabase() {
 
   await database.collection("users").createIndex({ email: 1 });
 
+  // o mesmo e-mail pode ter uma conta de produtor e outra de fornecedor, mas não duas do mesmo tipo
+  await database.collection("users").createIndex(
+    { email: 1, accountType: 1 },
+    { unique: true, partialFilterExpression: { accountType: { $type: "string" } } }
+  );
+
   await database.collection("profiles").createIndex(
     { userId: 1 },
     { unique: true }
   );
 
-  await database.collection("addresses").createIndex({
-    userId: 1
-  });
+  // Os endereços ficam em profiles.addresses; a coleção "addresses" foi removida.
 
   const indices = [
     ["produtos", { categoria: 1, marca: 1 }],

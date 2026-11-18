@@ -390,7 +390,7 @@ router.delete("/account", async (req, res, next) => {
       return res.status(401).json({ message: "Senha incorreta." });
     }
 
-    const emAndamento = await db.collection("pedidos").findOne({ userId, status: { $in: ["aguardando_pagamento", "em_analise", "pago", "enviado"] } }, { projection: { _id: 1 } });
+    const emAndamento = await db.collection("pedidos").findOne({ userId, status: { $in: ["criado", "confirmado", "em_separacao", "aguardando_pagamento", "em_analise", "pago", "enviado"] } }, { projection: { _id: 1 } });
     if (emAndamento) return res.status(409).json({ message: "Você tem pedidos em andamento. Conclua ou cancele antes de encerrar a conta." });
 
     await db.collection("users").updateOne({ _id: userId }, { $set: { status: "inactive", updatedAt: new Date() } });

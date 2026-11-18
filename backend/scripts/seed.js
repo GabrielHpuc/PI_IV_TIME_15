@@ -1,4 +1,5 @@
 import "dotenv/config";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import bcrypt from "bcryptjs";
@@ -19,13 +20,26 @@ try {
   await client.connect();
   const db = client.db("agrorecursos");
 
+  // As fotos dos produtos de exemplo ficam gravadas só no banco (campo imagens), não nos JSONs.
+  // Guarda as que já existem para o seed não apagá-las ao recriar os produtos.
+  const fotosAtuais = new Map(
+    (await db.collection("produtos").find({ seed: true, "imagens.0": { $exists: true } }, { projection: { imagens: 1 } }).toArray())
+      .map(p => [String(p._id), p.imagens])
+  );
+
   for (const nome of colecoes) {
     const docs = BSON.EJSON.parse(fs.readFileSync(path.join(pasta, nome + ".json"), "utf8"));
+    if (nome === "produtos") docs.forEach(d => { if (fotosAtuais.has(String(d._id))) d.imagens = fotosAtuais.get(String(d._id)); });
     await db.collection(nome).deleteMany({ seed: true });
     await db.collection(nome).insertMany(docs);
     console.log(`${nome}: ${docs.length} documentos`);
   }
 
+  // Os usuários de demonstração mantêm o mesmo _id entre execuções do seed; se o id mudasse,
+  // os pedidos, cotações e avaliações deles ficariam órfãos.
+  const idsDemo = new Map(
+    (await db.collection("users").find({ seed: true }, { projection: { email: 1 } }).toArray()).map(u => [u.email, u._id])
+  );
   await db.collection("users").deleteMany({ seed: true });
   await db.collection("profiles").deleteMany({ seed: true });
 
@@ -38,13 +52,14 @@ try {
   ];
 
   for (const demo of demos) {
-    const userId = new ObjectId();
-    await db.collection("users").insertOne({ ...base, _id: userId, email: demo.email });
+    const userId = idsDemo.get(demo.email) ?? new ObjectId();
+    await db.collection("users").insertOne({ ...base, _id: userId, email: demo.email, accountType: demo.accountType });
     await db.collection("profiles").insertOne({
       userId, name: demo.name, accountType: demo.accountType, phone: demo.phone, document: demo.document,
       companyName: demo.accountType === "fornecedor" ? "AgroVant Insumos Agrícolas Ltda" : null,
       tradeName: demo.accountType === "fornecedor" ? "AgroVant" : null,
       address: { cep: "13010111", street: "Rua Barão de Jaguara", number: "100", complement: "", neighborhood: "Centro", city: "Campinas", state: "SP" },
+      addresses: [{ id: crypto.randomUUID(), label: "Endereço principal", cep: "13010111", street: "Rua Barão de Jaguara", number: "100", complement: "", neighborhood: "Centro", city: "Campinas", state: "SP", observacoes: "", principal: true }],
       registrationStatus: "complete", seed: true, createdAt: agora, updatedAt: agora
     });
     if (demo.accountType === "fornecedor") {

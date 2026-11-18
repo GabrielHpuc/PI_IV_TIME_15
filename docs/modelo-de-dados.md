@@ -36,7 +36,8 @@ erDiagram
 | Campo | Tipo | Observação |
 |---|---|---|
 | _id | ObjectId | |
-| email | string | único |
+| email | string | único por tipo de conta (o mesmo e-mail pode ter uma conta de produtor e outra de fornecedor) |
+| accountType | string | `produtor` ou `fornecedor` (copiado do perfil) |
 | passwordHash | string | bcrypt, custo 12 |
 | status | string | `active` ou `inactive` |
 | emailVerified | bool | |
@@ -47,11 +48,12 @@ erDiagram
 |---|---|---|
 | userId | ObjectId | único, referencia `users` |
 | name, accountType | string | `produtor` ou `fornecedor` |
-| document | string | CPF/CNPJ só com dígitos; único quando preenchido |
+| document | string | CPF/CNPJ só com dígitos; único por tipo de conta (documento + accountType) quando preenchido |
 | phone | string | |
 | companyName, tradeName, stateRegistration | string | fornecedor |
 | categories | string[] | categorias que o fornecedor vende |
-| address | objeto | cep, street, number, complement, neighborhood, city, state |
+| addresses | array | endereços do usuário: id, label, cep, street, number, complement, neighborhood, city, state, observacoes, principal (um é o principal) |
+| address | objeto | cópia do endereço principal (cep, street, number, complement, neighborhood, city, state) |
 | registrationStatus | string | `basic` ou `complete` |
 
 ### fornecedores
@@ -69,6 +71,7 @@ erDiagram
 | laudoId | ObjectId ou null | referencia `laudos` |
 | chave | string | `nome|marca` normalizado; impede duplicados por fornecedor |
 | ativo | bool | exclusão lógica |
+| imagens | string[] | fotos do produto; a primeira é a capa e pode ser um data URI (JPEG em base64) gravado direto no banco |
 
 ### laudos
 `numero` (único, ex.: `MAPA-00123`), `orgao`, `produtoId`, `fornecedorId`, `emissao`, `validade`, `resultados` (objeto), `criadoEm`.
@@ -81,20 +84,22 @@ erDiagram
 Documentos com `modelo: true` são modelos de exemplo copiados para cada produtor no primeiro acesso.
 
 ### pedidos
-`numero` (`PED000001`), `userId`, `itens[]` (produtoId, fornecedorId, nome, preco, quantidade, subtotal), `subtotal`, `frete` (valor, prazo), `total`, `entrega` (endereço), `pagamento` (metodo, parcelas, valorParcelas[], status), `status` (`aguardando_pagamento`, `em_analise`, `pago`, `enviado`, `entregue`, `cancelado`).
+`numero` (`PED000001`), `userId`, `itens[]` (produtoId, fornecedorId, nome, preco, quantidade, subtotal), `subtotal`, `frete` (valor, prazo), `total`, `entrega` (endereço), `pagamento` (metodo, parcelas, valorParcelas[], status), `status` (`criado`, `confirmado`, `em_separacao`, `enviado`, `entregue`, `cancelado`; os antigos `aguardando_pagamento`, `em_analise` e `pago` ainda são aceitos). Total e parcelas são calculados pelo servidor Java (`servidor-java/`) e, se ele estiver fora do ar, pelo Node.
 
 ### auditoria
 `userId`, `acao` (ex.: `login`, `produto.criado`, `pedido.criado`, `cotacao.aprovada`), `entidade`, `entidadeId`, `detalhes`, `ip`, `criadoEm`. Nunca guarda senhas.
 
 ### Coleções de apoio
-`sessions` (connect-mongo), `password_resets` (token em hash SHA-256, expira em 1 h por índice TTL), `counters` (sequências de cotação e pedido).
+A coleção `addresses` foi removida: os endereços ficam em `profiles.addresses`.
+
+`sessions` (connect-mongo; criada automaticamente),  `password_resets` (token em hash SHA-256, expira em 1 h por índice TTL), `counters` (sequências de cotação e pedido).
 
 ## Índices
 
 | Coleção | Índice | Tipo |
 |---|---|---|
-| users | email | único |
-| profiles | userId; document | único (document só quando existe) |
+| users | email; email+accountType | o segundo é único (só quando accountType existe) |
+| profiles | userId; document+accountType | únicos (document só quando existe) |
 | produtos | categoria+marca; fornecedorId; vendidos; fornecedorId+chave (ativos) | o último é único |
 | laudos | numero | único |
 | avaliacoes | produtoId+userId | |
