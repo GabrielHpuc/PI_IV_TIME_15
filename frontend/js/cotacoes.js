@@ -1,3 +1,4 @@
+// Pedro RA: 25004075
 (function () {
   const ui = window.AgroUI;
 
@@ -46,6 +47,7 @@
     vazio.hidden = false;
   }
 
+  // Busca a lista de cotacoes na API e preenche a tabela com os botoes de comparar ou enviar proposta
   async function carregar() {
     const busca = campoBusca ? campoBusca.value.trim() : "";
     try {
@@ -73,6 +75,7 @@
     }
   }
 
+  // Monta a tabela comparativa lado a lado destacando em verde a proposta com menor preco
   function renderComparativo() {
     const c = aberta;
     const encerrada = c.status === "fechada" || c.status === "recusada";
@@ -151,6 +154,7 @@
     renderComparativo();
   });
 
+  // Envia a decisao do produtor de aprovar uma proposta especifica ou recusar a cotacao
   async function decidir(caminho, corpoRequisicao) {
     try {
       await ui.api("/api/cotacoes/" + aberta.id + "/" + caminho, { method: "POST", body: corpoRequisicao });

@@ -1,3 +1,4 @@
+// Pedro RA: 25004075
 const form = document.querySelector("#register-form");
 try {
   const ultimaConta = localStorage.getItem("agro_ultima_conta_id");
@@ -27,6 +28,7 @@ let passo = 0;
 const digitos = (valor) => String(valor).replace(/\D/g, "");
 const emailValido = (valor) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
 
+// Formata automaticamente o campo de CPF ou CNPJ conforme a quantidade de digitos
 function mascaraDocumento(valor) {
   const d = digitos(valor).slice(0, 14);
   if (d.length <= 11) {
@@ -53,6 +55,7 @@ aplicarMascara("f-cnpj", mascaraDocumento);
 aplicarMascara("p-cel", mascaraTelefone);
 aplicarMascara("f-cel", mascaraTelefone);
 
+// Controla qual etapa do formulario de cadastro esta visivel na tela e atualiza a barra de progresso
 function render() {
   const fluxo = fluxos[tipo];
   const ultimo = passo === fluxo.length - 1;
@@ -79,6 +82,7 @@ function erroCampo(nome, texto) {
   return false;
 }
 
+// Valida os campos obrigatorios da etapa atual antes de avancar para o proximo passo
 function validar() {
   document.querySelectorAll(".cad-erro").forEach((el) => el.classList.remove("cad-erro"));
   const v = (nome) => form.elements[nome].value.trim();
@@ -111,6 +115,7 @@ function validar() {
   return true;
 }
 
+// Reune os dados preenchidos de acordo com o tipo de conta escolhido e envia o cadastro para a API
 function montarDados() {
   const v = (nome) => form.elements[nome].value.trim();
 

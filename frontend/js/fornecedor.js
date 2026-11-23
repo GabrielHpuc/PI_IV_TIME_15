@@ -1,3 +1,4 @@
+// Pedro RA: 25004075
 (function () {
   const ui = window.AgroUI;
   const raiz = document.querySelector("#forn-conteudo");
@@ -12,6 +13,7 @@
       .replace(/\.(\d{3})(\d)/, ".$1/$2").replace(/(\d{4})(\d)/, "$1-$2");
   }
 
+  // Valida os digitos verificadores do CNPJ informado no formulario da empresa
   function cnpjValido(valor) {
     const d = so(valor);
     if (d.length !== 14 || /^(\d)\1+$/.test(d)) return false;
@@ -43,6 +45,7 @@
     return '<p class="forn-resumo"><span>' + nota + "</span><span>" + f.produtos + " produtos ativos</span></p>";
   }
 
+  // Exibe a vitrine publica de um fornecedor com sua nota media e todos os seus produtos ativos
   async function publica(id) {
     try {
       const f = await ui.api("/api/fornecedores/" + encodeURIComponent(id));
@@ -75,6 +78,7 @@
     }
   }
 
+  // Carrega e permite atualizar os dados cadastrais da empresa do fornecedor logado
   async function meu() {
     let f;
     try {

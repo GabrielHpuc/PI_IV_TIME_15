@@ -1,3 +1,4 @@
+// Pedro RA: 25004075
 (function () {
   const ui = window.AgroUI;
   const params = new URLSearchParams(window.location.search);
@@ -20,6 +21,7 @@
   let acumulados = [];
   let sequencia = 0;
 
+  // Monta o card HTML de cada produto exibido na grade do catalogo
   function cartao(produto) {
     const selo = produto.laudo ? '<span class="mk-selo">Laudo MAPA</span>' : "";
     const detalhes = '<a class="mk-btn" href="produto.html?id=' + produto.id + '">Ver Detalhes</a>';
@@ -69,6 +71,7 @@
     return { minimo: minimo, maximo: maximo };
   }
 
+  // Monta a string de parametros da URL com termo de busca, categorias, faixa de preco, laudo e ordenacao
   function consulta() {
     const q = new URLSearchParams();
     if (termo) {
@@ -95,6 +98,7 @@
     return q.toString();
   }
 
+  // Busca os produtos filtrados na API e atualiza a grade e os contadores laterais
   async function carregar() {
     const minha = ++sequencia;
     titulo.textContent = termo ? termo.charAt(0).toUpperCase() + termo.slice(1) : "Todos os produtos";

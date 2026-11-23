@@ -1,3 +1,5 @@
+// Pedro RA: 25004075
+// Aplica o modo escuro salvo no navegador logo ao abrir a pagina inicial
 function aplicarTemaInicial() {
   try {
     const ultimaConta = localStorage.getItem("agro_ultima_conta_id");
@@ -14,6 +16,7 @@ function aplicarTemaInicial() {
 
 aplicarTemaInicial();
 
+// Sincroniza o tema escuro com a preferencia salva na sessao do usuario e verifica o status da API
 async function sincronizarTemaSessao() {
   try {
     const res = await fetch("/api/auth/me", { credentials: "same-origin" });

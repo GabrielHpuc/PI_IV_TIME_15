@@ -1,4 +1,4 @@
-
+// Pedro RA: 25004075
 try {
   const ultimaConta = localStorage.getItem("agro_ultima_conta_id");
   const escuro = Boolean(ultimaConta) && localStorage.getItem("agro_tema_ultima_conta") === "dark";
@@ -15,6 +15,7 @@ function esc(texto) {
   return String(texto ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+// Envia as credenciais para a API e exibe a escolha de perfil caso o email tenha conta de produtor e fornecedor
 async function enviarLogin(accountType) {
   message.textContent = "";
   button.disabled = true;

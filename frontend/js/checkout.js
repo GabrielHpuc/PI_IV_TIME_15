@@ -1,3 +1,4 @@
+// Pedro RA: 25004075
 (function () {
   const ui = window.AgroUI;
 
@@ -39,6 +40,7 @@
     mensagem.innerHTML = texto;
   }
 
+  // Consulta os dados atualizados de cada produto que esta no carrinho
   async function carregarItens() {
     const carrinho = ui.carrinho.ler();
     const respostas = await Promise.all(carrinho.map(function (item) {
@@ -52,6 +54,7 @@
     itens = respostas.filter(Boolean);
   }
 
+  // Recalcula o subtotal dos itens, o valor do frete, o prazo total e o valor final do pedido
   function atualizarResumo() {
     const quantidade = itens.reduce(function (s, i) { return s + i.qtd; }, 0);
     const subtotal = itens.reduce(function (s, i) { return s + i.qtd * i.produto.preco; }, 0);
@@ -221,6 +224,7 @@
     } catch (e) {}
   }
 
+  // Carrega os enderecos salvos no perfil do usuario para facilitar o preenchimento da entrega
   async function carregarEnderecosSalvos() {
     const acumulados = [];
     const vistos = new Set();
@@ -313,6 +317,7 @@
     aviso_(ui.esc(texto), ok && Boolean(texto));
   });
 
+  // Valida o endereco de entrega e envia o pedido para registro na API
   botaoPagar.addEventListener("click", async function () {
     if (finalizado) {
       return;

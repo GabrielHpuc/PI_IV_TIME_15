@@ -1,6 +1,8 @@
+// Pedro RA: 25004075
 (function () {
   // Consulta de CEP (preenche o endereço) e previsão de entrega em dias úteis, no estilo dos marketplaces.
 
+  // Faz a requisicao para a rota de CEP no backend e devolve os dados do logradouro
   async function buscar(cep) {
     const digitos = String(cep || "").replace(/\D/g, "");
     if (digitos.length !== 8) {
@@ -19,6 +21,7 @@
     return dados;
   }
 
+  // Calcula a data estimada de entrega pulando sabados e domingos
   function somarDiasUteis(dias) {
     const data = new Date();
     let restantes = Math.max(0, Math.round(dias));
