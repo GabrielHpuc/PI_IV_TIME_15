@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node backend/src/app.js",
     "dev": "nodemon backend/src/app.js",
+    "java:servidor": "java -cp servidor-java/Servidor Servidor",
+    "java:cliente": "java -cp servidor-java/Cliente Cliente",
     "seed": "node backend/scripts/seed.js",
     "test": "node --test",
     "smoke": "node backend/scripts/smoke.mjs"

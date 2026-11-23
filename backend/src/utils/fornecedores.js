@@ -1,5 +1,7 @@
+// Tom RA: 25015528
 import { getDatabase } from "../config/database.js";
 
+// Busca o registro de fornecedor vinculado ao usuario logado ou cria um novo automaticamente se nao existir
 export async function fornecedorDoUsuario(usuario) {
   const col = getDatabase().collection("fornecedores");
   const existente = await col.findOne({ userId: usuario.id });

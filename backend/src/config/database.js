@@ -1,0 +1,100 @@
+// Gabriel RA: 25004669
+import dns from "node:dns";
+import { MongoClient } from "mongodb";
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+let client;
+let database;
+
+// Conecta ao cluster do MongoDB e prepara os indices necessarios da aplicacao
+export async function connectDatabase() {
+  const uri = process.env.MONGODB_URI;
+
+  if (!uri || uri.includes("COLE_AQUI") || uri.includes("SEU-CLUSTER")) {
+    throw new Error(
+      "Configure MONGODB_URI no arquivo .env antes de iniciar."
+    );
+  }
+
+  client = new MongoClient(uri);
+  await client.connect();
+
+  database = client.db("agrorecursos");
+
+  // Remove indices antigos simples para permitir o mesmo email ou documento em tipos de conta diferentes
+  try {
+    await database.collection("users").dropIndex("email_1");
+  } catch {}
+  try {
+    await database.collection("profiles").dropIndex("document_1");
+  } catch {}
+
+  await database.collection("users").createIndex({ email: 1 });
+
+  // o mesmo e-mail pode ter uma conta de produtor e outra de fornecedor, mas não duas do mesmo tipo
+  await database.collection("users").createIndex(
+    { email: 1, accountType: 1 },
+    { unique: true, partialFilterExpression: { accountType: { $type: "string" } } }
+  );
+
+  await database.collection("profiles").createIndex(
+    { userId: 1 },
+    { unique: true }
+  );
+
+  // Os endereços ficam em profiles.addresses; a coleção "addresses" foi removida.
+
+  // Define os indices das demais colecoes para otimizar consultas e garantir unicidade
+  const indices = [
+    ["produtos", { categoria: 1, marca: 1 }],
+    ["produtos", { fornecedorId: 1 }],
+    ["produtos", { vendidos: -1 }],
+    ["produtos", { fornecedorId: 1, chave: 1 }, { unique: true, partialFilterExpression: { ativo: true, chave: { $type: "string" } } }],
+    ["auditoria", { userId: 1, criadoEm: -1 }],
+    ["laudos", { numero: 1 }, { unique: true }],
+    ["fornecedores", { userId: 1 }],
+    ["avaliacoes", { produtoId: 1, userId: 1 }],
+    ["cotacoes", { userId: 1, criadoEm: -1 }],
+    ["cotacoes", { codigo: 1 }, { unique: true, partialFilterExpression: { codigo: { $type: "string" } } }],
+    ["pedidos", { userId: 1, criadoEm: -1 }],
+    ["pedidos", { "itens.fornecedorId": 1 }],
+    ["password_resets", { expiresAt: 1 }, { expireAfterSeconds: 0 }],
+    ["password_resets", { tokenHash: 1 }],
+    ["profiles", { document: 1, accountType: 1 }, { unique: true, partialFilterExpression: { document: { $type: "string" } } }]
+  ];
+
+  for (const [colecao, chaves, opcoes] of indices) {
+    try {
+      await database.collection(colecao).createIndex(chaves, opcoes);
+    } catch (error) {
+      console.warn(`Índice não criado em ${colecao}:`, error.message);
+    }
+  }
+
+  // Nenhum dado e apagado na inicializacao: as cotacoes de exemplo ficam por conta do `npm run seed`
+  // e as cotacoes reais dos produtores nunca devem sumir quando alguem reinicia o servidor.
+  await database.command({ ping: 1 });
+
+  console.log("MongoDB conectado com sucesso.");
+  return database;
+}
+
+// Devolve a conexao ja aberta para as rotas consultarem o banco
+export function getDatabase() {
+  if (!database) {
+    throw new Error("O banco de dados ainda não foi conectado.");
+  }
+
+  return database;
+}
+
+// Fecha o cliente do MongoDB quando o servidor e finalizado
+export async function closeDatabase() {
+  if (client) {
+    await client.close();
+    client = undefined;
+    database = undefined;
+  }
+}
+

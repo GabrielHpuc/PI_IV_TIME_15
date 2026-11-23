@@ -1,3 +1,5 @@
+// Pedro RA: 25004075
+// Base estatica de produtos e cotacoes de exemplo disponibilizada no objeto global AgroDados
 window.AgroDados = {
   produtos: [
     { id: 1, nome: "Semente Soja RR Super 40kg", categoria: "Sementes", marca: "Monsanto", regiao: "Centro-Oeste", preco: 180, entrega: 3, laudo: true, cultura: "Soja", tecnologia: "RR Super", embalagem: "Saco: 40kg", germinacao: 92, vigor: 88, pureza: 99.5, vencimento: "06/2026", vendidos: 120, condicao: "Novo" },

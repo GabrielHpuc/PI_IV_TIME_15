@@ -1,5 +1,7 @@
+// Pedro RA: 25004075
 import { ObjectId } from "mongodb";
 
+// Funcoes utilitarias para limpar textos, extrair digitos, arredondar valores e validar ObjectIds do MongoDB
 export const texto = (valor, max = 120) => String(valor ?? "").trim().slice(0, max);
 export const digitos = valor => String(valor ?? "").replace(/\D/g, "");
 export const arredondar = valor => Math.round(valor * 100) / 100;
@@ -10,6 +12,7 @@ export const CATEGORIAS = ["Sementes", "Fertilizantes", "Defensivos", "Outros"];
 export const REGIOES = ["Sudeste", "Sul", "Centro-Oeste", "Nordeste", "Norte"];
 export const METODOS_PAGAMENTO = ["boleto", "cartao", "credito_rural"];
 
+// Verifica se o documento informado possui 11 ou 14 digitos e calcula os digitos verificadores de CPF ou CNPJ
 export function validarCpfCnpj(valor) {
   const d = digitos(valor);
   if (d.length === 11) return cpfValido(d);

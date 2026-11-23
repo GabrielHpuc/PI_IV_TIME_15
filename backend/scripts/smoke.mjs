@@ -1,7 +1,9 @@
+// Tom RA: 25015528
 const base = process.env.BASE_URL || "http://localhost:3000";
 let cookie = "";
 let falhas = 0;
 
+// Funcao auxiliar para disparar requisicoes HTTP guardando o cookie de sessao entre as chamadas
 async function chamar(metodo, rota, corpo, tipo = "application/json") {
   const resposta = await fetch(base + rota, {
     method: metodo,
@@ -16,6 +18,7 @@ async function chamar(metodo, rota, corpo, tipo = "application/json") {
   return { status: resposta.status, dados };
 }
 
+// Registra no terminal se cada etapa do teste passou ou falhou
 function verificar(nome, condicao, detalhe = "") {
   console.log(`${condicao ? "OK   " : "FALHA"} ${nome}${condicao ? "" : " -> " + JSON.stringify(detalhe)}`);
   if (!condicao) falhas += 1;
@@ -23,12 +26,14 @@ function verificar(nome, condicao, detalhe = "") {
 
 const entrar = (email) => chamar("POST", "/api/auth/login", { login: email, password: "Demo@12345" });
 
+// Testa a saude do servidor e o bloqueio de rota privada sem login
 let r = await chamar("GET", "/api/health");
 verificar("servidor no ar", r.status === 200, r);
 
 r = await chamar("GET", "/api/painel");
 verificar("painel exige login", r.status === 401, r);
 
+// Testa o fluxo completo do produtor incluindo login, catalogo, avaliacao, cotacao, frete e pedido
 r = await entrar("demo.produtor@agrorecursos.com");
 verificar("login do produtor", r.status === 200, r);
 r = await entrar("52998224725");
@@ -79,6 +84,7 @@ verificar("logout", r.status === 200, r);
 r = await chamar("GET", "/api/auth/me");
 verificar("sessão encerrada", r.status === 401, r);
 
+// Testa o fluxo do fornecedor incluindo importacao de CSV, remocao em lote e atualizacao de status da venda
 r = await entrar("demo.fornecedor@agrorecursos.com");
 verificar("login do fornecedor", r.status === 200, r);
 

@@ -1,0 +1,79 @@
+// Tom RA: 25015528
+import "dotenv/config";
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import bcrypt from "bcryptjs";
+import { fileURLToPath } from "node:url";
+import { BSON, MongoClient, ObjectId } from "mongodb";
+
+// Define a pasta onde ficam os arquivos JSON do banco e a lista de colecoes iniciais
+const pasta = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../banco");
+const colecoes = ["fornecedores", "produtos", "laudos", "avaliacoes", "cotacoes"];
+const SENHA_DEMO = "Demo@12345";
+
+if (!process.env.MONGODB_URI) {
+  throw new Error("Configure MONGODB_URI no arquivo .env.");
+}
+
+const client = new MongoClient(process.env.MONGODB_URI);
+
+try {
+  await client.connect();
+  const db = client.db("agrorecursos");
+
+  // As fotos dos produtos de exemplo ficam gravadas só no banco (campo imagens), não nos JSONs.
+  // Guarda as que já existem para o seed não apagá-las ao recriar os produtos.
+  const fotosAtuais = new Map(
+    (await db.collection("produtos").find({ seed: true, "imagens.0": { $exists: true } }, { projection: { imagens: 1 } }).toArray())
+      .map(p => [String(p._id), p.imagens])
+  );
+
+  // Recarrega os documentos de exemplo de cada colecao a partir dos arquivos JSON
+  for (const nome of colecoes) {
+    const docs = BSON.EJSON.parse(fs.readFileSync(path.join(pasta, nome + ".json"), "utf8"));
+    if (nome === "produtos") docs.forEach(d => { if (fotosAtuais.has(String(d._id))) d.imagens = fotosAtuais.get(String(d._id)); });
+    await db.collection(nome).deleteMany({ seed: true });
+    await db.collection(nome).insertMany(docs);
+    console.log(`${nome}: ${docs.length} documentos`);
+  }
+
+  // Os usuários de demonstração mantêm o mesmo _id entre execuções do seed; se o id mudasse,
+  // os pedidos, cotações e avaliações deles ficariam órfãos.
+  const idsDemo = new Map(
+    (await db.collection("users").find({ seed: true }, { projection: { email: 1 } }).toArray()).map(u => [u.email, u._id])
+  );
+  await db.collection("users").deleteMany({ seed: true });
+  await db.collection("profiles").deleteMany({ seed: true });
+
+  // Cria as contas de demonstracao de produtor e fornecedor com senha criptografada
+  const passwordHash = await bcrypt.hash(SENHA_DEMO, 12);
+  const agora = new Date();
+  const base = { passwordHash, status: "active", emailVerified: true, seed: true, createdAt: agora, updatedAt: agora };
+  const demos = [
+    { email: "demo.produtor@agrorecursos.com", name: "Marcos Roberto", accountType: "produtor", document: "52998224725", phone: "(19) 99999-8888" },
+    { email: "demo.fornecedor@agrorecursos.com", name: "Ana Souza", accountType: "fornecedor", document: "11222333000181", phone: "(19) 3333-4444" }
+  ];
+
+  // Insere o usuario, o perfil completo e vincula o fornecedor de demonstracao no banco
+  for (const demo of demos) {
+    const userId = idsDemo.get(demo.email) ?? new ObjectId();
+    await db.collection("users").insertOne({ ...base, _id: userId, email: demo.email, accountType: demo.accountType });
+    await db.collection("profiles").insertOne({
+      userId, name: demo.name, accountType: demo.accountType, phone: demo.phone, document: demo.document,
+      companyName: demo.accountType === "fornecedor" ? "AgroVant Insumos Agrícolas Ltda" : null,
+      tradeName: demo.accountType === "fornecedor" ? "AgroVant" : null,
+      address: { cep: "13010111", street: "Rua Barão de Jaguara", number: "100", complement: "", neighborhood: "Centro", city: "Campinas", state: "SP" },
+      addresses: [{ id: crypto.randomUUID(), label: "Endereço principal", cep: "13010111", street: "Rua Barão de Jaguara", number: "100", complement: "", neighborhood: "Centro", city: "Campinas", state: "SP", observacoes: "", principal: true }],
+      registrationStatus: "complete", seed: true, createdAt: agora, updatedAt: agora
+    });
+    if (demo.accountType === "fornecedor") {
+      await db.collection("fornecedores").updateOne({ nomeFantasia: "AgroVant", seed: true }, { $set: { userId } });
+    }
+  }
+
+  console.log(`Usuários de demonstração criados (senha ${SENHA_DEMO}):`);
+  demos.forEach(d => console.log(" -", d.email));
+} finally {
+  await client.close();
+}

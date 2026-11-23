@@ -1,0 +1,80 @@
+<!-- Isabela RA: 25003335 -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meus produtos | AgroRecursos</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/marketplace.css">
+  <link rel="stylesheet" href="css/fornecedor.css">
+  <script src="js/marketplace.js" defer></script>
+  <script src="js/meus-produtos.js" defer></script>
+</head>
+<body class="mk-page" data-pagina="meus-produtos">
+  <header id="site-header"></header>
+
+  <!-- Tabela de gerenciamento de produtos do fornecedor e atalho para importacao CSV -->
+  <main class="mk-content" id="meus-produtos">
+    <div class="forn-topo">
+      <h1>Meus produtos</h1>
+      <div>
+        <a class="mk-btn" href="fornecedor.html?meu=1">Dados da empresa</a>
+        <a class="mk-btn" href="/api/csv/modelo-produtos">Modelo CSV</a>
+        <label class="mk-btn" for="csv-arquivo">Importar produtos (CSV)</label>
+        <input type="file" id="csv-arquivo" accept=".csv,text/csv" class="sr-only">
+        <button class="mk-btn mk-btn-verde" type="button" id="novo-produto">Novo produto</button>
+      </div>
+    </div>
+    <p class="forn-msg" id="lista-msg" role="status"></p>
+    <div class="mk-card forn-tabela-wrap"><table class="forn-tabela">
+      <thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Laudo</th><th></th></tr></thead>
+      <tbody id="linhas"></tbody>
+    </table></div>
+  </main>
+
+  <!-- Modais de cadastro ou edicao de produto e de selecao de fotos para importacao CSV -->
+  <dialog class="dialogo" id="dlg-produto">
+    <h2 id="dlg-titulo">Cadastrar produto</h2>
+    <form id="form-produto" novalidate>
+      <label>Nome<input name="nome" maxlength="120" required></label>
+      <label>Categoria<select name="categoria"></select></label>
+      <label>Marca<input name="marca" maxlength="60" required></label>
+      <label>Região<select name="regiao"></select></label>
+      <label>Preço (R$)<input name="preco" inputmode="decimal" placeholder="0,00" required></label>
+      <label>Prazo de entrega (dias)<input name="entregaDias" inputmode="numeric" required></label>
+      <label>Estoque<input name="estoque" inputmode="numeric" placeholder="0"></label>
+      <label>Cultura<input name="cultura" maxlength="60"></label>
+      <label>Tecnologia<input name="tecnologia" maxlength="60"></label>
+      <label>Embalagem<input name="embalagem" maxlength="60" placeholder="Saco: 40kg"></label>
+      <label>Foto(s) do produto<input type="file" name="foto" id="foto-produto" multiple accept="image/png,image/jpeg,image/webp,image/gif"></label>
+      <div class="previa-foto" id="previa-foto" hidden>
+        <img id="previa-foto-img" alt="Prévia da foto do produto">
+        <button class="mk-btn" type="button" id="remover-foto">Remover foto</button>
+      </div>
+      <label>Descrição<textarea name="descricao" rows="3" maxlength="1000"></textarea></label>
+      <p class="dialogo-msg" id="msg-produto" role="status"></p>
+      <div class="dialogo-acoes">
+        <button class="mk-btn" type="button" id="cancelar">Cancelar</button>
+        <button class="mk-btn mk-btn-verde" type="submit">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialogo dialogo-largo" id="dlg-csv-fotos">
+    <h2>Fotos dos produtos importados</h2>
+    <p class="muted" style="margin:0 0 10px;font-size:.88rem">Todo produto precisa ter foto. Caso o CSV já tenha a coluna <strong>imagem</strong> (URL ou base64), ela já aparece abaixo. Você também pode selecionar várias fotos de uma vez ou escolher individualmente para cada produto.</p>
+    <label class="csv-lote-label">Selecionar várias fotos de uma vez (associa por nome do arquivo ou na ordem da lista)
+      <input type="file" id="csv-fotos-lote" multiple accept="image/png,image/jpeg,image/webp,image/gif">
+    </label>
+    <div id="csv-lista-produtos" class="csv-lista-produtos"></div>
+    <p class="dialogo-msg" id="msg-dlg-csv" role="status"></p>
+    <div class="dialogo-acoes">
+      <button class="mk-btn" type="button" id="cancelar-csv">Cancelar</button>
+      <button class="mk-btn mk-btn-verde" type="button" id="confirmar-csv">Confirmar importação</button>
+    </div>
+  </dialog>
+
+  <footer id="site-footer"></footer>
+</body>
+</html>
