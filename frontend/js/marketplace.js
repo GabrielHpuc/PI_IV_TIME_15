@@ -32,6 +32,26 @@
 
   tema.aplicar(tema.estaEscuro());
 
+  // Endereços e favoritos ficam no navegador: apaga quando a conta muda ou o usuário sai, para não vazar para outra conta
+  function limparDadosLocais() {
+    try {
+      ["agro_enderecos", "agro_ultimo_endereco", CHAVE_FAVORITOS].forEach(function (chave) { localStorage.removeItem(chave); });
+    } catch (e) {
+      return;
+    }
+  }
+
+  function limparSeOutraConta(idAtual) {
+    try {
+      const anterior = localStorage.getItem(CHAVE_ULTIMA_CONTA);
+      if (anterior && anterior !== String(idAtual)) {
+        limparDadosLocais();
+      }
+    } catch (e) {
+      return;
+    }
+  }
+
   // Funcoes utilitarias para escapar HTML, formatar valores em reais e remover acentos em buscas
   function esc(texto) {
     return String(texto).replace(/[&<>"']/g, function (c) {
@@ -331,6 +351,7 @@
       const resposta = await fetch("/api/auth/me", { credentials: "same-origin" });
       const resultado = await resposta.json();
       if (resposta.ok && resultado.user && resultado.user.name) {
+        limparSeOutraConta(resultado.user.id);
         alvo.textContent = "Conta";
         const ehFornecedor = resultado.user.accountType === "fornecedor";
         try {
@@ -425,7 +446,7 @@
   }
 
   // Expoe as funcoes compartilhadas no objeto global AgroUI para uso nas demais telas
-  window.AgroUI = { icone: icone, iconeProduto: iconeProduto, nomeIconeProduto: nomeIconeProduto, fotoProduto: fotoProduto, lerImagem: lerImagem, esc: esc, moeda: moeda, normalizar: normalizar, carrinho: carrinho, favoritos: favoritos, tema: tema, api: api, mascararCep: mascararCep };
+  window.AgroUI = { limparDadosLocais: limparDadosLocais, icone: icone, iconeProduto: iconeProduto, nomeIconeProduto: nomeIconeProduto, fotoProduto: fotoProduto, lerImagem: lerImagem, esc: esc, moeda: moeda, normalizar: normalizar, carrinho: carrinho, favoritos: favoritos, tema: tema, api: api, mascararCep: mascararCep };
 
   document.addEventListener("DOMContentLoaded", iniciar);
 })();

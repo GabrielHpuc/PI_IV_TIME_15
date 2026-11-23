@@ -631,6 +631,7 @@ $("#logout-button").addEventListener("click", async () => {
   try {
     const response = await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
     if (!response.ok) throw new Error("Não foi possível encerrar a sessão.");
+    if (window.AgroUI && window.AgroUI.limparDadosLocais) window.AgroUI.limparDadosLocais();
     window.location.replace("login.html");
   } catch (error) { statusElement.hidden = false; statusElement.textContent = error.message; button.disabled = false; }
 });

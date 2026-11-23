@@ -95,7 +95,7 @@ Produto representa o **insumo agropecuário** anunciado por um fornecedor (semen
 | regiao | Texto enumerado | Sim | Simples | Sudeste, Sul, Centro-Oeste, Nordeste, Norte | Lua, vazio | Região de atendimento. |
 | preco | Número decimal | Sim | Simples | 180, 10.5, "1.234,50" (aceito na importação) | 0, -5, texto | Maior que zero, com 2 casas decimais, em reais. |
 | entregaDias | Número inteiro | Sim | Simples | 3, 60 | 0, 61, 2.5 | Prazo de preparo do fornecedor, de 1 a 60 dias. |
-| estoque | Número inteiro | Sim | Simples | 0, 500 | -1, 2.5 | Quantidade em estoque (padrão 0). |
+| estoque | Número inteiro | Sim | Simples | 0, 500 | -1, 2.5 | Quantidade em estoque (padrão 0). O pedido só é aceito se houver estoque, e o estoque é baixado na compra e devolvido no cancelamento. |
 | vendidos | Número inteiro | Sim | Simples | 0, 120 | -1, texto | Unidades vendidas; soma a cada pedido (sistema). |
 | cultura | Texto | Não | Simples | Soja, Milho | mais de 60 caracteres | Padrão "Diversas". |
 | tecnologia | Texto | Não | Simples | RR Super | mais de 60 caracteres | Tecnologia ou característica técnica. |
@@ -223,6 +223,7 @@ Item do pedido representa **um produto comprado** dentro de um pedido. Fica **em
 | preco | Número decimal | Sim | Simples | 168 | 0, -1 | Preço unitário na hora da compra (cópia). |
 | quantidade | Número inteiro | Sim | Simples | 1, 10000 | 0, 10001, 2.5 | De 1 a 10.000. Itens repetidos no carrinho são somados. |
 | subtotal | Número decimal | Sim | Simples | 168 | -1 | `preco × quantidade`, com 2 casas decimais. |
+| status | Texto | Sim | Simples | criado, enviado, cancelado | outro valor | Status do item: cada fornecedor muda só os seus itens. Pedidos antigos sem este campo usam o status do pedido. |
 
 ### 2.11. Registro de Auditoria
 
@@ -470,7 +471,7 @@ As propostas ficam dentro da cotação porque só fazem sentido nela e são lida
   "numero": "PED000006",
   "userId": "6afc6567f1b79309ed2a1695",
   "itens": [
-    { "produtoId": "b20000000000000000000025", "fornecedorId": "a10000000000000000000004", "nome": "Fertilizante NPK 20-05-20 50kg", "preco": 168, "quantidade": 1, "subtotal": 168 }
+    { "produtoId": "b20000000000000000000025", "fornecedorId": "a10000000000000000000004", "nome": "Fertilizante NPK 20-05-20 50kg", "preco": 168, "quantidade": 1, "subtotal": 168, "status": "criado" }
   ],
   "subtotal": 168,
   "frete": { "valor": 50, "prazo": 3 },
@@ -739,9 +740,12 @@ As referências foram mantidas onde a entidade existe sozinha ou é consultada p
 - Cotação com propostas não pode ser excluída; só pode ser aprovada (fecha) ou recusada.
 - Conta com pedidos em andamento (`criado`, `confirmado`, `em_separacao`, `aguardando_pagamento`, `em_analise`, `pago` ou `enviado`) não pode ser encerrada; ao encerrar, a conta fica `inactive`, e não é apagada.
 - A exportação de pedidos em CSV só é liberada quando nenhum pedido está `aguardando_pagamento` ou `em_analise`.
-- Status do pedido: `criado` → `confirmado` → `em_separacao` → `enviado` → `entregue`; `cancelado` só é possível antes do envio. Só o fornecedor do pedido muda o status.
+- Status do pedido: `criado` → `confirmado` → `em_separacao` → `enviado` → `entregue`; `cancelado` só é possível antes do envio. Cada fornecedor muda o status apenas dos próprios itens; o status do pedido é o do item menos adiantado, e o pedido só fica `cancelado` quando todos os itens foram cancelados.
+- Estoque: o pedido é recusado se algum item não tiver estoque; a baixa é feita na hora da compra e devolvida quando o fornecedor cancela os seus itens.
 - Total, frete e parcelas são sempre recalculados no servidor, a partir do preço atual do produto; nunca são aceitos do cliente. A soma das parcelas é igual ao total, e a última parcela leva a sobra dos centavos.
 - O total do pedido é calculado pelo servidor Java (soma do subtotal com o frete e divisão em parcelas); se ele estiver fora do ar, o Node faz a mesma conta.
 - Os produtos de demonstração (`seed: true`) e seus dados são recriados pelo `npm run seed`, que preserva as fotos já gravadas e mantém o mesmo `_id` dos usuários de demonstração.
 - A auditoria é um histórico: não deve ser removida em uso normal, e nunca guarda senhas.
-- Ao iniciar, o servidor remove cotações de demonstração (`modelo` ou `seed`) e as que têm propostas dos fornecedores de exemplo.
+- Ao iniciar, o servidor não apaga nenhum dado. As cotações de exemplo vêm do `npm run seed`.
+- Login: só entra numa conta cuja senha conferiu. O limite de tentativas vale para login (só falhas), cadastro e recuperação de senha. A recuperação gera um link para cada conta ativa do e-mail.
+- Avaliação: o fornecedor não pode avaliar o próprio produto, e o selo "Verificado" não vale para pedido cancelado.
