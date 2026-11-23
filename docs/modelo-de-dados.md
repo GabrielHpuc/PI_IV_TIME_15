@@ -4,6 +4,7 @@
 
 Banco: MongoDB (`agrorecursos`). Acesso pelo driver oficial `mongodb`. Os índices são criados na inicialização (`backend/src/config/database.js`).
 
+<!-- Diagrama de relacionamento entre as colecoes do banco de dados -->
 ## Modelo lógico
 
 ```mermaid
@@ -22,6 +23,7 @@ erDiagram
     fornecedores ||--o{ propostas : "fornecedorId"
 ```
 
+<!-- Justificativa de quando usamos referencia por ID e quando embutimos documentos -->
 ## Decisões de normalização
 
 - **Referência** entre entidades que existem sozinhas e são consultadas por diferentes telas: `users`, `profiles`, `fornecedores`, `produtos`, `laudos`, `avaliacoes`.
@@ -30,6 +32,7 @@ erDiagram
 - Médias (`fornecedores.avaliacao`) são recalculadas a cada avaliação nova e guardadas, para evitar agregação a cada leitura do catálogo.
 - Produtos nunca são apagados fisicamente: `ativo: false` preserva pedidos e laudos antigos.
 
+<!-- Estrutura detalhada dos campos e tipos de cada colecao no MongoDB -->
 ## Modelo físico (coleções)
 
 ### users

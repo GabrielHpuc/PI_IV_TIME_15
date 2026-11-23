@@ -7,6 +7,7 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 let client;
 let database;
 
+// Conecta ao cluster do MongoDB e prepara os indices necessarios da aplicacao
 export async function connectDatabase() {
   const uri = process.env.MONGODB_URI;
 
@@ -21,6 +22,7 @@ export async function connectDatabase() {
 
   database = client.db("agrorecursos");
 
+  // Remove indices antigos simples para permitir o mesmo email ou documento em tipos de conta diferentes
   try {
     await database.collection("users").dropIndex("email_1");
   } catch {}
@@ -43,6 +45,7 @@ export async function connectDatabase() {
 
   // Os endereços ficam em profiles.addresses; a coleção "addresses" foi removida.
 
+  // Define os indices das demais colecoes para otimizar consultas e garantir unicidade
   const indices = [
     ["produtos", { categoria: 1, marca: 1 }],
     ["produtos", { fornecedorId: 1 }],
@@ -69,6 +72,7 @@ export async function connectDatabase() {
     }
   }
 
+  // Remove cotacoes temporarias de seed ou de demonstracao na inicializacao
   await database.collection("cotacoes").deleteMany({
     $or: [
       { modelo: true },
@@ -93,6 +97,7 @@ export async function connectDatabase() {
   return database;
 }
 
+// Devolve a conexao ja aberta para as rotas consultarem o banco
 export function getDatabase() {
   if (!database) {
     throw new Error("O banco de dados ainda não foi conectado.");
@@ -101,6 +106,7 @@ export function getDatabase() {
   return database;
 }
 
+// Fecha o cliente do MongoDB quando o servidor e finalizado
 export async function closeDatabase() {
   if (client) {
     await client.close();

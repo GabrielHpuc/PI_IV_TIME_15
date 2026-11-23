@@ -9,6 +9,7 @@ const favoritesContainer = $("#favorites-list");
 const purchasesContainer = $("#purchases-list");
 const saveButton = $("#save-profile");
 
+// Aplica o modo escuro ou claro na tela e guarda a escolha no localStorage
 function applyTheme(dark, userId) {
   const isDark = Boolean(dark);
   document.documentElement.classList.toggle("dark-mode", isDark);
@@ -34,6 +35,7 @@ try {
 const esc = (texto) => String(texto ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const moeda = (valor) => Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+// Le e salva a lista de IDs de produtos favoritados no armazenamento local
 function readFavs() {
   try {
     const d = JSON.parse(localStorage.getItem("agro_favoritos"));
@@ -51,6 +53,7 @@ function saveFavs(ids) {
   return unique;
 }
 
+// Busca os produtos favoritados na API e monta os cards na aba de favoritos da conta
 async function renderFavoritesSection() {
   if (!favoritesContainer) return;
   const ids = readFavs();
@@ -83,6 +86,7 @@ async function renderFavoritesSection() {
   }
 }
 
+// Adiciona um produto ao carrinho salvo no navegador
 function addItemToCart(produtoId, qtd = 1) {
   try {
     const atual = JSON.parse(localStorage.getItem("agro_carrinho")) || [];
@@ -95,6 +99,7 @@ function addItemToCart(produtoId, qtd = 1) {
   } catch (e) {}
 }
 
+// Trata os cliques de comprar ou remover item dentro da aba de favoritos
 if (favoritesContainer) {
   favoritesContainer.addEventListener("click", async (event) => {
     const comprar = event.target.closest("[data-comprar]");
@@ -137,6 +142,7 @@ const INDICE_STATUS = {
   entregue: 4
 };
 
+// Monta a barra de progresso com as etapas de entrega do pedido
 function renderOrderTimeline(status) {
   if (status === "cancelado") {
     return '<div class="pedido-trilha"><span class="status recusada">Pedido cancelado</span></div>';
@@ -154,6 +160,7 @@ function renderOrderTimeline(status) {
     "</ol>";
 }
 
+// Consulta o historico de compras do usuario na API e exibe os pedidos na tela
 async function renderPurchasesSection() {
   if (!purchasesContainer) return;
   try {
@@ -187,6 +194,7 @@ async function renderPurchasesSection() {
   }
 }
 
+// Permite adicionar todos os itens de um pedido antigo de volta ao carrinho para repetir a compra
 if (purchasesContainer) {
   purchasesContainer.addEventListener("click", (event) => {
     const repetir = event.target.closest("[data-repetir-pedido]");
@@ -209,6 +217,7 @@ if (purchasesContainer) {
   });
 }
 
+// Salva a alteracao do botao de modo escuro tanto no navegador quanto no perfil do banco
 if (darkToggle) {
   darkToggle.addEventListener("change", async () => {
     const dark = darkToggle.checked;
@@ -258,6 +267,7 @@ let currentUser = null;
 const clean = value => String(value ?? "").trim();
 const typeLabel = type => type === "produtor" ? "Produtor rural" : type === "fornecedor" ? "Fornecedor" : "Não informado";
 
+// Funcoes para formatar a exibicao de CEP e montar o texto completo dos enderecos do usuario
 function formatCepDisplay(cep) {
   const d = String(cep || "").replace(/\D/g, "").slice(0, 8);
   return d.length > 5 ? d.slice(0, 5) + "-" + d.slice(5) : d;
@@ -287,6 +297,7 @@ function getUserAddresses(user) {
   return [];
 }
 
+// Exibe o endereco principal e os enderecos adicionais no resumo da conta
 function renderOverviewAddresses(user) {
   const el = $("#profile-address");
   if (!el) return;
@@ -315,6 +326,7 @@ function syncAddressesToStorage(addresses) {
   } catch (e) {}
 }
 
+// Aplica mascara no campo de CEP e preenche rua, bairro, cidade e estado automaticamente
 function bindCepInputs(cepInput, streetInput, numberInput, neighborhoodInput, cityInput, stateInput) {
   if (!cepInput) return;
   cepInput.addEventListener("input", () => {
@@ -335,6 +347,7 @@ function bindCepInputs(cepInput, streetInput, numberInput, neighborhoodInput, ci
   });
 }
 
+// Cria o bloco de formulario para cadastrar ou editar enderecos adicionais e permite trocar o principal
 function createExtraAddressBlock(addr = {}, index = 2) {
   if (!extraAddressesContainer) return;
   const card = document.createElement("div");
@@ -418,6 +431,7 @@ if (addAddressBtn) {
   });
 }
 
+// Preenche os campos do formulario de edicao de perfil com os dados atuais do usuario
 function fillForm(user) {
   fields.name.value = user.name || ""; fields.email.value = user.email || "";
   fields.phone.value = user.phone || ""; fields.document.value = user.document || "";
@@ -435,6 +449,7 @@ function fillForm(user) {
   }
 }
 
+// Carrega os produtos que estao no carrinho e calcula o subtotal dentro da area da conta
 async function renderCartSection() {
   if (!cartContainer) return;
   let itensCarrinho = [];
@@ -481,6 +496,7 @@ async function renderCartSection() {
   }
 }
 
+// Alterna entre as abas da pagina Minha Conta atualizando o menu lateral e o conteudo visivel
 function showSection(name) {
   if (!sections[name]) return;
   Object.entries(sections).forEach(([key, section]) => section.hidden = key !== name);
@@ -492,6 +508,8 @@ function showSection(name) {
   if (name === "purchases") { renderPurchasesSection(); }
 }
 document.querySelectorAll("[data-section]").forEach(el => el.addEventListener("click", () => showSection(el.dataset.section)));
+
+// Busca os dados da sessao atual na API e preenche as informacoes do usuario ou redireciona para o login
 async function loadAccount() {
   try {
     const response = await fetch("/api/auth/me", { credentials: "same-origin" });
@@ -525,6 +543,7 @@ async function loadAccount() {
   } catch (error) { statusElement.hidden = false; statusElement.textContent = error.message; console.error(error); }
 }
 
+// Reune o endereco principal e todos os enderecos extras preenchidos no formulario para envio
 function collectAllAddressesFromForm() {
   const lista = [];
   const principal = {
@@ -563,6 +582,7 @@ function collectAllAddressesFromForm() {
   return lista;
 }
 
+// Envia as alteracoes cadastrais e de enderecos para a API e atualiza a tela
 $("#profile-form").addEventListener("submit", async event => {
   event.preventDefault(); if (!currentUser) return;
   profileMessage.textContent = ""; profileMessage.classList.remove("success-message");
@@ -604,6 +624,8 @@ $("#profile-form").addEventListener("submit", async event => {
   } catch (error) { profileMessage.textContent = error.message; }
   finally { saveButton.disabled = false; saveButton.textContent = "Salvar alterações"; }
 });
+
+// Encerra a sessao do usuario no servidor e volta para a tela de login
 $("#logout-button").addEventListener("click", async () => {
   const button = $("#logout-button"); button.disabled = true;
   try {

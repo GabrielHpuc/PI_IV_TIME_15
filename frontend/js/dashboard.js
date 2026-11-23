@@ -3,6 +3,7 @@
   const ui = window.AgroUI;
   const raiz = document.querySelector("#home");
 
+  // Dicionarios com os textos e etapas de status das cotacoes e dos pedidos
   const rotulosCotacao = { analise: "Em análise", aguardando: "Aguardando propostas", fechada: "Fechada", recusada: "Recusada" };
   const classesCotacao = { analise: "analise", aguardando: "aguardando", fechada: "aprovada", recusada: "recusada" };
   const rotulosPedido = {
@@ -34,6 +35,7 @@
     return dias > 0 ? dias + (dias === 1 ? " dia" : " dias") : "Encerrada";
   }
 
+  // Monta o card visual de cada produto com foto, selo do MAPA, botao de compra e favorito
   function cartaoProduto(produto) {
     const selo = produto.laudo ? '<span class="mk-selo">Laudo MAPA</span>' : "";
     const detalhes = '<a class="mk-btn" href="produto.html?id=' + produto.id + '">Ver Detalhes</a>';
@@ -56,6 +58,7 @@
 
   let pedidosCache = [];
 
+  // Desenha a linha do tempo horizontal mostrando em qual etapa da entrega o pedido esta
   function trilhaStatusPedido(status) {
     if (status === "cancelado") {
       return '<div class="pedido-trilha"><span class="status recusada">Pedido cancelado</span></div>';
@@ -74,6 +77,7 @@
       "</ol>";
   }
 
+  // Monta o resumo do pedido com itens, cidade de destino, valor total e opcao de repetir compra
   function cartaoPedido(p) {
     const listaItens = Array.isArray(p.itens) && p.itens.length
       ? '<p class="pedido-itens">' + p.itens.map(function (i) {
@@ -104,6 +108,7 @@
   }
 
   let escutaProdutor = false;
+  // Captura os cliques nos botoes de favoritar, repetir pedido e comprar dentro do painel do produtor
   function vincularCliquesCards() {
     if (escutaProdutor) return;
     escutaProdutor = true;
@@ -135,6 +140,7 @@
     });
   }
 
+  // Carrega e exibe a lista completa de pedidos realizados pelo produtor
   async function paginaPedidos() {
     document.title = "Meus Pedidos | AgroRecursos";
     vincularCliquesCards();
@@ -150,6 +156,7 @@
     }
   }
 
+  // Busca na API os produtos salvos nos favoritos e monta a grade na tela
   async function paginaFavoritos() {
     document.title = "Meus Favoritos | AgroRecursos";
     vincularCliquesCards();
@@ -174,6 +181,7 @@
     }
   }
 
+  // Renderiza a tela inicial do produtor com banner, cotacoes abertas, recomendados e ultimos pedidos
   function produtor(painel) {
     document.title = "Início | AgroRecursos";
 
@@ -205,6 +213,7 @@
   const REGIOES = ["Sudeste", "Sul", "Centro-Oeste", "Nordeste", "Norte"];
   const opcoes = lista => lista.map(function (v) { return '<option value="' + v + '">' + v + "</option>"; }).join("");
 
+  // Injeta na pagina os modais de cadastro de produto, vinculo de laudo PDF e importacao de fotos do CSV
   function dialogosFornecedor() {
     document.body.insertAdjacentHTML("beforeend",
       '<dialog class="dialogo" id="dlg-produto"><h2>Cadastrar produto</h2><form id="form-produto" novalidate>' +
@@ -243,6 +252,7 @@
   }
 
 
+  // Define para quais status o fornecedor pode avancar cada venda recebida
   const proximos = {
     criado: ["confirmado", "em_separacao", "enviado", "entregue", "cancelado"],
     aguardando_pagamento: ["confirmado", "em_separacao", "enviado", "entregue", "cancelado"],
@@ -290,6 +300,7 @@
     campo.insertAdjacentHTML("afterend", '<small role="alert"> ' + ui.esc(texto) + "</small>");
   }
 
+  // Faz o download do relatorio de pedidos do fornecedor em formato CSV
   async function baixarPedidos(msg) {
     const resposta = await fetch("/api/csv/pedidos", { credentials: "same-origin" });
     if (!resposta.ok) {
@@ -306,6 +317,7 @@
     msg.textContent = "Exportação concluída.";
   }
 
+  // Le o texto do arquivo CSV no navegador identificando o separador e separando colunas e linhas
   function parseCsvCliente(texto) {
     const t = String(texto || "").replace(/^\uFEFF/, "");
     const primeira = t.split(/\r?\n/, 1)[0] || "";
@@ -373,6 +385,7 @@
     }).join("");
   }
 
+  // Prepara os produtos lidos do CSV e abre o modal para associar as fotos antes de enviar ao servidor
   async function prepararImportacaoCsv(arquivo, msg) {
     const texto = await arquivo.text();
     const registros = parseCsvCliente(texto);
@@ -398,6 +411,7 @@
     dlgCsv.showModal();
   }
 
+  // Valida se todos os itens do CSV possuem foto e envia o lote para cadastro na API
   async function enviarImportacaoCsvConfirmada() {
     if (!estadoImportacaoCsv) return;
     const msgDlg = document.querySelector("#msg-dlg-csv");
@@ -435,6 +449,7 @@
     if (msgCsv) msgCsv.textContent = resumoTexto;
   }
 
+  // Renderiza o painel do fornecedor com indicadores, tabela de produtos, vendas, CSV e auditoria
   async function fornecedor(painel) {
     document.title = "Painel do fornecedor | AgroRecursos";
     if (!ligado) {
@@ -496,6 +511,7 @@
     const previaImg = document.querySelector("#previa-foto-img");
     const btnRemoverFoto = document.querySelector("#remover-foto");
 
+    // Converte as fotos selecionadas no cadastro de produto para base64 e mostra a previa
     if (campoFoto) {
       campoFoto.addEventListener("change", async function () {
         const arquivos = campoFoto.files ? Array.from(campoFoto.files).slice(0, 6) : [];
@@ -527,6 +543,7 @@
     const inputFotosLote = document.querySelector("#csv-fotos-lote");
     const btnConfirmarCsv = document.querySelector("#confirmar-csv");
 
+    // Associa varias fotos de uma vez aos produtos do CSV pelo nome do arquivo ou pela ordem da lista
     if (inputFotosLote) {
       inputFotosLote.addEventListener("change", async function () {
         if (!estadoImportacaoCsv || !inputFotosLote.files || !inputFotosLote.files.length) return;
@@ -637,6 +654,7 @@
       }
     });
 
+    // Trata o envio do formulario de novo produto formatando preco, estoque e imagens
     document.querySelector("#form-produto").addEventListener("submit", async function (evento) {
       evento.preventDefault();
       const d = new FormData(evento.target);
@@ -662,6 +680,7 @@
       }
     });
 
+    // Valida o tipo e tamanho do arquivo PDF do laudo e converte para base64 antes de salvar
     function lerPdfBase64(arquivo) {
       return new Promise(function (resolve, reject) {
         if (!arquivo) return reject(new Error("Anexe o arquivo PDF do laudo MAPA."));
@@ -697,6 +716,7 @@
     });
   }
 
+  // Consulta os dados do painel na API e direciona para a visao de produtor ou de fornecedor
   async function iniciar() {
     try {
       const painel = await ui.api("/api/painel");

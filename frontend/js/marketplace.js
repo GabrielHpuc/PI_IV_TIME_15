@@ -6,6 +6,7 @@
   const CHAVE_TEMA_CONTA = "agro_tema_ultima_conta";
   const CHAVE_ULTIMA_CONTA = "agro_ultima_conta_id";
 
+  // Controla o modo escuro salvando a preferencia da conta no localStorage
   const tema = {
     estaEscuro() {
       try {
@@ -31,6 +32,7 @@
 
   tema.aplicar(tema.estaEscuro());
 
+  // Funcoes utilitarias para escapar HTML, formatar valores em reais e remover acentos em buscas
   function esc(texto) {
     return String(texto).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -45,6 +47,7 @@
     return String(texto).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
 
+  // Gerencia os itens do carrinho no navegador e atualiza o contador no topo da pagina
   const carrinho = {
     ler() {
       try {
@@ -92,6 +95,7 @@
     }
   };
 
+  // Controla a lista de produtos favoritados e sincroniza a preferencia com o backend
   const favoritos = {
     ler() {
       try {
@@ -154,6 +158,7 @@
     }
   };
 
+  // Centraliza as chamadas HTTP para a API convertendo JSON e tratando erros de conexao
   async function api(url, opcoes) {
     const config = Object.assign({ credentials: "same-origin", headers: {} }, opcoes);
     if (config.body && typeof config.body !== "string") {
@@ -177,6 +182,7 @@
     return dados;
   }
 
+  // Aplica a formatacao automatica de CEP conforme o usuario digita
   function mascararCep(campo) {
     campo.addEventListener("input", function () {
       const d = campo.value.replace(/\D/g, "").slice(0, 8);
@@ -184,6 +190,7 @@
     });
   }
 
+  // Biblioteca de icones SVG usados nos menus e categorias de produtos
   const icones = {
     lista: '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',
     coracao: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
@@ -209,6 +216,7 @@
     return mapa[produto.categoria] || "pacote";
   }
 
+  // Exibe a foto real do produto quando existir ou um icone da categoria como alternativa
   function fotoProduto(produto) {
     if (!produto) return "";
     if (Array.isArray(produto.imagens) && produto.imagens.length && produto.imagens[0]) {
@@ -228,6 +236,7 @@
     return icone(nomeIconeProduto(produto));
   }
 
+  // Valida o arquivo de imagem e redimensiona no canvas para no maximo 600px antes de gerar o base64
   function lerImagem(arquivo) {
     return new Promise(function (resolve, reject) {
       if (!arquivo) return resolve("");
@@ -269,6 +278,7 @@
     });
   }
 
+  // Monta o cabecalho principal ocultando itens de compra quando a conta for de fornecedor
   function cabecalhoPadrao(placeholder) {
     const qtdCarrinho = carrinho.quantidade();
     const qtdFav = favoritos.quantidade();
@@ -295,6 +305,7 @@
     );
   }
 
+  // Monta o cabecalho simplificado do checkout com as etapas da compra
   function cabecalhoCheckout() {
     return (
       '<a class="mk-brand" href="dashboard.html"><span class="mk-brand-logo">' + icone("folha") + '</span>' +
@@ -310,6 +321,7 @@
     return '<p>© 2026 AgroRecursos MarketPlace</p>';
   }
 
+  // Busca o usuario logado para aplicar o tema, sincronizar favoritos e contar cotacoes abertas
   async function carregarConta() {
     const alvo = document.querySelector("#mk-conta-nome");
     if (!alvo) {
@@ -366,6 +378,7 @@
     }
   }
 
+  // Renderiza o cabecalho e o rodape ao abrir a pagina e ativa a barra de pesquisa do catalogo
   function iniciar() {
     const topo = document.querySelector("#site-header");
     const base = document.querySelector("#site-footer");
@@ -411,6 +424,7 @@
     carregarConta();
   }
 
+  // Expoe as funcoes compartilhadas no objeto global AgroUI para uso nas demais telas
   window.AgroUI = { icone: icone, iconeProduto: iconeProduto, nomeIconeProduto: nomeIconeProduto, fotoProduto: fotoProduto, lerImagem: lerImagem, esc: esc, moeda: moeda, normalizar: normalizar, carrinho: carrinho, favoritos: favoritos, tema: tema, api: api, mascararCep: mascararCep };
 
   document.addEventListener("DOMContentLoaded", iniciar);
