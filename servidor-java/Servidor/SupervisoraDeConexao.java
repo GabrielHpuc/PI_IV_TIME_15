@@ -1,13 +1,16 @@
+// João Pedro RA: 25007162
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
+// Thread dedicada a atender um cliente conectado processando seus pedidos de calculo ou desconexao
 public class SupervisoraDeConexao extends Thread
 {
     private Parceiro            usuario;
     private Socket              conexao;
     private ArrayList<Parceiro> usuarios;
 
+    // Valida o socket e a lista de usuarios antes de iniciar o atendimento da conexao
     public SupervisoraDeConexao
     (Socket conexao, ArrayList<Parceiro> usuarios)
     throws Exception
@@ -27,6 +30,7 @@ public class SupervisoraDeConexao extends Thread
         return String.format (Locale.US, "R$ %.2f", valor).replace('.', ',');
     }
 
+    // Abre os canais de objeto do cliente, registra na lista de usuarios e processa os comunicados recebidos
     public void run ()
     {
 

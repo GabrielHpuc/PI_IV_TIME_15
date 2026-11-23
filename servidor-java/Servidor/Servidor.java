@@ -1,5 +1,7 @@
+// João Pedro RA: 25007162
 import java.util.*;
 
+// Classe principal do servidor Java que inicia a aceitadora de conexoes e aguarda o comando de desligamento
 public class Servidor
 {
     public static String PORTA_PADRAO = "4000";
@@ -50,6 +52,7 @@ public class Servidor
             if (comando == null)
                 continue;
 
+            // Envia comunicado de desligamento para todos os clientes conectados antes de encerrar o servidor
             if (comando.toLowerCase().equals("desativar"))
             {
                 synchronized (usuarios)

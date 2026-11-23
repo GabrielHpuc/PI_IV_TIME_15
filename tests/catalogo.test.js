@@ -1,7 +1,9 @@
+// Isabela RA: 25003335
 import test from "node:test";
 import assert from "node:assert/strict";
 import { montarConsulta, ORDENS, lerProduto, gerarImagemPadrao } from "../backend/src/utils/produtos.js";
 
+// Verifica os filtros, ordenacao, paginacao e validacao de imagens das funcoes de produtos
 test("consulta padrão só traz produtos ativos, 12 por página, mais vendidos primeiro", () => {
   const c = montarConsulta({});
   assert.deepEqual(c.filtro, { ativo: { $ne: false } });
