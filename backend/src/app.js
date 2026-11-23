@@ -23,6 +23,7 @@ import painelRoutes from "./routes/painel.js";
 import csvRoutes from "./routes/csv.js";
 import fornecedoresRoutes from "./routes/fornecedores.js";
 import auditoriaRoutes from "./routes/auditoria.js";
+import adminRoutes from "./routes/admin.js";
 
 import {
   connectDatabase,
@@ -119,6 +120,7 @@ app.use("/api/painel", painelRoutes);
 app.use("/api/csv", csvRoutes);
 app.use("/api/fornecedores", fornecedoresRoutes);
 app.use("/api/auditoria", auditoriaRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use("/api", (req, res) => {
   res.status(404).json({ message: "Rota não encontrada." });
@@ -126,6 +128,11 @@ app.use("/api", (req, res) => {
 
 // Entrega os arquivos estaticos do frontend e abre o index.html na rota principal
 app.use(express.static(frontendPath));
+
+// Painel do administrador (demonstração): http://localhost:3000/admin
+app.get(["/admin", "/admin/"], (req, res) => {
+  res.sendFile(path.join(frontendPath, "admin.html"));
+});
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
