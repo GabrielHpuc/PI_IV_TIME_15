@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Administrador | AgroRecursos</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/admin.js" defer></script>
+</head>
+<body class="admin-page">
+
+  <!-- Tela de acesso: aparece até o administrador entrar -->
+  <main id="tela-login" class="auth-card admin-login" hidden>
+    <a class="brand" href="index.html">AgroRecursos</a>
+    <h1>Área do administrador</h1>
+    <p class="muted">Acesso restrito. Informe usuário e senha.</p>
+
+    <form id="form-login">
+      <label for="usuario">Usuário</label>
+      <input id="usuario" name="usuario" type="text" autocomplete="username" maxlength="60" required>
+
+      <label for="senha">Senha</label>
+      <input id="senha" name="senha" type="password" autocomplete="current-password" maxlength="100" required>
+
+      <button class="button full-width" type="submit">Entrar</button>
+      <p id="msg-login" class="form-message" role="status"></p>
+    </form>
+  </main>
+
+  <!-- Dashboard: carregado só depois do login -->
+  <div id="tela-painel" hidden>
+    <header class="admin-topbar">
+      <div>
+        <a class="brand" href="index.html">AgroRecursos</a>
+        <span class="admin-tag">Administrador</span>
+      </div>
+      <div class="admin-actions">
+        <button id="btn-atualizar" class="button button-small button-outline" type="button">Atualizar</button>
+        <button id="btn-sair" class="button button-small" type="button">Sair</button>
+      </div>
+    </header>
+
+    <main class="admin-container">
+      <div class="admin-aviso">
+        Demonstração: não há gateway de pagamento. A comissão de <strong>3%</strong> é calculada sobre o valor dos produtos
+        dos pedidos registrados (o frete não entra) e fica como saldo do administrador.
+      </div>
+
+      <section class="admin-cards" aria-label="Resumo financeiro">
+        <article class="admin-card destaque">
+          <span>Lucro da plataforma (3%)</span>
+          <strong id="k-lucro">–</strong>
+          <small>Saldo do administrador</small>
+        </article>
+        <article class="admin-card">
+          <span>Faturamento total do site</span>
+          <strong id="k-faturamento">–</strong>
+          <small>Produtos + frete dos pedidos</small>
+        </article>
+        <article class="admin-card">
+          <span>Repasse aos fornecedores</span>
+          <strong id="k-repasse">–</strong>
+          <small>97% das vendas de produtos</small>
+        </article>
+        <article class="admin-card">
+          <span>Pedidos</span>
+          <strong id="k-pedidos">–</strong>
+          <small id="k-ticket">Ticket médio –</small>
+        </article>
+      </section>
+
+      <section class="admin-box">
+        <h2>Lucro por dia <small>(últimos 30 dias)</small></h2>
+        <div id="grafico" class="grafico" role="img" aria-label="Lucro diário da plataforma"></div>
+      </section>
+
+      <div class="admin-grid">
+        <section class="admin-box">
+          <h2>Fornecedores com mais vendas</h2>
+          <div class="tabela-rolagem">
+            <table>
+              <thead><tr><th>Fornecedor</th><th class="num">Pedidos</th><th class="num">Vendas</th><th class="num">Comissão 3%</th></tr></thead>
+              <tbody id="tb-fornecedores"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="admin-box">
+          <h2>Últimos pedidos</h2>
+          <div class="tabela-rolagem">
+            <table>
+              <thead><tr><th>Pedido</th><th>Data</th><th>Status</th><th class="num">Total</th><th class="num">Comissão</th></tr></thead>
+              <tbody id="tb-pedidos"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <p id="msg-painel" class="form-message" role="status"></p>
+    </main>
+  </div>
+</body>
+</html>
