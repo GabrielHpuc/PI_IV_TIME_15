@@ -23,6 +23,11 @@ async function sincronizarTemaSessao() {
     if (!res.ok) return;
     const data = await res.json();
     if (data && data.user && data.user.id) {
+      // outra conta neste navegador: apaga endereços e favoritos guardados da conta anterior
+      const anterior = localStorage.getItem("agro_ultima_conta_id");
+      if (anterior && anterior !== String(data.user.id)) {
+        ["agro_enderecos", "agro_ultimo_endereco", "agro_favoritos"].forEach(function (chave) { localStorage.removeItem(chave); });
+      }
       const escuro = Boolean(data.user.darkMode);
       localStorage.setItem("agro_ultima_conta_id", String(data.user.id));
       localStorage.setItem("agro_tema_ultima_conta", escuro ? "dark" : "light");

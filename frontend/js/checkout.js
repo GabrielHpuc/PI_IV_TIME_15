@@ -238,9 +238,11 @@
       acumulados.push(n);
     }
 
+    let logado = false;
     try {
       const me = await fetch("/api/auth/me", { credentials: "same-origin" }).then(function (r) { return r.ok ? r.json() : null; });
       if (me && me.user) {
+        logado = true;
         if (Array.isArray(me.user.addresses)) {
           const ordenados = me.user.addresses.slice().sort(function (a, b) {
             return (b.principal ? 1 : 0) - (a.principal ? 1 : 0);
@@ -253,15 +255,19 @@
       }
     } catch (e) {}
 
-    try {
-      const ultimo = JSON.parse(localStorage.getItem("agro_ultimo_endereco"));
-      if (ultimo) adicionar(ultimo);
-    } catch (e) {}
+    // Endereços guardados no navegador só valem sem conta carregada; com login, vale só o que é da conta
+    // (senão os endereços de quem usou o computador antes apareceriam para a próxima pessoa).
+    if (!logado) {
+      try {
+        const ultimo = JSON.parse(localStorage.getItem("agro_ultimo_endereco"));
+        if (ultimo) adicionar(ultimo);
+      } catch (e) {}
 
-    try {
-      const locais = JSON.parse(localStorage.getItem("agro_enderecos"));
-      if (Array.isArray(locais)) locais.forEach(adicionar);
-    } catch (e) {}
+      try {
+        const locais = JSON.parse(localStorage.getItem("agro_enderecos"));
+        if (Array.isArray(locais)) locais.forEach(adicionar);
+      } catch (e) {}
+    }
 
     if (!acumulados.length) {
       try {

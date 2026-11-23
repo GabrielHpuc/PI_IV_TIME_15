@@ -139,7 +139,7 @@ router.get("/pedidos", async (req, res, next) => {
     for (const p of pedidos) {
       const itens = comprador ? p.itens : p.itens.filter(i => String(i.fornecedorId) === String(filtro["itens.fornecedorId"]));
       for (const i of itens) {
-        linhas.push([p.numero, formatarData(p.criadoEm), p.status, p.pagamento?.metodo, i.nome, i.quantidade, formatarPreco(i.preco), formatarPreco(i.subtotal), p.entrega?.cidade, p.entrega?.estado]);
+        linhas.push([p.numero, formatarData(p.criadoEm), comprador ? p.status : (i.status ?? p.status), p.pagamento?.metodo, i.nome, i.quantidade, formatarPreco(i.preco), formatarPreco(i.subtotal), p.entrega?.cidade, p.entrega?.estado]);
       }
     }
 

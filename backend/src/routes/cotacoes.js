@@ -147,8 +147,20 @@ router.post("/:id/propostas", exigirTipo("fornecedor"), async (req, res, next) =
       preco, prazo, laudo: Boolean(req.body.laudo), avaliacao: fornecedor.avaliacao ?? 0, criadoEm: new Date()
     };
 
-    const propostas = [...(cotacao.propostas || []), proposta];
-    await col.updateOne({ _id: cotacao._id }, { $set: { propostas, status: statusPelasPropostas(propostas.length) } });
+    // $push em vez de regravar o array inteiro: propostas de fornecedores diferentes no mesmo instante não se sobrescrevem.
+    // O filtro repete as regras (aberta, no prazo, sem proposta deste fornecedor) no momento exato da gravação.
+    const gravada = await col.updateOne(
+      { _id: cotacao._id, modelo: { $ne: true }, status: { $in: ABERTAS }, vencimento: { $gte: new Date() }, "propostas.fornecedorId": { $ne: fornecedor._id } },
+      { $push: { propostas: proposta } }
+    );
+    if (!gravada.matchedCount) {
+      return res.status(409).json({ message: "Você já enviou uma proposta ou a cotação não está mais aberta." });
+    }
+    // com 2 ou mais propostas a cotação passa para "em análise"
+    await col.updateOne(
+      { _id: cotacao._id, status: "aguardando", "propostas.1": { $exists: true } },
+      { $set: { status: statusPelasPropostas(2) } }
+    );
 
     await auditar(req, { acao: "cotacao.proposta", entidade: "cotacao", entidadeId: cotacao._id, detalhes: { preco, prazo } });
     res.status(201).json({ message: "Proposta enviada." });
@@ -175,7 +187,9 @@ async function decidir(req, res, next, novoStatus) {
       alteracao.propostaAprovadaId = proposta._id;
     }
 
-    await col.updateOne({ _id: cotacao._id }, { $set: alteracao });
+    // só encerra se a cotação ainda estiver aberta neste instante (evita aprovar e recusar ao mesmo tempo)
+    const encerrada = await col.updateOne({ _id: cotacao._id, status: { $in: ABERTAS } }, { $set: alteracao });
+    if (!encerrada.matchedCount) return res.status(409).json({ message: "Esta cotação já foi encerrada." });
     await auditar(req, { acao: novoStatus === "fechada" ? "cotacao.aprovada" : "cotacao.recusada", entidade: "cotacao", entidadeId: cotacao._id });
     res.json({ message: novoStatus === "fechada" ? "Orçamento aprovado." : "Cotação recusada." });
   } catch (error) {

@@ -92,12 +92,23 @@ app.use(
   })
 );
 
-// Limita a quantidade de requisicoes seguidas no login e cadastro para evitar ataques de forca bruta
+// Limita tentativas de login (só as que falham contam) e de cadastro/recuperacao de senha para evitar forca bruta.
+// Rotas como /me e /preferences ficam de fora: o site chama /me a cada pagina aberta.
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  skipSuccessfulRequests: true,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { message: "Muitas tentativas de login. Aguarde alguns minutos." }
+});
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 20,
   standardHeaders: "draft-8",
-  legacyHeaders: false
+  legacyHeaders: false,
+  message: { message: "Muitas tentativas. Aguarde alguns minutos." }
 });
 
 app.get("/api/health", (req, res) => {
@@ -108,7 +119,8 @@ app.get("/api/health", (req, res) => {
 });
 
 // Registra os modulos de rotas da API
-app.use("/api/auth", authLimiter);
+app.use("/api/auth/login", loginLimiter);
+app.use(["/api/auth/register", "/api/auth/forgot-password", "/api/auth/reset-password"], authLimiter);
 app.use("/api/auth", authRoutes);
 app.use("/api/produtos", produtosRoutes);
 app.use("/api/laudos", laudosRoutes);
