@@ -206,10 +206,10 @@ Empresas ou profissionais responsáveis pela disponibilização de produtos e ap
 | Integrante |
 |---|
 | Gabriel Hespanholeto Maziero |
-| Giovana Portela Bonfim |
-| Pedro Vinicius Romanato |
+| Isabela Aparecida Paslauski Pinto |
 | João Pedro Bergamin Diniz |
-| Isabela Paslauski |
+| Pedro Vinicius Romanato |
+| Tom Hewtson Bean |
 
 ---
 
