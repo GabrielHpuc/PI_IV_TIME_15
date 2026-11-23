@@ -1,7 +1,9 @@
+// Pedro RA: 25004075
 const form = document.querySelector("#recovery-form");
 const message = document.querySelector("#message");
 const button = form.querySelector('button[type="submit"]');
 
+// Envia o email informado para a rota de solicitacao de link de recuperacao de senha
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 

@@ -1,3 +1,4 @@
+// Pedro RA: 25004075
 (function () {
   const ui = window.AgroUI;
   const raiz = document.querySelector("#produto-conteudo");
@@ -15,6 +16,7 @@
     raiz.innerHTML = '<div class="mk-vazio mk-card"><h1>' + ui.esc(texto) + '</h1><a class="mk-btn" href="catalogo.html">Voltar ao catálogo</a></div>';
   }
 
+  // Renderiza a pagina completa de detalhes do produto com galeria de fotos, ficha tecnica, laudo e avaliacoes
   function montar(produto) {
     const fotosSalvas = Array.isArray(produto.imagens) && produto.imagens.length
       ? produto.imagens.filter(Boolean).map(String)
@@ -141,6 +143,7 @@
     const resultado = document.querySelector("#frete-resultado");
     ui.mascararCep(campoCep);
 
+    // Calcula o valor e o prazo de frete para o CEP digitado na tela do produto
     async function calcularFrete() {
       try {
         const [frete, endereco] = await Promise.all([

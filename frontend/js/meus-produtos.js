@@ -1,3 +1,4 @@
+// Pedro RA: 25004075
 (function () {
   const ui = window.AgroUI;
   const CATEGORIAS = ["Sementes", "Fertilizantes", "Defensivos", "Outros"];
@@ -51,6 +52,7 @@
     atualizarPrevia([]);
   });
 
+  // Desenha a tabela com os produtos do fornecedor e os botoes de editar e remover
   function desenhar() {
     if (!produtos.length) {
       linhas.innerHTML = '<tr><td colspan="6" class="forn-vazio">Você ainda não cadastrou produtos.</td></tr>';
@@ -80,6 +82,7 @@
     }
   }
 
+  // Abre o modal preenchido para editar um produto existente ou limpo para um novo cadastro
   function abrir(produto) {
     editandoId = produto ? produto.id : null;
     imagensAtuais = undefined;
@@ -156,6 +159,7 @@
   const listaCsvContainer = document.querySelector("#csv-lista-produtos");
   let estadoCsv = null;
 
+  // Le o arquivo CSV selecionado no navegador para preparar a associacao de fotos dos produtos
   function parseCsv(texto) {
     const t = String(texto || "").replace(/^\uFEFF/, "");
     const primeira = t.split(/\r?\n/, 1)[0] || "";

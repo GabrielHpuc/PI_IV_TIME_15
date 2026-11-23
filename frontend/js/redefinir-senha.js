@@ -1,8 +1,10 @@
+// Pedro RA: 25004075
 const form = document.querySelector("#reset-form");
 const message = document.querySelector("#message");
 const button = form.querySelector('button[type="submit"]');
 const token = new URLSearchParams(window.location.search).get("token") || "";
 
+// Confere se as duas senhas digitadas sao iguais e envia a nova senha junto com o token da URL
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
