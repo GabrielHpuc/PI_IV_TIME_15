@@ -1,3 +1,5 @@
+/* Isabela RA: 25003335 */
+/* Estilos dos campos de faixa de preco e do filtro de laudo na barra lateral do catalogo */
 .filtro-preco { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .filtro-preco label { display: block; font-size: .85rem; font-weight: 600; }
 .filtro-preco input { display: block; width: 100%; margin-top: 4px; padding: 8px 10px; border: 1px solid var(--borda, #cfd8d1); border-radius: 6px; font: inherit; }

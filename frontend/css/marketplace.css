@@ -1,3 +1,5 @@
+/* Isabela RA: 25003335 */
+/* Variaveis de cores e layout principal das paginas internas do marketplace */
 .mk-page {
   --azul: var(--green);
   --azul-2: var(--green-2);
@@ -15,6 +17,7 @@
   background: var(--cinza-fundo);
 }
 
+/* Barra de cabecalho superior com logotipo, campo de pesquisa e menu de navegacao */
 .mk-header {
   display: flex;
   align-items: stretch;
@@ -773,7 +776,9 @@ html.dark-mode .pedido-etapa.pendente .pedido-etapa-icone { background: #26352c;
 @media (max-width: 600px) { .home-banner { padding: 18px; } .home-banner .ico { display: none; } .cad-duas { grid-template-columns: 1fr; } }
 
 /* ===== MODO ESCURO (MARKETPLACE) ===== */
-html.dark-mode .mk-page {
+html.dark-mode /* Isabela RA: 25003335 */
+/* Variaveis de cores e layout principal das paginas internas do marketplace */
+.mk-page {
   --cinza-fundo: #111915;
   --borda: #2a3b31;
   --texto: #e5efe9;
