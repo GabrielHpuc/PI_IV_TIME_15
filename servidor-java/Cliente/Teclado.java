@@ -1,5 +1,7 @@
+// João Pedro RA: 25007162
 import java.io.*;
 
+// Classe utilitaria para leitura e conversao de dados digitados pelo usuario no terminal
 public class Teclado
 {
     private static BufferedReader teclado =
@@ -7,6 +9,7 @@ public class Teclado
                    new InputStreamReader (
                    System.in));
 
+    // Le uma linha de texto digitada na entrada padrao
     public static String getUmString ()
     {
         String ret=null;

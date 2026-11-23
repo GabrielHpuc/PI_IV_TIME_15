@@ -1,11 +1,14 @@
+// João Pedro RA: 25007162
 import java.net.*;
 import java.util.*;
 
+// Thread que fica escutando a porta do servidor e cria uma SupervisoraDeConexao para cada novo cliente
 public class AceitadoraDeConexao extends Thread
 {
     private ServerSocket        pedido;
     private ArrayList<Parceiro> usuarios;
 
+    // Abre o ServerSocket na porta informada e guarda a lista compartilhada de usuarios conectados
     public AceitadoraDeConexao
     (String porta, ArrayList<Parceiro> usuarios)
     throws Exception
@@ -29,6 +32,7 @@ public class AceitadoraDeConexao extends Thread
         this.usuarios = usuarios;
     }
 
+    // Loop continuo que aceita conexoes via socket e inicia a thread supervisora de cada cliente
     public void run ()
     {
         for(;;)

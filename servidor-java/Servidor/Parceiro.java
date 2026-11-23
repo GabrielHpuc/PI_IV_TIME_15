@@ -1,8 +1,10 @@
+// João Pedro RA: 25007162
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
+// Encapsula o socket e os fluxos de entrada e saida do cliente conectado ao servidor
 public class Parceiro
 {
     private Socket             conexao;
@@ -11,8 +13,10 @@ public class Parceiro
     
     private Comunicado proximoComunicado=null;
 
+    // Semaforo para sincronizar a leitura concorrente do canal de entrada
     private Semaphore mutEx = new Semaphore (1,true);
 
+    // Valida e guarda o socket, o receptor e o transmissor do cliente
     public Parceiro (Socket             conexao,
                      ObjectInputStream  receptor,
                      ObjectOutputStream transmissor)
@@ -32,6 +36,7 @@ public class Parceiro
         this.transmissor = transmissor;
     }
 
+    // Envia um objeto Comunicado serializado pela rede para o cliente
     public void receba (Comunicado x) throws Exception
     {
         try
@@ -60,6 +65,7 @@ public class Parceiro
         }
     }
 
+    // Le e consome o proximo comunicado enviado pelo cliente
     public Comunicado envie () throws Exception
     {
         try
@@ -75,6 +81,7 @@ public class Parceiro
         }
     }
 
+    // Fecha os canais de comunicacao e o socket ao desconectar o cliente
     public void adeus () throws Exception
     {
         try
