@@ -1,4 +1,4 @@
-// Gabriel
+// Gabriel RA: 25004669
 // Objeto enviado pelo cliente ao servidor contendo os valores da compra para calcular o total e as parcelas
 public class PedidoDeCalculo extends Comunicado
 {

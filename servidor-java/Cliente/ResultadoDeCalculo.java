@@ -1,4 +1,4 @@
-// Gabriel
+// Gabriel RA: 25004669
 // Objeto retornado pelo servidor contendo o valor total do pedido e o valor de cada parcela calculada
 public class ResultadoDeCalculo extends Comunicado
 {

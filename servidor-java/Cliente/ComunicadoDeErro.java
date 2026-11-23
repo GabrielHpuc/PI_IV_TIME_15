@@ -1,4 +1,4 @@
-// Gabriel
+// Gabriel RA: 25004669
 // Representa uma resposta de erro enviada pelo servidor quando algum dado ou operacao falha
 public class ComunicadoDeErro extends Comunicado
 {

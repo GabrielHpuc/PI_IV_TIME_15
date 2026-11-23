@@ -1,4 +1,4 @@
-// Gabriel
+// Gabriel RA: 25004669
 import java.net.*;
 
 // Thread que roda em segundo plano no cliente monitorando se o servidor enviou aviso de desligamento

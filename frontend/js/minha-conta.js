@@ -1,4 +1,4 @@
-// Gabriel
+// Gabriel RA: 25004669
 const $ = (selector) => document.querySelector(selector);
 const statusElement = $("#account-status");
 const profileMessage = $("#profile-message");

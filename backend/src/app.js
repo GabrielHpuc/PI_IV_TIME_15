@@ -1,4 +1,4 @@
-// Gabriel
+// Gabriel RA: 25004669
 import "dotenv/config";
 import dns from "node:dns";
 // Define o DNS do Google para evitar falha de resolucao ao conectar no MongoDB Atlas

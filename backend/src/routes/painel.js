@@ -1,4 +1,4 @@
-// Gabriel
+// Gabriel RA: 25004669
 import { Router } from "express";
 import { getDatabase } from "../config/database.js";
 import { carregarUsuario } from "../middleware/auth.js";

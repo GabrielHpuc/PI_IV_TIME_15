@@ -1,4 +1,4 @@
-// Gabriel
+// Gabriel RA: 25004669
 (function () {
   const CHAVE_CARRINHO = "agro_carrinho";
   const CHAVE_FAVORITOS = "agro_favoritos";
