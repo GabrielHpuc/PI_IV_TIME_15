@@ -1,5 +1,7 @@
+// Pedro RA: 25004075
 const escapar = valor => String(valor).replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
 
+// Monta a estrutura binaria de um arquivo PDF simples de uma pagina a partir de uma lista de linhas de texto
 export function gerarPdf(linhas) {
   let y = 790;
   let conteudo = "BT\n";

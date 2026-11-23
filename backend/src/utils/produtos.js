@@ -1,3 +1,4 @@
+// Pedro RA: 25004075
 import { CATEGORIAS, REGIOES, arredondar, escaparRegex, texto } from "./validacao.js";
 import { numeroBrasileiro } from "./calculos.js";
 
@@ -7,9 +8,11 @@ const numero = (valor, padrao) => {
   return Number.isFinite(n) ? n : padrao;
 };
 
+// Gera uma chave unica normalizada com nome e marca para impedir o cadastro de produtos duplicados
 export const chaveDuplicidade = (nome, marca) =>
   `${String(nome).trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")}|${String(marca).trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")}`;
 
+// Cria uma imagem SVG em base64 com as cores da categoria quando o produto nao possui foto
 export function gerarImagemPadrao(nome = "Produto", categoria = "Outros") {
   const cores = {
     Sementes: ["#174d35", "#26734b"],
@@ -31,6 +34,7 @@ export function gerarImagemPadrao(nome = "Produto", categoria = "Outros") {
   return `data:image/svg+xml;base64,${Buffer.from(svg, "utf8").toString("base64")}`;
 }
 
+// Valida e higieniza todos os campos obrigatorios, precos, prazos e fotos no cadastro ou edicao de produto
 export function lerProduto(corpo) {
   const nome = texto(corpo.nome, 120);
   const categoria = texto(corpo.categoria, 30);
@@ -119,6 +123,7 @@ const numeroDaConsulta = (valor, padrao) => {
   return Number.isFinite(n) ? n : padrao;
 };
 
+// Transforma os parametros da URL em filtros do MongoDB para busca por texto, faixa de preco e ordenacao
 export function montarConsulta(query = {}) {
   const base = { ativo: { $ne: false } };
   const busca = texto(query.q, 80);

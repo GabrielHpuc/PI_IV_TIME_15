@@ -1,3 +1,5 @@
+// Tom RA: 25015528
+// Interpreta o texto de um arquivo CSV detectando virgula ou ponto e virgula e respeitando campos entre aspas
 export function lerCsv(texto) {
   const t = String(texto ?? "").replace(/^﻿/, "");
   const primeira = t.split(/\r?\n/, 1)[0] ?? "";
@@ -52,6 +54,7 @@ export function lerCsv(texto) {
   }));
 }
 
+// Gera o texto de um arquivo CSV com cabecalho e linhas escapando caracteres especiais e formulas
 export function gerarCsv(cabecalho, linhas) {
   const escapar = valor => {
     const s = valor === null || valor === undefined ? "" : String(valor);

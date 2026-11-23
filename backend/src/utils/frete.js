@@ -1,3 +1,5 @@
+// Pedro RA: 25004075
+// Calcula o valor e o prazo do frete com base no primeiro digito do CEP de destino
 export function calcularFrete(cep) {
   const digitos = String(cep ?? "").replace(/\D/g, "");
   if (digitos.length !== 8) return null;

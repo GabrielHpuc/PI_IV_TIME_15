@@ -1,3 +1,4 @@
+// Tom RA: 25015528
 import { Router } from "express";
 import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
@@ -11,6 +12,7 @@ const router = Router();
 
 const formatarData = data => (data ? new Date(data).toLocaleDateString("pt-BR", { timeZone: "UTC" }) : "-");
 
+// Busca o laudo pelo numero identificador e traz junto o produto vinculado a ele
 async function buscarLaudo(numero) {
   const db = getDatabase();
   const laudo = await db.collection("laudos").findOne({ numero: String(numero).toUpperCase() });
@@ -19,6 +21,7 @@ async function buscarLaudo(numero) {
   return { laudo, produto };
 }
 
+// Consulta os dados tecnicos e a validade de um laudo cadastrado
 router.get("/:numero", async (req, res, next) => {
   try {
     const encontrado = await buscarLaudo(req.params.numero);
@@ -40,6 +43,7 @@ router.get("/:numero", async (req, res, next) => {
   }
 });
 
+// Entrega o arquivo PDF original salvo em base64 ou gera um documento PDF com os dados do laudo
 router.get("/:numero/download", async (req, res, next) => {
   try {
     const encontrado = await buscarLaudo(req.params.numero);
@@ -83,6 +87,7 @@ router.get("/:numero/download", async (req, res, next) => {
   }
 });
 
+// Cadastra um novo laudo do MAPA enviado pelo fornecedor e vincula ao produto correspondente
 router.post("/", carregarUsuario, exigirTipo("fornecedor"), async (req, res, next) => {
   try {
     const numero = texto(req.body.numero, 40).toUpperCase();

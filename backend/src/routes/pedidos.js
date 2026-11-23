@@ -1,3 +1,4 @@
+// Tom RA: 25015528
 import { Router } from "express";
 import crypto from "node:crypto";
 import { ObjectId } from "mongodb";
@@ -26,6 +27,7 @@ const formatar = pedido => ({
   criadoEm: pedido.criadoEm
 });
 
+// Registra um novo pedido validando itens, frete, pagamento e calculando o total pelo servidor Java
 router.post("/", exigirTipo("produtor"), async (req, res, next) => {
   try {
     const bruto = Array.isArray(req.body.itens) ? req.body.itens.slice(0, 50) : [];
@@ -150,6 +152,7 @@ router.post("/", exigirTipo("produtor"), async (req, res, next) => {
   }
 });
 
+// Lista o historico de compras realizadas pelo produtor logado
 router.get("/", exigirTipo("produtor"), async (req, res, next) => {
   try {
     const itens = await getDatabase().collection("pedidos").find({ userId: req.usuario.id }).sort({ criadoEm: -1 }).limit(100).toArray();
@@ -159,6 +162,7 @@ router.get("/", exigirTipo("produtor"), async (req, res, next) => {
   }
 });
 
+// Lista as vendas recebidas pelo fornecedor filtrando apenas os itens que pertencem a ele
 router.get("/vendas", exigirTipo("fornecedor"), async (req, res, next) => {
   try {
     const fornecedor = await fornecedorDoUsuario(req.usuario);
@@ -191,6 +195,7 @@ const TRANSICOES = {
   enviado: ["entregue"]
 };
 
+// Permite que o fornecedor avance o status da entrega respeitando a ordem permitida em TRANSICOES
 router.patch("/:id/status", exigirTipo("fornecedor"), async (req, res, next) => {
   try {
     if (!idValido(req.params.id)) return res.status(404).json({ message: "Pedido não encontrado." });

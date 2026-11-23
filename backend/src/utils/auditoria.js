@@ -1,6 +1,8 @@
+// Tom RA: 25015528
 import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
 
+// Grava na colecao de auditoria a acao executada pelo usuario junto com a data e o IP da requisicao
 export async function auditar(req, { acao, entidade = null, entidadeId = null, detalhes = {}, userId } = {}) {
   try {
     let dono = userId ?? req.usuario?.id ?? null;

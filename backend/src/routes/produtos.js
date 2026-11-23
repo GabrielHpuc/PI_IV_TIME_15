@@ -1,3 +1,4 @@
+// Tom RA: 25015528
 import { Router } from "express";
 import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
@@ -10,6 +11,7 @@ import { idValido, texto } from "../utils/validacao.js";
 
 const router = Router();
 
+// Junta os dados do fornecedor em cada produto listado para exibir nome e nota no catalogo
 async function anexarFornecedores(produtos) {
   const ids = [...new Set(produtos.map(p => String(p.fornecedorId)).filter(Boolean))].map(id => new ObjectId(id));
   const fornecedores = ids.length ? await getDatabase().collection("fornecedores").find({ _id: { $in: ids } }).toArray() : [];
@@ -25,6 +27,7 @@ async function anexarFornecedores(produtos) {
   });
 }
 
+// Lista os produtos do catalogo com filtros, ordenacao, paginacao e contagem por categoria, marca e regiao
 router.get("/", async (req, res, next) => {
   try {
     const col = getDatabase().collection("produtos");
@@ -75,6 +78,7 @@ router.get("/meus", carregarUsuario, exigirTipo("fornecedor"), async (req, res, 
   }
 });
 
+// Busca todos os detalhes de um produto especifico incluindo laudo vinculado e avaliacoes dos compradores
 router.get("/:id", async (req, res, next) => {
   try {
     if (!idValido(req.params.id)) return res.status(404).json({ message: "Produto não encontrado." });
@@ -114,6 +118,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+// Registra ou atualiza a nota e comentario de um produto e recalcula a media do fornecedor
 router.post("/:id/avaliacoes", carregarUsuario, async (req, res, next) => {
   try {
     if (!idValido(req.params.id)) return res.status(404).json({ message: "Produto não encontrado." });
@@ -204,6 +209,7 @@ router.put("/:id", carregarUsuario, exigirTipo("fornecedor"), async (req, res, n
   }
 });
 
+// Realiza a exclusao logica dos produtos marcando ativo como false caso nao tenham pedidos em andamento
 export async function removerProdutos(req, fornecedor, ids) {
   const db = getDatabase();
   const objetos = ids.map(id => new ObjectId(id));
