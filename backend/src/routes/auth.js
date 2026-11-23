@@ -1,3 +1,4 @@
+// Tom RA: 25015528
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import crypto from "node:crypto";
@@ -12,6 +13,7 @@ const cleanString = (value, max = 120) => String(value ?? "").trim().slice(0, ma
 const digitsOnly = value => String(value ?? "").replace(/\D/g, "");
 const EMPTY_ADDRESS = { cep: "", street: "", number: "", complement: "", neighborhood: "", city: "", state: "" };
 
+// Padroniza os campos de um endereco e gera um identificador unico caso ainda nao tenha
 function normalizeAddressItem(input = {}, defaultPrincipal = false) {
   if (!input || typeof input !== "object") return null;
   const cep = digitsOnly(input.cep).slice(0, 8);
@@ -39,6 +41,7 @@ function normalizeAddressItem(input = {}, defaultPrincipal = false) {
   };
 }
 
+// Recupera a lista de enderecos salvos no perfil garantindo que um deles seja marcado como principal
 function getProfileAddresses(profile) {
   const list = Array.isArray(profile?.addresses)
     ? profile.addresses.map((a, idx) => normalizeAddressItem(a, idx === 0)).filter(Boolean)
@@ -53,6 +56,7 @@ function getProfileAddresses(profile) {
   return list;
 }
 
+// Cadastra uma nova conta validando CPF ou CNPJ, criptografando a senha e iniciando a sessao
 router.post("/register", async (req, res, next) => {
   try {
     const name = String(req.body.name ?? "").trim();
@@ -122,6 +126,7 @@ router.post("/register", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+// Autentica o usuario por email ou documento e permite escolher o perfil caso possua as duas contas
 router.post("/login", async (req, res, next) => {
   try {
     const identificador = String(req.body.login ?? req.body.email ?? "").trim(), password = String(req.body.password ?? "");
@@ -190,6 +195,7 @@ router.post("/login", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+// Retorna os dados cadastrais, enderecos e preferencias do usuario logado
 router.get("/me", async (req, res, next) => {
   try {
     if (!req.session.userId || !ObjectId.isValid(req.session.userId)) return res.status(401).json({ message: "Você não está autenticado." });
@@ -228,6 +234,7 @@ router.get("/me", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+// Atualiza nome, email, telefone, documento e a lista de enderecos do perfil
 router.put("/profile", async (req, res, next) => {
   try {
     if (!req.session.userId || !ObjectId.isValid(req.session.userId)) return res.status(401).json({ message: "Faça login para atualizar seu perfil." });
@@ -299,6 +306,7 @@ router.put("/profile", async (req, res, next) => {
   }
 });
 
+// Salva a preferencia de modo escuro e a lista de produtos favoritos no perfil do usuario
 router.put("/preferences", async (req, res, next) => {
   try {
     if (!req.session.userId || !ObjectId.isValid(req.session.userId)) {
@@ -340,6 +348,7 @@ router.put("/preferences", async (req, res, next) => {
   }
 });
 
+// Gera um token temporario de recuperacao de senha com validade de 1 hora
 router.post("/forgot-password", async (req, res, next) => {
   try {
     const email = normalizeEmail(req.body.email);
@@ -361,6 +370,7 @@ router.post("/forgot-password", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+// Valida o token de recuperacao, grava a nova senha criptografada e invalida sessoes antigas
 router.post("/reset-password", async (req, res, next) => {
   try {
     const token = String(req.body.token ?? ""), password = String(req.body.password ?? "");
@@ -380,6 +390,7 @@ router.post("/reset-password", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+// Desativa a conta do usuario caso a senha esteja correta e nao existam pedidos em andamento
 router.delete("/account", async (req, res, next) => {
   try {
     if (!req.session.userId || !ObjectId.isValid(req.session.userId)) return res.status(401).json({ message: "Faça login para continuar." });
@@ -403,6 +414,7 @@ router.delete("/account", async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+// Encerra a sessao atual e remove o cookie de autenticacao do navegador
 router.post("/logout", async (req, res, next) => {
   await auditar(req, { acao: "logout" });
   req.session.destroy(error => {

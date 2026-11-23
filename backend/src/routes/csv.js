@@ -1,3 +1,4 @@
+// Tom RA: 25015528
 import { Router } from "express";
 import express from "express";
 import { getDatabase } from "../config/database.js";
@@ -15,6 +16,7 @@ const LIMITE_LINHAS = 500;
 const formatarPreco = valor => Number(valor).toFixed(2).replace(".", ",");
 const formatarData = valor => new Date(valor).toISOString().slice(0, 10);
 
+// Configura os cabecalhos HTTP para forcar o download do arquivo CSV gerado
 function enviarCsv(res, nome, conteudo) {
   res.set({
     "Content-Type": "text/csv; charset=utf-8",
@@ -23,6 +25,7 @@ function enviarCsv(res, nome, conteudo) {
   res.send(conteudo);
 }
 
+// Importa uma planilha CSV de produtos validando colunas obrigatorias, fotos e duplicidade
 router.post("/produtos", exigirTipo("fornecedor"), express.text({ type: ["text/csv", "text/plain"], limit: "15mb" }), async (req, res, next) => {
   try {
     const conteudoCsv = typeof req.body === "string"
@@ -87,12 +90,14 @@ router.post("/produtos", exigirTipo("fornecedor"), express.text({ type: ["text/c
   }
 });
 
+// Entrega uma planilha CSV de exemplo com as colunas esperadas para orientar o fornecedor
 router.get("/modelo-produtos", exigirTipo("fornecedor"), (req, res) => {
   enviarCsv(res, "modelo-produtos.csv", gerarCsv(COLUNAS_PRODUTO, [
     ["Semente Soja RR 40kg", "Sementes", "Monsanto", "Centro-Oeste", "180,00", 3, 500, "Soja", "RR", "Saco: 40kg", "Descrição opcional", "https://exemplo.com/foto-soja.jpg"]
   ]));
 });
 
+// Exporta todos os produtos ativos do fornecedor logado em formato CSV
 router.get("/produtos", exigirTipo("fornecedor"), async (req, res, next) => {
   try {
     const fornecedor = await fornecedorDoUsuario(req.usuario);
@@ -105,6 +110,7 @@ router.get("/produtos", exigirTipo("fornecedor"), async (req, res, next) => {
   }
 });
 
+// Exporta os pedidos ou vendas em CSV desde que nao haja pagamentos pendentes
 router.get("/pedidos", async (req, res, next) => {
   try {
     const col = getDatabase().collection("pedidos");

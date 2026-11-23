@@ -1,9 +1,11 @@
+// Tom RA: 25015528
 import { Router } from "express";
 
 const router = Router();
 const cache = new Map();
 
 // Consulta o ViaCEP pelo servidor (o navegador não pode chamar sites externos por causa da CSP do helmet).
+// Valida o formato do CEP, verifica o cache em memoria e busca os dados de logradouro na API externa
 router.get("/:cep", async (req, res) => {
   const cep = String(req.params.cep ?? "").replace(/\D/g, "");
   if (cep.length !== 8) return res.status(400).json({ message: "Informe um CEP válido com 8 dígitos." });

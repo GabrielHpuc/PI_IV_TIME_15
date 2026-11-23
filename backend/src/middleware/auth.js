@@ -1,6 +1,8 @@
+// Tom RA: 25015528
 import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
 
+// Verifica se existe uma sessao valida no servidor e carrega os dados do usuario logado em req.usuario
 export async function carregarUsuario(req, res, next) {
   try {
     if (!req.session.userId || !ObjectId.isValid(req.session.userId)) {
@@ -29,6 +31,7 @@ export async function carregarUsuario(req, res, next) {
   }
 }
 
+// Restringe o acesso de determinadas rotas apenas para produtores ou apenas para fornecedores
 export const exigirTipo = tipo => (req, res, next) => {
   if (req.usuario?.tipo === tipo) return next();
   return res.status(403).json({

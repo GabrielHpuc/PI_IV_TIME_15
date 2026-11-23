@@ -1,3 +1,4 @@
+// Tom RA: 25015528
 import { Router } from "express";
 import { getDatabase } from "../config/database.js";
 import { carregarUsuario } from "../middleware/auth.js";
@@ -5,6 +6,7 @@ import { carregarUsuario } from "../middleware/auth.js";
 const router = Router();
 router.use(carregarUsuario);
 
+// Lista as ultimas acoes registradas na auditoria para o usuario autenticado
 router.get("/", async (req, res, next) => {
   try {
     const limite = Math.min(Math.max(Math.trunc(Number(req.query.limite) || 20), 1), 100);

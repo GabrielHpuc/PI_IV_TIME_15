@@ -1,3 +1,4 @@
+// Tom RA: 25015528
 import { Router } from "express";
 import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
@@ -12,6 +13,7 @@ router.use(carregarUsuario);
 
 const ABERTAS = ["aguardando", "analise"];
 
+// Formata os dados da cotacao e das propostas para retornar no padrao esperado pelo frontend
 function formatar(cotacao, completo = true, meuFornecedorId = null) {
   const propostas = (cotacao.propostas || []).map(p => ({
     id: String(p._id), fornecedorId: String(p.fornecedorId ?? ""), fornecedor: p.fornecedor,
@@ -33,6 +35,7 @@ function formatar(cotacao, completo = true, meuFornecedorId = null) {
   };
 }
 
+// Lista as cotacoes do proprio produtor ou todas as cotacoes abertas no caso de fornecedor
 router.get("/", async (req, res, next) => {
   try {
     const col = getDatabase().collection("cotacoes");
@@ -60,6 +63,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// Retorna os detalhes de uma cotacao ocultando propostas de concorrentes quando o acesso for de fornecedor
 router.get("/:id", async (req, res, next) => {
   try {
     if (!idValido(req.params.id)) return res.status(404).json({ message: "Cotação não encontrada." });
@@ -82,6 +86,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+// Cria uma nova solicitacao de cotacao para o produtor com codigo sequencial e prazo de validade
 router.post("/", exigirTipo("produtor"), async (req, res, next) => {
   try {
     const item = texto(req.body.item, 120);
@@ -117,6 +122,7 @@ router.post("/", exigirTipo("produtor"), async (req, res, next) => {
   }
 });
 
+// Permite que um fornecedor envie uma proposta de preco e prazo para uma cotacao em aberto
 router.post("/:id/propostas", exigirTipo("fornecedor"), async (req, res, next) => {
   try {
     if (!idValido(req.params.id)) return res.status(404).json({ message: "Cotação não encontrada." });
@@ -151,6 +157,7 @@ router.post("/:id/propostas", exigirTipo("fornecedor"), async (req, res, next) =
   }
 });
 
+// Aprova uma proposta escolhida pelo produtor ou encerra a cotacao como recusada
 async function decidir(req, res, next, novoStatus) {
   try {
     if (!idValido(req.params.id)) return res.status(404).json({ message: "Cotação não encontrada." });
@@ -176,6 +183,7 @@ async function decidir(req, res, next, novoStatus) {
   }
 }
 
+// Exclui uma cotacao do produtor desde que ainda nao tenha recebido propostas de fornecedores
 router.delete("/:id", exigirTipo("produtor"), async (req, res, next) => {
   try {
     if (!idValido(req.params.id)) return res.status(404).json({ message: "Cotação não encontrada." });

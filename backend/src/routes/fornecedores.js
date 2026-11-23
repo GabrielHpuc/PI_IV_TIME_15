@@ -1,3 +1,4 @@
+// Tom RA: 25015528
 import { Router } from "express";
 import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
@@ -12,6 +13,7 @@ const publico = (f, produtos = 0) => ({
   id: String(f._id), nome: f.nome, nomeFantasia: f.nomeFantasia, avaliacao: f.avaliacao ?? 0, totalAvaliacoes: f.totalAvaliacoes ?? 0, produtos
 });
 
+// Conta quantos produtos ativos existem em cada categoria do marketplace
 router.get("/categorias", async (req, res, next) => {
   try {
     const contagem = await getDatabase().collection("produtos").aggregate([
@@ -25,6 +27,7 @@ router.get("/categorias", async (req, res, next) => {
   }
 });
 
+// Lista os fornecedores cadastrados ordenados pela media de avaliacao junto com o total de produtos
 router.get("/", async (req, res, next) => {
   try {
     const db = getDatabase();
@@ -48,6 +51,7 @@ const dadosDoFornecedor = (f, perfil, produtos) => ({
   categorias: Array.isArray(perfil.categories) ? perfil.categories : []
 });
 
+// Retorna os dados comerciais da empresa do fornecedor logado
 router.get("/meu", carregarUsuario, exigirTipo("fornecedor"), async (req, res, next) => {
   try {
     const f = await fornecedorDoUsuario(req.usuario);
@@ -58,6 +62,7 @@ router.get("/meu", carregarUsuario, exigirTipo("fornecedor"), async (req, res, n
   }
 });
 
+// Atualiza razao social, nome fantasia, CNPJ, telefone e categorias atendidas pelo fornecedor
 router.put("/meu", carregarUsuario, exigirTipo("fornecedor"), async (req, res, next) => {
   try {
     const nome = texto(req.body.nome, 120);
@@ -95,6 +100,7 @@ router.put("/meu", carregarUsuario, exigirTipo("fornecedor"), async (req, res, n
   }
 });
 
+// Busca as informacoes publicas de um fornecedor especifico pelo seu identificador
 router.get("/:id", async (req, res, next) => {
   try {
     if (!idValido(req.params.id)) return res.status(404).json({ message: "Fornecedor não encontrado." });
