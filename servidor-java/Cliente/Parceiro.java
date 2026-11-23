@@ -1,18 +1,23 @@
+// Gabriel
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
+// Representa a outra ponta da comunicacao via socket e gerencia o envio e recepcao de objetos
 public class Parceiro
 {
     private Socket             conexao;
     private ObjectInputStream  receptor;
     private ObjectOutputStream transmissor;
     
+    // Guarda temporariamente o comunicado lido pelo metodo espie antes de ser consumido pelo envie
     private Comunicado proximoComunicado=null;
 
+    // Semaforo de exclusao mutua para evitar conflito entre threads lendo do mesmo canal ao mesmo tempo
     private Semaphore mutEx = new Semaphore (1,true);
 
+    // Valida e armazena o socket e os canais de entrada e saida da conexao
     public Parceiro (Socket             conexao,
                      ObjectInputStream  receptor,
                      ObjectOutputStream transmissor)
@@ -32,6 +37,7 @@ public class Parceiro
         this.transmissor = transmissor;
     }
 
+    // Envia um comunicado serializado para o parceiro na outra ponta da rede e limpa o buffer com flush
     public void receba (Comunicado x) throws Exception
     {
         try
@@ -45,6 +51,8 @@ public class Parceiro
         }
     }
 
+    // Olha qual e o proximo comunicado que chegou sem remover da variavel proximoComunicado
+    // Usa o semaforo mutEx porque a thread de desligamento e a thread principal podem espiar juntas
     public Comunicado espie () throws Exception
     {
         try
@@ -60,6 +68,7 @@ public class Parceiro
         }
     }
 
+    // Consome de vez o comunicado recebido e limpa a variavel proximoComunicado para a proxima leitura
     public Comunicado envie () throws Exception
     {
         try
@@ -75,6 +84,7 @@ public class Parceiro
         }
     }
 
+    // Fecha os canais de transmissao, recepcao e o socket para encerrar a conexao
     public void adeus () throws Exception
     {
         try
