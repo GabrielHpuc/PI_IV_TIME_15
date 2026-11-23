@@ -1,15 +1,18 @@
+// Gabriel
 import { Router } from "express";
 import { getDatabase } from "../config/database.js";
 import { carregarUsuario } from "../middleware/auth.js";
 import { fornecedorDoUsuario } from "../utils/fornecedores.js";
 
 const router = Router();
+// Exige que o usuario esteja autenticado antes de consultar os dados do painel
 router.use(carregarUsuario);
 
 router.get("/", async (req, res, next) => {
   try {
     const db = getDatabase();
 
+    // Se a conta logada for de produtor, busca as ultimas cotacoes, pedidos e produtos recomendados em paralelo
     if (req.usuario.tipo === "produtor") {
       const [cotacoes, pedidos, recomendados] = await Promise.all([
         db.collection("cotacoes").find({ userId: req.usuario.id }).sort({ criadoEm: -1 }).limit(6).toArray(),
@@ -45,6 +48,7 @@ router.get("/", async (req, res, next) => {
       });
     }
 
+    // Se a conta for de fornecedor, conta quantos produtos ativos, cotacoes abertas e vendas ele possui
     const fornecedor = await fornecedorDoUsuario(req.usuario);
     const [produtos, cotacoesAbertas, vendas] = await Promise.all([
       db.collection("produtos").countDocuments({ fornecedorId: fornecedor._id, ativo: { $ne: false } }),

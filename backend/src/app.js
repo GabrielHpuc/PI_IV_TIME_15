@@ -1,6 +1,7 @@
 // Gabriel
 import "dotenv/config";
 import dns from "node:dns";
+// Define o DNS do Google para evitar falha de resolucao ao conectar no MongoDB Atlas
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 import express from "express";
@@ -28,6 +29,7 @@ import {
   closeDatabase
 } from "./config/database.js";
 
+// Inicializa a aplicacao Express e resolve o caminho da pasta do frontend
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -43,6 +45,7 @@ console.log(
   )
 );
 
+// Valida se as variaveis obrigatorias de sessao e banco foram configuradas no .env
 if (!process.env.SESSION_SECRET) {
   throw new Error("Configure SESSION_SECRET no arquivo .env.");
 }
@@ -51,6 +54,7 @@ if (!process.env.MONGODB_URI) {
   throw new Error("Configure MONGODB_URI no arquivo .env.");
 }
 
+// Configura o Helmet para seguranca dos cabecalhos HTTP e libera imagens em base64 e links externos
 app.disable("x-powered-by");
 app.use(
   helmet({
@@ -62,9 +66,11 @@ app.use(
     }
   })
 );
+// Aumenta o limite do corpo da requisicao para 15mb para suportar envio de fotos e laudos em PDF
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: false, limit: "15mb" }));
 
+// Gerencia a sessao do usuario salvando os dados no MongoDB com validade de 8 horas
 app.use(
   session({
     name: "agrorecursos.sid",
@@ -85,6 +91,7 @@ app.use(
   })
 );
 
+// Limita a quantidade de requisicoes seguidas no login e cadastro para evitar ataques de forca bruta
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 20,
@@ -99,6 +106,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Registra os modulos de rotas da API
 app.use("/api/auth", authLimiter);
 app.use("/api/auth", authRoutes);
 app.use("/api/produtos", produtosRoutes);
@@ -116,12 +124,14 @@ app.use("/api", (req, res) => {
   res.status(404).json({ message: "Rota não encontrada." });
 });
 
+// Entrega os arquivos estaticos do frontend e abre o index.html na rota principal
 app.use(express.static(frontendPath));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
+// Middleware de erro para capturar falhas internas sem derrubar o servidor
 app.use((err, req, res, next) => {
   console.error("Erro na aplicação:", err.message);
 
@@ -137,6 +147,7 @@ app.use((err, req, res, next) => {
 
 let server;
 
+// Conecta ao banco de dados primeiro e so depois inicia o servidor na porta configurada
 try {
   await connectDatabase();
 
@@ -149,6 +160,7 @@ try {
   process.exitCode = 1;
 }
 
+// Encerra o servidor HTTP e a conexao com o MongoDB de forma limpa ao desligar o sistema
 async function shutdown() {
   if (server) {
     await new Promise((resolve) => server.close(resolve));

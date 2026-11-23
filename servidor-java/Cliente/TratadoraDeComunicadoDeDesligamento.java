@@ -1,9 +1,12 @@
+// Gabriel
 import java.net.*;
 
+// Thread que roda em segundo plano no cliente monitorando se o servidor enviou aviso de desligamento
 public class TratadoraDeComunicadoDeDesligamento extends Thread
 {
     private Parceiro servidor;
 
+    // Recebe e valida a referencia do servidor conectado
     public TratadoraDeComunicadoDeDesligamento (Parceiro servidor) throws Exception
     {
         if (servidor==null)
@@ -12,6 +15,7 @@ public class TratadoraDeComunicadoDeDesligamento extends Thread
         this.servidor = servidor;
     }
 
+    // Verifica as mensagens que chegam e encerra o programa caso o servidor seja desligado
     public void run ()
     {
         for(;;)
