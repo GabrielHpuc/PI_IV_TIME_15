@@ -129,11 +129,22 @@ router.post("/:id/avaliacoes", carregarUsuario, async (req, res, next) => {
 
     const db = getDatabase();
     const produtoId = new ObjectId(req.params.id);
-    if (!(await db.collection("produtos").findOne({ _id: produtoId }, { projection: { _id: 1 } }))) {
-      return res.status(404).json({ message: "Produto não encontrado." });
+    const produto = await db.collection("produtos").findOne({ _id: produtoId, ativo: { $ne: false } }, { projection: { fornecedorId: 1 } });
+    if (!produto) return res.status(404).json({ message: "Produto não encontrado." });
+
+    // o fornecedor não pode avaliar o próprio produto
+    if (req.usuario.tipo === "fornecedor") {
+      const meuFornecedor = await fornecedorDoUsuario(req.usuario);
+      if (String(produto.fornecedorId) === String(meuFornecedor._id)) {
+        return res.status(403).json({ message: "Você não pode avaliar o seu próprio produto." });
+      }
     }
 
-    const verificado = Boolean(await db.collection("pedidos").findOne({ userId: req.usuario.id, "itens.produtoId": produtoId }, { projection: { _id: 1 } }));
+    // "Verificado" só vale para quem comprou e não cancelou o pedido
+    const verificado = Boolean(await db.collection("pedidos").findOne(
+      { userId: req.usuario.id, status: { $ne: "cancelado" }, itens: { $elemMatch: { produtoId, status: { $ne: "cancelado" } } } },
+      { projection: { _id: 1 } }
+    ));
     const rotulo = req.usuario.tipo === "produtor" ? "Produtor" : "Fornecedor";
     const agora = new Date();
 
@@ -144,8 +155,7 @@ router.post("/:id/avaliacoes", carregarUsuario, async (req, res, next) => {
       { upsert: true }
     );
 
-    const produto = await db.collection("produtos").findOne({ _id: produtoId }, { projection: { fornecedorId: 1 } });
-    if (produto?.fornecedorId) {
+    if (produto.fornecedorId) {
       const ids = (await db.collection("produtos").find({ fornecedorId: produto.fornecedorId }, { projection: { _id: 1 } }).toArray()).map(p => p._id);
       const notas = (await db.collection("avaliacoes").find({ produtoId: { $in: ids } }, { projection: { nota: 1 } }).toArray()).map(a => a.nota);
       await db.collection("fornecedores").updateOne({ _id: produto.fornecedorId }, { $set: { avaliacao: mediaNotas(notas), totalAvaliacoes: notas.length } });

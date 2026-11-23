@@ -1,6 +1,6 @@
 // Gabriel RA: 25004669
 import dns from "node:dns";
-import { MongoClient, ObjectId } from "mongodb";
+import { MongoClient } from "mongodb";
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
@@ -72,25 +72,8 @@ export async function connectDatabase() {
     }
   }
 
-  // Remove cotacoes temporarias de seed ou de demonstracao na inicializacao
-  await database.collection("cotacoes").deleteMany({
-    $or: [
-      { modelo: true },
-      { seed: true },
-      {
-        "propostas.fornecedorId": {
-          $in: [
-            new ObjectId("a10000000000000000000001"),
-            new ObjectId("a10000000000000000000002"),
-            new ObjectId("a10000000000000000000003"),
-            new ObjectId("a10000000000000000000004"),
-            new ObjectId("a10000000000000000000005")
-          ]
-        }
-      }
-    ]
-  });
-
+  // Nenhum dado e apagado na inicializacao: as cotacoes de exemplo ficam por conta do `npm run seed`
+  // e as cotacoes reais dos produtores nunca devem sumir quando alguem reinicia o servidor.
   await database.command({ ping: 1 });
 
   console.log("MongoDB conectado com sucesso.");

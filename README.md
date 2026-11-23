@@ -174,14 +174,14 @@ Essa priorização poderá ser revisada de acordo com requisitos técnicos, vali
 
 ## 8. Tecnologias
 
-A arquitetura inicialmente proposta durante a etapa de ideação considera as seguintes tecnologias:
+A arquitetura do projeto usa as seguintes tecnologias:
 
-| Tecnologia | Aplicação prevista |
+| Tecnologia | Aplicação |
 |---|---|
-| Java | Desenvolvimento do servidor (nao desenvolver sera feito depois do preojeto pronto) |
-| MongoDB | Persistência de dados em banco NoSQL |
-| HTML | Estruturação da interface web |
-| JavaScript | Desenvolvimento do back-end |
+| Java (sockets) | Servidor de cálculo do pedido, na porta 4000: soma subtotal e frete e divide o total em parcelas. O Node consulta esse servidor e, se ele estiver desligado, faz a mesma conta sozinho. |
+| Node.js + Express | Back-end e API REST |
+| MongoDB (Atlas) | Persistência de dados em banco NoSQL |
+| HTML, CSS e JavaScript | Interface web |
 
 A definição da stack tecnológica poderá ser revisada conforme a evolução dos requisitos e as necessidades técnicas identificadas durante o desenvolvimento.
 
@@ -236,7 +236,78 @@ O Projeto Integrador IV dá continuidade à proposta, direcionando o trabalho pa
 
 ---
 
-## 13. Status do Projeto
+## 13. Como Executar
+
+### Pré-requisitos
+
+- Node.js 22 ou mais novo;
+- Java (JDK) 21 ou mais novo, para o servidor de cálculo;
+- acesso ao banco MongoDB Atlas do grupo.
+
+### Configuração
+
+Crie o arquivo `.env` na raiz do projeto:
+
+```env
+MONGODB_URI=<endereço do MongoDB Atlas>
+SESSION_SECRET=<texto longo e aleatório>
+```
+
+Opcionais: `PORT` (padrão 3000) e `APP_URL` (usado no link de recuperação de senha).
+
+### Passos
+
+```bash
+npm install
+npm run seed     # opcional: carrega produtos, fornecedores, laudos e contas de exemplo
+npm run dev      # site em http://localhost:3000
+```
+
+Contas de exemplo (criadas pelo `npm run seed`, senha `Demo@12345`): `demo.produtor@agrorecursos.com` e `demo.fornecedor@agrorecursos.com`.
+
+> O banco é compartilhado pelo grupo. Evite rodar `npm run seed` sem avisar a equipe.
+
+### Servidor Java (opcional)
+
+```bash
+npm run java:servidor    # sobe o servidor na porta 4000; digite "desativar" para encerrar
+```
+
+Com o servidor ligado, o total do pedido é calculado por ele (visível no log "Calculando pedido"). Sem ele, o site funciona do mesmo jeito.
+
+Se alterar os arquivos `.java`, recompile dentro de cada pasta (`servidor-java/Cliente` e `servidor-java/Servidor`) com:
+
+```bash
+javac --release 21 *.java
+```
+
+O `--release 21` mantém os `.class` compatíveis com qualquer Java do 21 em diante; sem ele, quem tem um Java mais antigo recebe `UnsupportedClassVersionError` e o cálculo cai no Node sem aviso.
+
+### Testes
+
+```bash
+npm test         # testes automáticos (não alteram o banco)
+npm run smoke    # percorre os fluxos com o site no ar; usa as contas de exemplo e grava dados no banco
+```
+
+Os testes do servidor Java estão em `tests/java` (veja o `README.md` da pasta).
+
+### Documentação técnica
+
+- [Dicionário de dados](docs/dicionario-de-dados.md)
+- [Modelo de dados](docs/modelo-de-dados.md)
+
+### Principais regras do sistema
+
+- O login só abre a conta cuja senha foi conferida; o mesmo e-mail pode ter uma conta de produtor e outra de fornecedor.
+- O pedido só é aceito se houver estoque; a baixa é feita na compra e devolvida quando o fornecedor cancela os seus itens.
+- Cada fornecedor muda o status apenas dos próprios itens do pedido.
+- O fornecedor não pode avaliar o próprio produto.
+- Ao iniciar, o servidor não apaga dados do banco.
+
+---
+
+## 14. Status do Projeto
 
 **Em desenvolvimento.**
 

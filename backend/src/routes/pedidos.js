@@ -9,6 +9,7 @@ import { proximoNumero } from "../utils/cotacoes.js";
 import { auditar } from "../utils/auditoria.js";
 import { calcularPedidoNoServidorJava } from "../utils/calculos.js";
 import { calcularFrete } from "../utils/frete.js";
+import { devolverEstoque, reservarEstoque, statusDoPedido } from "../utils/pedidos.js";
 import { METODOS_PAGAMENTO, arredondar, idValido, texto } from "../utils/validacao.js";
 
 const router = Router();
@@ -65,15 +66,27 @@ router.post("/", exigirTipo("produtor"), async (req, res, next) => {
     }).toArray();
     if (produtos.length !== quantidades.size) return res.status(400).json({ message: "Um ou mais produtos não estão mais disponíveis." });
 
+    const semEstoque = produtos.find(p => typeof p.estoque === "number" && p.estoque < quantidades.get(String(p._id)));
+    if (semEstoque) {
+      return res.status(409).json({ message: `Estoque insuficiente para "${semEstoque.nome}" (disponível: ${semEstoque.estoque}).` });
+    }
+
+    // cada item guarda o próprio status, para cada fornecedor acompanhar só a sua parte do pedido
     const itens = produtos.map(p => {
       const quantidade = quantidades.get(String(p._id));
       return {
         produtoId: p._id, fornecedorId: p.fornecedorId, nome: p.nome, preco: p.preco, quantidade,
-        subtotal: arredondar(p.preco * quantidade)
+        subtotal: arredondar(p.preco * quantidade), status: "criado"
       };
     });
     const { subtotal, total, valorParcelas } = await calcularPedidoNoServidorJava(itens, frete.valor, parcelas);
     const numero = await proximoNumero("pedido");
+
+    // baixa o estoque de forma atômica antes de gravar o pedido (dois compradores não levam a mesma unidade)
+    const reserva = await reservarEstoque(db, itens, new Map(produtos.map(p => [String(p._id), p])));
+    if (reserva.falhou) {
+      return res.status(409).json({ message: `Estoque insuficiente para "${reserva.falhou.nome}". Atualize o carrinho e tente de novo.` });
+    }
 
     const pedido = {
       numero: "PED" + String(numero).padStart(6, "0"),
@@ -84,7 +97,13 @@ router.post("/", exigirTipo("produtor"), async (req, res, next) => {
       status: "criado",
       criadoEm: new Date()
     };
-    const { insertedId } = await db.collection("pedidos").insertOne(pedido);
+    let insertedId;
+    try {
+      ({ insertedId } = await db.collection("pedidos").insertOne(pedido));
+    } catch (erro) {
+      await devolverEstoque(db, reserva.feitos);
+      throw erro;
+    }
 
     try {
       const perfil = await db.collection("profiles").findOne({ userId: req.usuario.id });
@@ -144,7 +163,6 @@ router.post("/", exigirTipo("produtor"), async (req, res, next) => {
     } catch {}
 
     await auditar(req, { acao: "pedido.criado", entidade: "pedido", entidadeId: insertedId, detalhes: { numero: pedido.numero, total } });
-    await Promise.all(itens.map(i => db.collection("produtos").updateOne({ _id: i.produtoId }, { $inc: { vendidos: i.quantidade } })));
 
     res.status(201).json({ message: "Pedido registrado com sucesso!", pedido: formatar({ ...pedido, _id: insertedId }) });
   } catch (error) {
@@ -173,7 +191,8 @@ router.get("/vendas", exigirTipo("fornecedor"), async (req, res, next) => {
       itens: pedidos.map(p => {
         const meus = p.itens.filter(i => String(i.fornecedorId) === String(fornecedor._id));
         return {
-          id: String(p._id), numero: p.numero, status: p.status, criadoEm: p.criadoEm,
+          // o fornecedor vê o status dos próprios itens (pedidos antigos usam o status do pedido)
+          id: String(p._id), numero: p.numero, status: meus[0]?.status ?? p.status, criadoEm: p.criadoEm,
           cidade: p.entrega.cidade, estado: p.entrega.estado,
           itens: meus.map(i => ({ produtoId: String(i.produtoId), nome: i.nome, preco: i.preco, quantidade: i.quantidade, subtotal: i.subtotal })),
           total: arredondar(meus.reduce((soma, i) => soma + i.subtotal, 0))
@@ -201,19 +220,36 @@ router.patch("/:id/status", exigirTipo("fornecedor"), async (req, res, next) => 
     if (!idValido(req.params.id)) return res.status(404).json({ message: "Pedido não encontrado." });
     const novo = String(req.body.status ?? "");
     const fornecedor = await fornecedorDoUsuario(req.usuario);
-    const col = getDatabase().collection("pedidos");
+    const db = getDatabase();
+    const col = db.collection("pedidos");
     const pedido = await col.findOne({ _id: new ObjectId(req.params.id), "itens.fornecedorId": fornecedor._id });
     if (!pedido) return res.status(404).json({ message: "Pedido não encontrado." });
-    if (!(TRANSICOES[pedido.status] ?? []).includes(novo)) {
+
+    // o fornecedor só mexe nos próprios itens; os de outros fornecedores não mudam
+    const meusItens = pedido.itens.filter(i => String(i.fornecedorId) === String(fornecedor._id));
+    const atual = meusItens[0].status ?? pedido.status;
+    if (!(TRANSICOES[atual] ?? []).includes(novo)) {
       return res.status(409).json({ message: "Mudança de status não permitida para este pedido." });
     }
 
-    const alteracao = { status: novo, atualizadoEm: new Date() };
+    // itens antigos de outros fornecedores, sem status próprio, herdam o status que o pedido tinha
+    await col.updateOne(
+      { _id: pedido._id },
+      { $set: { "itens.$[meus].status": novo, "itens.$[outros].status": pedido.status, atualizadoEm: new Date() } },
+      { arrayFilters: [{ "meus.fornecedorId": fornecedor._id }, { "outros.fornecedorId": { $ne: fornecedor._id }, "outros.status": { $exists: false } }] }
+    );
+
+    // o pedido passa a ter o status do item menos adiantado; só fica cancelado se todos os itens foram cancelados
+    const atualizado = await col.findOne({ _id: pedido._id });
+    const statusPedido = statusDoPedido(atualizado.itens, pedido.status);
+    const alteracao = { status: statusPedido };
     if (novo === "pago") alteracao["pagamento.status"] = "confirmado";
-    if (novo === "cancelado") alteracao["pagamento.status"] = "cancelado";
+    if (statusPedido === "cancelado") alteracao["pagamento.status"] = "cancelado";
     await col.updateOne({ _id: pedido._id }, { $set: alteracao });
-    await auditar(req, { acao: "pedido.status", entidade: "pedido", entidadeId: pedido._id, detalhes: { de: pedido.status, para: novo } });
-    res.json({ message: "Status atualizado.", status: novo });
+
+    if (novo === "cancelado") await devolverEstoque(db, meusItens);
+    await auditar(req, { acao: "pedido.status", entidade: "pedido", entidadeId: pedido._id, detalhes: { de: atual, para: novo } });
+    res.json({ message: "Status atualizado.", status: novo, statusPedido });
   } catch (error) {
     next(error);
   }

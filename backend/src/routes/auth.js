@@ -6,6 +6,7 @@ import { ObjectId } from "mongodb";
 import { getDatabase } from "../config/database.js";
 import { auditar } from "../utils/auditoria.js";
 import { CATEGORIAS, validarCpfCnpj } from "../utils/validacao.js";
+import { selecionarConta } from "../utils/contas.js";
 
 const router = Router();
 const normalizeEmail = email => String(email ?? "").trim().toLowerCase();
@@ -159,26 +160,21 @@ router.post("/login", async (req, res, next) => {
       senhaOk: await bcrypt.compare(password, c.user.passwordHash)
     })));
 
-    if (!checados.some(c => c.senhaOk)) {
-      return res.status(401).json({ message: "E-mail ou senha incorretos." });
-    }
+    // Só contas cuja senha conferiu entram na escolha: nunca se abre uma conta com a senha de outra
+    const selecao = selecionarConta(checados, chosenType);
+    if (selecao.negado) return res.status(401).json({ message: "E-mail ou senha incorretos." });
 
-    if (candidatos.length > 1 && !chosenType) {
+    if (selecao.opcoes) {
       return res.json({
         chooseAccountType: true,
-        accounts: candidatos.map(c => ({
+        accounts: selecao.opcoes.map(c => ({
           accountType: c.profile.accountType,
           name: c.profile.tradeName || c.profile.companyName || c.profile.name
         }))
       });
     }
 
-    const escolhido = chosenType
-      ? (checados.find(c => c.profile.accountType === chosenType && c.senhaOk) || candidatos.find(c => c.profile.accountType === chosenType))
-      : (checados.find(c => c.senhaOk) || candidatos[0]);
-
-    if (!escolhido) return res.status(401).json({ message: "Conta selecionada não encontrada." });
-    const { user, profile } = escolhido;
+    const { user, profile } = selecao.escolhido;
 
     req.session.regenerate(sessionError => {
       if (sessionError) return next(sessionError);
@@ -355,16 +351,23 @@ router.post("/forgot-password", async (req, res, next) => {
     const resposta = { message: "Se o e-mail estiver cadastrado, enviaremos um link de recuperação." };
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return res.json(resposta);
 
-    const db = getDatabase(), user = await db.collection("users").findOne({ email });
-    if (user && user.status === "active") {
+    // O mesmo e-mail pode ter conta de produtor e de fornecedor: gera um link para cada conta ativa
+    const db = getDatabase();
+    const usuarios = await db.collection("users").find({ email, status: "active" }).toArray();
+    const perfis = usuarios.length
+      ? await db.collection("profiles").find({ userId: { $in: usuarios.map(u => u._id) } }, { projection: { userId: 1, accountType: 1 } }).toArray()
+      : [];
+    const tipos = new Map(perfis.map(p => [String(p.userId), p.accountType]));
+    const base = process.env.APP_URL || `http://localhost:${process.env.PORT || 3000}`;
+
+    for (const user of usuarios) {
       const token = crypto.randomBytes(32).toString("hex");
       const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
       await db.collection("password_resets").deleteMany({ userId: user._id });
       await db.collection("password_resets").insertOne({
         userId: user._id, tokenHash, createdAt: new Date(), expiresAt: new Date(Date.now() + 60 * 60 * 1000)
       });
-      const base = process.env.APP_URL || `http://localhost:${process.env.PORT || 3000}`;
-      console.log(`Link de recuperação para ${email}: ${base}/redefinir-senha.html?token=${token}`);
+      console.log(`Link de recuperação para ${email} (conta ${tipos.get(String(user._id)) ?? "?"}): ${base}/redefinir-senha.html?token=${token}`);
     }
     return res.json(resposta);
   } catch (error) { next(error); }

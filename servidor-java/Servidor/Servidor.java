@@ -49,8 +49,24 @@ public class Servidor
             catch (Exception erro)
             {}
 
+            // Sem teclado (entrada fechada, servidor em segundo plano): nao ha comando para ler.
+            // Repetir o laco sem pausa consumiria CPU e inundaria o console, entao o servidor
+            // continua atendendo clientes e so um sinal de encerramento (Ctrl+C) o desliga.
             if (comando == null)
-                continue;
+            {
+                System.out.println ("Entrada do teclado indisponivel; o servidor segue ativo.");
+                for(;;)
+                {
+                    try
+                    {
+                        Thread.sleep (60000);
+                    }
+                    catch (InterruptedException erro)
+                    {
+                        return;
+                    }
+                }
+            }
 
             // Envia comunicado de desligamento para todos os clientes conectados antes de encerrar o servidor
             if (comando.toLowerCase().equals("desativar"))
