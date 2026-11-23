@@ -1,3 +1,4 @@
+// Tom RA: 25015528
 import test from "node:test";
 import assert from "node:assert/strict";
 import { calcularComissao, credenciaisValidas, resumirVendas, TAXA_COMISSAO } from "../backend/src/utils/admin.js";

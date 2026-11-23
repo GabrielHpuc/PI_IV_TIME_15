@@ -1,3 +1,4 @@
+// Tom RA: 25015528
 // Painel do administrador (demonstração)
 const telaLogin = document.querySelector("#tela-login");
 const telaPainel = document.querySelector("#tela-painel");

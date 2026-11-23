@@ -1,3 +1,4 @@
+// Tom RA: 25015528
 import crypto from "node:crypto";
 import { arredondar } from "./validacao.js";
 
